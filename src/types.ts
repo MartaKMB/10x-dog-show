@@ -414,9 +414,7 @@ export interface CreateEvaluationDto {
   is_best_in_show?: boolean;
 }
 
-export interface EvaluationResponseDto extends Evaluation {
-  // Extends Evaluation with no additional fields for basic response
-}
+export type EvaluationResponseDto = Evaluation;
 
 // =============================================================================
 // DICTIONARY DTOs
