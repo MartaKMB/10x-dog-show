@@ -58,10 +58,9 @@ System 10x Dog Show wykorzystuje **unified interface approach** z jednym wspóln
 - **User Stories**: Wszystkie - punkt wejścia
 - **Kluczowe informacje**:
   - Lista ostatnich wystaw (role-filtered)
-  - Statystyki użytkownika (liczba opisów, wystaw)
   - Quick actions (nowa wystawa, nowy opis)
   - Nadchodzące deadlines i notifications
-- **Komponenty**: `ShowCard`, `StatsWidget`, `QuickActions`, `NotificationCenter`
+- **Komponenty**: `ShowCard`, `QuickActions`, `NotificationCenter`
 - **UX/Dostępność**: Card-based layout, keyboard shortcuts
 - **Bezpieczeństwo**: Role-based data filtering, privacy toggle respect
 
