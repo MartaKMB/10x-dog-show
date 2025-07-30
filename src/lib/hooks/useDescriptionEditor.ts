@@ -1,10 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import type {
   DescriptionResponseDto,
-  CreateDescriptionDto,
-  UpdateDescriptionDto,
   CreateEvaluationDto,
-  EvaluationResponseDto,
   DescriptionVersionDto,
 } from "../../types";
 
@@ -36,7 +33,6 @@ interface HistoryState {
 
 export function useDescriptionEditor({
   descriptionId,
-  dogId,
   showId,
   initialData,
 }: UseDescriptionEditorProps) {
@@ -167,6 +163,7 @@ export function useDescriptionEditor({
         ...prev,
         isLoading: false,
       }));
+      // eslint-disable-next-line no-console
       console.error("Error loading versions:", error);
     }
   }, [descriptionId]);
@@ -197,6 +194,7 @@ export function useDescriptionEditor({
         });
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Error checking permissions:", error);
     }
   }, [showId]);
