@@ -26,12 +26,12 @@ export function mountDescriptionEditor() {
   const root = createRoot(container);
   
   root.render(
-    <DescriptionEditor
-      descriptionId={descriptionId || undefined}
-      showId={showId || undefined}
-      dogId={dogId || undefined}
-      mode={mode}
-    />
+    React.createElement(DescriptionEditor, {
+      descriptionId: descriptionId || undefined,
+      showId: showId || undefined,
+      dogId: dogId || undefined,
+      mode: mode
+    })
   );
 }
 

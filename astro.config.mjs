@@ -13,6 +13,10 @@ export default defineConfig({
   server: { port: 3000 },
   vite: {
     plugins: [tailwindcss()],
+    esbuild: {
+      jsx: 'automatic',
+      jsxImportSource: 'react'
+    }
   },
   adapter: node({
     mode: "standalone",

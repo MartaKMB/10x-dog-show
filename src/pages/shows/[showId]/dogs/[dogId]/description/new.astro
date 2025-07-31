@@ -6,6 +6,8 @@ const { showId, dogId } = Astro.params;
 if (!showId || !dogId) {
   return Astro.redirect('/404');
 }
+
+import { DescriptionEditor } from '@/components/DescriptionEditor';
 ---
 
 <!DOCTYPE html>
@@ -18,8 +20,12 @@ if (!showId || !dogId) {
 </head>
 <body>
   <div class="container mx-auto px-4 py-8">
-    <div id="description-editor-root" data-show-id={showId} data-dog-id={dogId} data-mode="create"></div>
+    <DescriptionEditor 
+      client:load
+      showId={showId} 
+      dogId={dogId} 
+      mode="create"
+    />
   </div>
-  <script type="module" src="/src/scripts/mountDescriptionEditor.tsx"></script>
 </body>
 </html>

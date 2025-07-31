@@ -46,6 +46,15 @@ interface OfflineState {
   } | null;
 }
 
+// Stan animacji
+interface AnimationState {
+  isVisible: boolean;
+  isSaving: boolean;
+  showSuccess: boolean;
+  showError: boolean;
+  fadeIn: boolean;
+}
+
 export function DescriptionEditor({
   descriptionId,
   showId,
@@ -73,6 +82,23 @@ export function DescriptionEditor({
     draftData: null,
   });
 
+  // Stan animacji
+  const [animationState, setAnimationState] = useState<AnimationState>({
+    isVisible: false,
+    isSaving: false,
+    showSuccess: false,
+    showError: false,
+    fadeIn: false,
+  });
+
+  // Animacja wejścia
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAnimationState((prev) => ({ ...prev, fadeIn: true }));
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
   // Pobieranie danych początkowych
   useEffect(() => {
     const loadInitialData = async () => {
@@ -94,6 +120,11 @@ export function DescriptionEditor({
             error: null,
             initialData: data,
           });
+
+          // Animacja po załadowaniu danych
+          setTimeout(() => {
+            setAnimationState((prev) => ({ ...prev, isVisible: true }));
+          }, 200);
         } catch (error) {
           setApiState({
             isLoading: false,
@@ -204,7 +235,7 @@ export function DescriptionEditor({
   }, [descriptionId, showId, dogId]);
 
   // Funkcje obsługi draftu
-  const saveDraft = () => {
+  const saveDraft = useCallback(() => {
     const draftKey = `description-draft-${descriptionId || `${showId}-${dogId}`}`;
     const draftData = {
       formState,
@@ -212,14 +243,14 @@ export function DescriptionEditor({
     };
     localStorage.setItem(draftKey, JSON.stringify(draftData));
     setOfflineState((prev) => ({ ...prev, hasDraft: true, draftData }));
-  };
+  }, [descriptionId, showId, dogId, formState]);
 
-  const restoreDraft = () => {
+  const restoreDraft = useCallback(() => {
     if (offlineState.draftData) {
       updateFormState(offlineState.draftData.formState);
       setSavingState(false);
     }
-  };
+  }, [offlineState.draftData, updateFormState, setSavingState]);
 
   // Funkcja do generowania diff
   const generateDiff = (
@@ -258,130 +289,177 @@ export function DescriptionEditor({
   };
 
   // Funkcje API z obsługą błędów
-  const saveDescription = async (finalize = false) => {
-    if (!permissions.canEdit && !finalize) return;
+  const saveDescription = useCallback(
+    async (finalize = false) => {
+      if (!permissions.canEdit && !finalize) return;
 
-    try {
-      setSavingState(true);
+      try {
+        setSavingState(true);
 
-      let response: Response;
+        let response: Response;
 
-      if (mode === "create") {
-        // Tworzenie nowego opisu
-        const createData: CreateDescriptionDto = {
-          show_id: showId || "",
-          dog_id: dogId || "",
-          judge_id: "judge-id", // TODO: pobrać z kontekstu użytkownika
-          content_pl: formState.content_pl || undefined,
-          content_en: formState.content_en || undefined,
-        };
+        if (mode === "create") {
+          // Tworzenie nowego opisu
+          const createData: CreateDescriptionDto = {
+            show_id: showId || "",
+            dog_id: dogId || "",
+            judge_id: "judge-id", // TODO: pobrać z kontekstu użytkownika
+            content_pl: formState.content_pl || undefined,
+            content_en: formState.content_en || undefined,
+          };
 
-        response = await fetch("/api/descriptions", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(createData),
-        });
-      } else {
-        // Aktualizacja istniejącego opisu
-        const updateData: UpdateDescriptionDto = {
-          content_pl: formState.content_pl || undefined,
-          content_en: formState.content_en || undefined,
-        };
-
-        response = await fetch(`/api/descriptions/${descriptionId}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(updateData),
-        });
-      }
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        const apiError = ApiErrorHandler.parseError(response, errorData);
-
-        // Obsługa konkretnych błędów
-        if (ApiErrorHandler.isConflictError(apiError)) {
-          // Przekieruj do edycji istniejącego opisu
-          window.location.href = `/descriptions/${errorData.existing_id}/edit`;
-          return;
-        }
-
-        if (ApiErrorHandler.isPermissionError(apiError)) {
-          // Blokada edycji - sprawdź uprawnienia ponownie
-          await checkPermissions();
-          setError(ApiErrorHandler.getErrorMessage(apiError));
-          return;
-        }
-
-        if (ApiErrorHandler.isShowCompletedError(apiError)) {
-          // Wystawa zakończona - zaktualizuj status
-          setPermissions((prev) => ({
-            ...prev,
-            canEdit: false,
-            canFinalize: false,
-          }));
-          setError(ApiErrorHandler.getErrorMessage(apiError));
-          return;
-        }
-
-        throw new Error(ApiErrorHandler.getErrorMessage(apiError));
-      }
-
-      const savedDescription: DescriptionResponseDto = await response.json();
-
-      // Jeśli finalizujemy, wywołaj endpoint finalizacji
-      if (finalize) {
-        const finalizeResponse = await fetch(
-          `/api/descriptions/${savedDescription.id}/finalize`,
-          {
-            method: "PATCH",
-          },
-        );
-
-        if (!finalizeResponse.ok) {
-          const finalizeErrorData = await finalizeResponse.json();
-          const finalizeApiError = ApiErrorHandler.parseError(
-            finalizeResponse,
-            finalizeErrorData,
-          );
-          throw new Error(ApiErrorHandler.getErrorMessage(finalizeApiError));
-        }
-      }
-
-      // Zapisz ocenę jeśli istnieje
-      if (formState.evaluation.grade || formState.evaluation.baby_puppy_grade) {
-        const evaluationData: CreateEvaluationDto = formState.evaluation;
-
-        const evaluationResponse = await fetch(
-          `/api/descriptions/${savedDescription.id}/evaluations`,
-          {
+          response = await fetch("/api/descriptions", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(evaluationData),
-          },
-        );
+            body: JSON.stringify(createData),
+          });
+        } else {
+          // Aktualizacja istniejącego opisu
+          const updateData: UpdateDescriptionDto = {
+            content_pl: formState.content_pl || undefined,
+            content_en: formState.content_en || undefined,
+          };
 
-        if (!evaluationResponse.ok) {
-          const evalErrorData = await evaluationResponse.json();
-          ApiErrorHandler.parseError(evaluationResponse, evalErrorData);
-          // Błąd podczas zapisywania oceny - logujemy ale nie przerywamy
+          response = await fetch(`/api/descriptions/${descriptionId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updateData),
+          });
         }
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          const apiError = ApiErrorHandler.parseError(response, errorData);
+
+          // Obsługa konkretnych błędów
+          if (ApiErrorHandler.isConflictError(apiError)) {
+            // Przekieruj do edycji istniejącego opisu
+            window.location.href = `/descriptions/${errorData.existing_id}/edit`;
+            return;
+          }
+
+          if (ApiErrorHandler.isPermissionError(apiError)) {
+            // Blokada edycji - sprawdź uprawnienia ponownie
+            await checkPermissions();
+            setError(ApiErrorHandler.getErrorMessage(apiError));
+            return;
+          }
+
+          if (ApiErrorHandler.isShowCompletedError(apiError)) {
+            // Wystawa zakończona - zaktualizuj status
+            setPermissions((prev) => ({
+              ...prev,
+              canEdit: false,
+              canFinalize: false,
+            }));
+            setError(ApiErrorHandler.getErrorMessage(apiError));
+            return;
+          }
+
+          throw new Error(ApiErrorHandler.getErrorMessage(apiError));
+        }
+
+        const savedDescription: DescriptionResponseDto = await response.json();
+
+        // Jeśli finalizujemy, wywołaj endpoint finalizacji
+        if (finalize) {
+          const finalizeResponse = await fetch(
+            `/api/descriptions/${savedDescription.id}/finalize`,
+            {
+              method: "PATCH",
+            },
+          );
+
+          if (!finalizeResponse.ok) {
+            const finalizeErrorData = await finalizeResponse.json();
+            const finalizeApiError = ApiErrorHandler.parseError(
+              finalizeResponse,
+              finalizeErrorData,
+            );
+            throw new Error(ApiErrorHandler.getErrorMessage(finalizeApiError));
+          }
+        }
+
+        // Animacja sukcesu
+        setAnimationState((prev) => ({
+          ...prev,
+          isSaving: false,
+          showSuccess: true,
+        }));
+
+        setTimeout(() => {
+          setAnimationState((prev) => ({ ...prev, showSuccess: false }));
+        }, 3000);
+
+        // Zapisz ocenę jeśli istnieje
+        if (
+          formState.evaluation.grade ||
+          formState.evaluation.baby_puppy_grade
+        ) {
+          const evaluationData: CreateEvaluationDto = formState.evaluation;
+
+          const evaluationResponse = await fetch(
+            `/api/descriptions/${savedDescription.id}/evaluations`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(evaluationData),
+            },
+          );
+
+          if (!evaluationResponse.ok) {
+            const evalErrorData = await evaluationResponse.json();
+            ApiErrorHandler.parseError(evaluationResponse, evalErrorData);
+            // Błąd podczas zapisywania oceny - logujemy ale nie przerywamy
+          }
+        }
+
+        updateSaveState(new Date().toISOString());
+
+        // Przekieruj do trybu edycji jeśli był w trybie tworzenia
+        if (mode === "create") {
+          window.location.href = `/descriptions/${savedDescription.id}/edit`;
+        }
+      } catch (error) {
+        setError(error instanceof Error ? error.message : "Nieznany błąd");
+
+        // Animacja błędu
+        setAnimationState((prev) => ({
+          ...prev,
+          isSaving: false,
+          showError: true,
+        }));
+
+        setTimeout(() => {
+          setAnimationState((prev) => ({ ...prev, showError: false }));
+        }, 5000);
       }
+    },
+    [
+      permissions.canEdit,
+      mode,
+      descriptionId,
+      showId,
+      dogId,
+      formState,
+      setSavingState,
+      setError,
+      updateSaveState,
+      checkPermissions,
+      setPermissions,
+      setAnimationState,
+    ],
+  );
 
-      updateSaveState(new Date().toISOString());
-
-      // Przekieruj do trybu edycji jeśli był w trybie tworzenia
-      if (mode === "create") {
-        window.location.href = `/descriptions/${savedDescription.id}/edit`;
-      }
-    } catch (error) {
-      setError(error instanceof Error ? error.message : "Nieznany błąd");
-    }
-  };
-
-  const handleSave = () => saveDescription(false);
-  const handleFinalize = () => saveDescription(true);
-  const handleCancel = () => {
+  const handleSave = useCallback(
+    () => saveDescription(false),
+    [saveDescription],
+  );
+  const handleFinalize = useCallback(
+    () => saveDescription(true),
+    [saveDescription],
+  );
+  const handleCancel = useCallback(() => {
     if (permissions.canEdit) {
       if (confirm("Masz niezapisane zmiany. Czy na pewno chcesz anulować?")) {
         window.history.back();
@@ -389,7 +467,60 @@ export function DescriptionEditor({
     } else {
       window.history.back();
     }
-  };
+  }, [permissions.canEdit]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Ctrl/Cmd + S - Zapisz
+      if ((event.ctrlKey || event.metaKey) && event.key === "s") {
+        event.preventDefault();
+        if (permissions.canEdit && !saveState.isSaving) {
+          handleSave();
+        }
+      }
+
+      // Ctrl/Cmd + Enter - Finalizuj
+      if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+        event.preventDefault();
+        if (
+          permissions.canEdit &&
+          permissions.canFinalize &&
+          !saveState.isSaving
+        ) {
+          handleFinalize();
+        }
+      }
+
+      // Escape - Anuluj
+      if (event.key === "Escape") {
+        event.preventDefault();
+        handleCancel();
+      }
+
+      // Ctrl/Cmd + Z - Przywróć draft (tylko w trybie offline)
+      if (
+        (event.ctrlKey || event.metaKey) &&
+        event.key === "z" &&
+        offlineState.hasDraft
+      ) {
+        event.preventDefault();
+        restoreDraft();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [
+    permissions.canEdit,
+    permissions.canFinalize,
+    saveState.isSaving,
+    offlineState.hasDraft,
+    handleSave,
+    handleFinalize,
+    handleCancel,
+    restoreDraft,
+  ]);
 
   // Inicjalizacja
   useEffect(() => {
@@ -427,7 +558,13 @@ export function DescriptionEditor({
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div
+      className={`max-w-4xl mx-auto px-4 sm:px-6 space-y-4 sm:space-y-6 transition-all duration-500 ${
+        animationState.fadeIn
+          ? "opacity-100 translate-y-0"
+          : "opacity-0 translate-y-4"
+      }`}
+    >
       {/* OfflineDetector */}
       <OfflineDetector
         isOffline={offlineState.isOffline}
@@ -437,13 +574,19 @@ export function DescriptionEditor({
       />
 
       {/* Header */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">
+      <div
+        className={`bg-white border border-gray-200 rounded-lg p-4 sm:p-6 transition-all duration-300 ${
+          animationState.isVisible ? "animate-fade-in-up" : "opacity-0"
+        }`}
+      >
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">
           {mode === "create" ? "Nowy opis psa" : "Edycja opisu psa"}
         </h1>
         {/* Status wystawy */}
-        <div className="flex items-center gap-2 mb-4">
-          <span className="text-sm text-gray-600">Status wystawy:</span>
+        <div className="flex items-center gap-2 mb-3 sm:mb-4">
+          <span className="text-xs sm:text-sm text-gray-600">
+            Status wystawy:
+          </span>
           <span
             className={`px-2 py-1 text-xs font-medium rounded ${
               permissions.showStatus !== "in_progress"
@@ -458,7 +601,7 @@ export function DescriptionEditor({
         </div>
         {/* Informacje o psie i wystawie */}
         {apiState.initialData && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 text-xs sm:text-sm">
             <div>
               <span className="font-medium">Pies:</span>{" "}
               {apiState.initialData.dog.name}
@@ -472,8 +615,14 @@ export function DescriptionEditor({
       </div>
 
       {/* Edytor treści */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h2 className="text-lg font-semibold mb-4">Treść opisu</h2>
+      <div
+        className={`bg-white border border-gray-200 rounded-lg p-4 sm:p-6 transition-all duration-300 delay-100 ${
+          animationState.isVisible ? "animate-fade-in-up" : "opacity-0"
+        }`}
+      >
+        <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">
+          Treść opisu
+        </h2>
         <RichTextEditor
           value={{
             content_pl: formState.content_pl,
@@ -488,8 +637,14 @@ export function DescriptionEditor({
       </div>
 
       {/* Formularz oceny */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h2 className="text-lg font-semibold mb-4">Ocena psa</h2>
+      <div
+        className={`bg-white border border-gray-200 rounded-lg p-4 sm:p-6 transition-all duration-300 delay-200 ${
+          animationState.isVisible ? "animate-fade-in-up" : "opacity-0"
+        }`}
+      >
+        <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">
+          Ocena psa
+        </h2>
         <EvaluationForm
           value={formState.evaluation}
           onChange={updateEvaluation}
@@ -501,8 +656,14 @@ export function DescriptionEditor({
 
       {/* Historia wersji */}
       {mode === "edit" && historyState.versions.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <h2 className="text-lg font-semibold mb-4">Historia wersji</h2>
+        <div
+          className={`bg-white border border-gray-200 rounded-lg p-4 sm:p-6 transition-all duration-300 delay-300 ${
+            animationState.isVisible ? "animate-fade-in-up" : "opacity-0"
+          }`}
+        >
+          <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">
+            Historia wersji
+          </h2>
           <ChangeHistory
             versions={historyState.versions}
             onSelect={selectVersion}
@@ -527,7 +688,11 @@ export function DescriptionEditor({
       )}
 
       {/* Przyciski akcji */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
+      <div
+        className={`bg-white border border-gray-200 rounded-lg p-4 sm:p-6 transition-all duration-300 delay-400 ${
+          animationState.isVisible ? "animate-fade-in-up" : "opacity-0"
+        }`}
+      >
         <ActionButtons
           onSave={handleSave}
           onFinalize={handleFinalize}
@@ -538,13 +703,21 @@ export function DescriptionEditor({
         />
         {/* Status zapisu */}
         {saveState.lastSaved && (
-          <div className="mt-3 text-sm text-gray-600">
+          <div
+            className={`mt-3 text-sm text-gray-600 transition-all duration-300 ${
+              animationState.showSuccess ? "animate-fade-in" : ""
+            }`}
+          >
             Ostatnio zapisano: {new Date(saveState.lastSaved).toLocaleString()}
           </div>
         )}
         {/* Błędy */}
         {saveState.error && (
-          <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+          <div
+            className={`mt-3 p-3 bg-red-50 border border-red-200 rounded-lg transition-all duration-300 ${
+              animationState.showError ? "animate-shake" : ""
+            }`}
+          >
             <p className="text-sm text-red-700">{saveState.error}</p>
           </div>
         )}
