@@ -318,7 +318,7 @@ async function handleCreateDescription(data: CreateDescriptionRequest) {
 
 ## Testing
 
-Szczegółowe instrukcje testowania znajdują się w `test-requests.md`. Obejmują one:
+Szczegółowe instrukcje testowania znajdują się w `test-descriptions-requests.md`. Obejmują one:
 
 - ✅ Pomyślne utworzenie opisu
 - ❌ Błędy walidacji
