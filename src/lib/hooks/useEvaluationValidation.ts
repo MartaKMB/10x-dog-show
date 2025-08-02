@@ -3,8 +3,6 @@ import type {
   DogClass,
   EvaluationGrade,
   BabyPuppyGrade,
-  TitleType,
-  Placement,
   CreateEvaluationDto,
 } from "../../types";
 
