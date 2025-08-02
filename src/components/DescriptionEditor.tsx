@@ -14,9 +14,15 @@ import { ActionButtons } from "./ui/ActionButtons";
 import { ChangeHistory } from "./ChangeHistory";
 import { SimpleDiffViewer } from "./SimpleDiffViewer";
 import { OfflineDetector } from "./OfflineDetector";
-import { ApiErrorHandler } from "../lib/services/errorHandler";
 import {
-  PermissionService,
+  parseError,
+  isConflictError,
+  isPermissionError,
+  isShowCompletedError,
+  getErrorMessage,
+} from "../lib/services/errorHandler";
+import {
+  checkDescriptionPermissions,
   type PermissionCheck,
 } from "../lib/services/permissionService";
 
@@ -67,12 +73,11 @@ export function DescriptionEditor({
     error: null,
     initialData: null,
   });
-
   // Stan uprawnień
   const [permissions, setPermissions] = useState<PermissionCheck>({
     canEdit: false,
     canFinalize: false,
-    showStatus: "unknown",
+    showStatus: "draft",
   });
 
   // Stan offline
@@ -176,12 +181,11 @@ export function DescriptionEditor({
       // TODO: pobrać userRole z kontekstu użytkownika
       const userRole = "secretary" as const;
 
-      const permissionCheck =
-        await PermissionService.checkDescriptionPermissions(
-          showId || "",
-          dogId || "",
-          userRole,
-        );
+      const permissionCheck = await checkDescriptionPermissions(
+        showId || "",
+        dogId || "",
+        userRole,
+      );
 
       setPermissions({
         canEdit: permissionCheck.canEdit,
@@ -329,34 +333,34 @@ export function DescriptionEditor({
 
         if (!response.ok) {
           const errorData = await response.json();
-          const apiError = ApiErrorHandler.parseError(response, errorData);
+          const apiError = parseError(response, errorData);
 
           // Obsługa konkretnych błędów
-          if (ApiErrorHandler.isConflictError(apiError)) {
+          if (isConflictError(apiError)) {
             // Przekieruj do edycji istniejącego opisu
             window.location.href = `/descriptions/${errorData.existing_id}/edit`;
             return;
           }
 
-          if (ApiErrorHandler.isPermissionError(apiError)) {
+          if (isPermissionError(apiError)) {
             // Blokada edycji - sprawdź uprawnienia ponownie
             await checkPermissions();
-            setError(ApiErrorHandler.getErrorMessage(apiError));
+            setError(getErrorMessage(apiError));
             return;
           }
 
-          if (ApiErrorHandler.isShowCompletedError(apiError)) {
+          if (isShowCompletedError(apiError)) {
             // Wystawa zakończona - zaktualizuj status
             setPermissions((prev) => ({
               ...prev,
               canEdit: false,
               canFinalize: false,
             }));
-            setError(ApiErrorHandler.getErrorMessage(apiError));
+            setError(getErrorMessage(apiError));
             return;
           }
 
-          throw new Error(ApiErrorHandler.getErrorMessage(apiError));
+          throw new Error(getErrorMessage(apiError));
         }
 
         const savedDescription: DescriptionResponseDto = await response.json();
@@ -372,11 +376,11 @@ export function DescriptionEditor({
 
           if (!finalizeResponse.ok) {
             const finalizeErrorData = await finalizeResponse.json();
-            const finalizeApiError = ApiErrorHandler.parseError(
+            const finalizeApiError = parseError(
               finalizeResponse,
               finalizeErrorData,
             );
-            throw new Error(ApiErrorHandler.getErrorMessage(finalizeApiError));
+            throw new Error(getErrorMessage(finalizeApiError));
           }
         }
 
@@ -409,7 +413,7 @@ export function DescriptionEditor({
 
           if (!evaluationResponse.ok) {
             const evalErrorData = await evaluationResponse.json();
-            ApiErrorHandler.parseError(evaluationResponse, evalErrorData);
+            parseError(evaluationResponse, evalErrorData);
             // Błąd podczas zapisywania oceny - logujemy ale nie przerywamy
           }
         }

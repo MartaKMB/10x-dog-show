@@ -373,9 +373,9 @@ create table audit.data_retention_schedule (
 -- 6. PERFORMANCE INDEXES
 -- =============================================================================
 
--- basic user indexes
-create index idx_users_email on auth.users(email) where deleted_at is null;
-create index idx_users_role on auth.users(role) where deleted_at is null;
+-- basic user indexes (commented out due to auth.users permissions)
+-- create index idx_users_email on auth.users(email) where deleted_at is null;
+-- create index idx_users_role on auth.users(role) where deleted_at is null;
 
 -- show-related indexes
 create index idx_shows_date on dog_shows.shows(show_date) where deleted_at is null;

@@ -187,6 +187,90 @@ export class ShowService {
     return newShow;
   }
 
+  async getShowById(id: string): Promise<any> {
+    const show = MOCK_DATA.shows.find((s) => s.id === id);
+    if (!show) {
+      throw new Error("NOT_FOUND: Show not found");
+    }
+    return this.formatResponse(show);
+  }
+
+  async update(id: string, data: any): Promise<any> {
+    const show = MOCK_DATA.shows.find((s) => s.id === id);
+    if (!show) {
+      throw new Error("NOT_FOUND: Show not found");
+    }
+
+    // Update show data
+    Object.assign(show, data, { updated_at: new Date().toISOString() });
+    return this.formatResponse(show);
+  }
+
+  async delete(id: string): Promise<void> {
+    const showIndex = MOCK_DATA.shows.findIndex((s) => s.id === id);
+    if (showIndex === -1) {
+      throw new Error("NOT_FOUND: Show not found");
+    }
+
+    MOCK_DATA.shows.splice(showIndex, 1);
+  }
+
+  async updateStatus(id: string, status: string): Promise<any> {
+    const show = MOCK_DATA.shows.find((s) => s.id === id);
+    if (!show) {
+      throw new Error("NOT_FOUND: Show not found");
+    }
+
+    show.status = status;
+    show.updated_at = new Date().toISOString();
+    return this.formatResponse(show);
+  }
+
+  async getRegistrations(): Promise<any[]> {
+    // Mock: Return empty array for now
+    return [];
+  }
+
+  async createRegistration(showId: string, data: any): Promise<any> {
+    // Mock: Create registration
+    const registration = {
+      id: crypto.randomUUID(),
+      show_id: showId,
+      dog_id: data.dog_id,
+      dog_class: data.dog_class,
+      registration_fee: data.registration_fee || null,
+      is_paid: false,
+      registered_at: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    return registration;
+  }
+
+  async updateRegistration(
+    showId: string,
+    registrationId: string,
+    data: any,
+  ): Promise<any> {
+    // Mock: Update registration
+    const registration = {
+      id: registrationId,
+      show_id: showId,
+      dog_id: "mock-dog-id",
+      dog_class: data.dog_class || "open",
+      registration_fee: 150.0,
+      is_paid: data.is_paid || false,
+      registered_at: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    return registration;
+  }
+
+  async deleteRegistration(): Promise<void> {
+    // Mock: Delete registration (no-op for now)
+  }
+
   private async formatResponse(
     show: Record<string, any>,
   ): Promise<ShowResponseDto> {

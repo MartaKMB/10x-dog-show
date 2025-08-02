@@ -85,7 +85,55 @@ export const showQuerySchema = z.object({
   limit: z.number().min(1).max(100).default(20),
 });
 
+// Schema for updating show status
+export const updateShowStatusSchema = z.object({
+  status: z.enum([
+    "draft",
+    "open_for_registration",
+    "registration_closed",
+    "in_progress",
+    "completed",
+    "cancelled",
+  ]),
+});
+
+// Schema for creating registrations
+export const createRegistrationSchema = z.object({
+  dog_id: uuidSchema,
+  dog_class: z.enum([
+    "baby",
+    "puppy",
+    "junior",
+    "intermediate",
+    "open",
+    "working",
+    "champion",
+    "veteran",
+  ]),
+  registration_fee: z.number().positive().optional(),
+});
+
+// Schema for updating registrations
+export const updateRegistrationSchema = z.object({
+  dog_class: z
+    .enum([
+      "baby",
+      "puppy",
+      "junior",
+      "intermediate",
+      "open",
+      "working",
+      "champion",
+      "veteran",
+    ])
+    .optional(),
+  is_paid: z.boolean().optional(),
+});
+
 // Type inference for validated data
 export type CreateShowInput = z.infer<typeof createShowSchema>;
 export type UpdateShowInput = z.infer<typeof updateShowSchema>;
 export type ShowQueryInput = z.infer<typeof showQuerySchema>;
+export type UpdateShowStatusInput = z.infer<typeof updateShowStatusSchema>;
+export type CreateRegistrationInput = z.infer<typeof createRegistrationSchema>;
+export type UpdateRegistrationInput = z.infer<typeof updateRegistrationSchema>;

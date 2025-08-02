@@ -14,9 +14,9 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
     esbuild: {
-      jsx: 'automatic',
-      jsxImportSource: 'react'
-    }
+      jsx: "automatic",
+      jsxImportSource: "react",
+    },
   },
   adapter: node({
     mode: "standalone",
