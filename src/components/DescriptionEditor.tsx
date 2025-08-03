@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
+import * as React from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useDescriptionEditor } from "../lib/hooks/useDescriptionEditor";
 import { useEvaluationValidation } from "../lib/hooks/useEvaluationValidation";
 import type {
@@ -14,6 +15,8 @@ import { ActionButtons } from "./ui/ActionButtons";
 import { ChangeHistory } from "./ChangeHistory";
 import { SimpleDiffViewer } from "./SimpleDiffViewer";
 import { OfflineDetector } from "./OfflineDetector";
+import { DescriptionHeader } from "./DescriptionHeader";
+import { FormWithConfirmation } from "./FormWithConfirmation";
 import {
   parseError,
   isConflictError,
@@ -96,6 +99,12 @@ export function DescriptionEditor({
     fadeIn: false,
   });
 
+  // Stan potwierdzenia
+  const [confirmationState, setConfirmationState] = useState({
+    showConfirmation: false,
+    pendingAction: null as (() => void) | null,
+  });
+
   // Animacja wejścia
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -175,38 +184,70 @@ export function DescriptionEditor({
     formState.evaluation.dog_class,
   );
 
+  // Obsługa potwierdzeń
+  const handleConfirmAction = useCallback(
+    (action: () => void) => {
+      if (saveState.isDirty) {
+        setConfirmationState({
+          showConfirmation: true,
+          pendingAction: action,
+        });
+      } else {
+        action();
+      }
+    },
+    [saveState.isDirty],
+  );
+
+  const handleConfirm = useCallback(() => {
+    if (confirmationState.pendingAction) {
+      confirmationState.pendingAction();
+    }
+    setConfirmationState({
+      showConfirmation: false,
+      pendingAction: null,
+    });
+  }, [confirmationState]);
+
+  const handleCancelConfirmation = useCallback(() => {
+    setConfirmationState({
+      showConfirmation: false,
+      pendingAction: null,
+    });
+  }, []);
+
   // Sprawdzenie uprawnień
   const checkPermissions = useCallback(async () => {
+    if (!showId || !dogId) return;
+
     try {
-      // TODO: pobrać userRole z kontekstu użytkownika
+      // Mock user role - w rzeczywistej aplikacji pobierane z kontekstu użytkownika
       const userRole = "secretary" as const;
 
-      const permissionCheck = await checkDescriptionPermissions(
-        showId || "",
-        dogId || "",
+      const permissions = await checkDescriptionPermissions(
+        showId,
+        dogId,
         userRole,
       );
 
-      setPermissions({
-        canEdit: permissionCheck.canEdit,
-        canFinalize: permissionCheck.canFinalize,
-        showStatus: permissionCheck.showStatus,
-      });
+      setPermissions(permissions);
 
-      // Jeśli nie ma uprawnień, wyświetl błąd
-      if (!permissionCheck.canEdit && permissionCheck.reason) {
+      // Jeśli nie ma uprawnień, pokaż błąd
+      if (!permissions.canEdit && permissions.reason) {
         setApiState((prev) => ({
           ...prev,
-          error: permissionCheck.reason || null,
+          error: permissions.reason || null,
         }));
       }
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error("Error checking permissions:", error);
-      setApiState((prev) => ({
-        ...prev,
-        error: "Błąd podczas sprawdzania uprawnień",
-      }));
+      setPermissions({
+        canEdit: false,
+        canFinalize: false,
+        showStatus: "completed",
+        reason: "Błąd podczas sprawdzania uprawnień",
+      });
     }
   }, [showId, dogId]);
 
@@ -463,15 +504,6 @@ export function DescriptionEditor({
     () => saveDescription(true),
     [saveDescription],
   );
-  const handleCancel = useCallback(() => {
-    if (permissions.canEdit) {
-      if (confirm("Masz niezapisane zmiany. Czy na pewno chcesz anulować?")) {
-        window.history.back();
-      }
-    } else {
-      window.history.back();
-    }
-  }, [permissions.canEdit]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -499,7 +531,11 @@ export function DescriptionEditor({
       // Escape - Anuluj
       if (event.key === "Escape") {
         event.preventDefault();
-        handleCancel();
+        if (saveState.isDirty) {
+          handleConfirmAction(() => window.history.back());
+        } else {
+          window.history.back();
+        }
       }
 
       // Ctrl/Cmd + Z - Przywróć draft (tylko w trybie offline)
@@ -522,7 +558,8 @@ export function DescriptionEditor({
     offlineState.hasDraft,
     handleSave,
     handleFinalize,
-    handleCancel,
+    handleConfirmAction,
+    saveState.isDirty,
     restoreDraft,
   ]);
 
@@ -562,170 +599,176 @@ export function DescriptionEditor({
   }
 
   return (
-    <div
-      className={`max-w-4xl mx-auto px-4 sm:px-6 space-y-4 sm:space-y-6 transition-all duration-500 ${
-        animationState.fadeIn
-          ? "opacity-100 translate-y-0"
-          : "opacity-0 translate-y-4"
-      }`}
+    <FormWithConfirmation
+      isDirty={saveState.isDirty}
+      showConfirmation={confirmationState.showConfirmation}
+      onConfirm={handleConfirm}
+      onCancel={handleCancelConfirmation}
     >
-      {/* OfflineDetector */}
-      <OfflineDetector
-        isOffline={offlineState.isOffline}
-        hasDraft={offlineState.hasDraft}
-        onRestoreDraft={restoreDraft}
-        onSaveDraft={saveDraft}
-      />
-
-      {/* Header */}
       <div
-        className={`bg-white border border-gray-200 rounded-lg p-4 sm:p-6 transition-all duration-300 ${
-          animationState.isVisible ? "animate-fade-in-up" : "opacity-0"
+        className={`max-w-4xl mx-auto px-4 sm:px-6 space-y-4 sm:space-y-6 transition-all duration-500 ${
+          animationState.fadeIn
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 translate-y-4"
         }`}
       >
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">
-          {mode === "create" ? "Nowy opis psa" : "Edycja opisu psa"}
-        </h1>
-        {/* Status wystawy */}
-        <div className="flex items-center gap-2 mb-3 sm:mb-4">
-          <span className="text-xs sm:text-sm text-gray-600">
-            Status wystawy:
-          </span>
-          <span
-            className={`px-2 py-1 text-xs font-medium rounded ${
-              permissions.showStatus !== "in_progress"
-                ? "bg-red-100 text-red-800"
-                : "bg-green-100 text-green-800"
-            }`}
-          >
-            {permissions.showStatus !== "in_progress"
-              ? "Zakończona"
-              : "W trakcie"}
-          </span>
-        </div>
-        {/* Informacje o psie i wystawie */}
-        {apiState.initialData && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 text-xs sm:text-sm">
-            <div>
-              <span className="font-medium">Pies:</span>{" "}
-              {apiState.initialData.dog.name}
-            </div>
-            <div>
-              <span className="font-medium">Wystawa:</span>{" "}
-              {apiState.initialData.show.name}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Edytor treści */}
-      <div
-        className={`bg-white border border-gray-200 rounded-lg p-4 sm:p-6 transition-all duration-300 delay-100 ${
-          animationState.isVisible ? "animate-fade-in-up" : "opacity-0"
-        }`}
-      >
-        <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">
-          Treść opisu
-        </h2>
-        <RichTextEditor
-          value={{
-            content_pl: formState.content_pl,
-            content_en: formState.content_en,
-          }}
-          onChange={(val) => {
-            updateContent("pl", val.content_pl);
-            updateContent("en", val.content_en);
-          }}
-          disabled={!permissions.canEdit}
+        {/* OfflineDetector */}
+        <OfflineDetector
+          isOffline={offlineState.isOffline}
+          hasDraft={offlineState.hasDraft}
+          onRestoreDraft={restoreDraft}
+          onSaveDraft={saveDraft}
         />
-      </div>
 
-      {/* Formularz oceny */}
-      <div
-        className={`bg-white border border-gray-200 rounded-lg p-4 sm:p-6 transition-all duration-300 delay-200 ${
-          animationState.isVisible ? "animate-fade-in-up" : "opacity-0"
-        }`}
-      >
-        <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">
-          Ocena psa
-        </h2>
-        <EvaluationForm
-          value={formState.evaluation}
-          onChange={updateEvaluation}
-          dogClass={formState.evaluation.dog_class}
-          disabled={!permissions.canEdit}
-          errors={validationResult.errors}
+        {/* DescriptionHeader */}
+        <DescriptionHeader
+          description={apiState.initialData || undefined}
+          showId={showId}
+          dogId={dogId}
+          mode={mode}
         />
-      </div>
 
-      {/* Historia wersji */}
-      {mode === "edit" && historyState.versions.length > 0 && (
+        {/* Edytor treści */}
         <div
-          className={`bg-white border border-gray-200 rounded-lg p-4 sm:p-6 transition-all duration-300 delay-300 ${
+          className={`bg-white border border-gray-200 rounded-lg p-4 sm:p-6 transition-all duration-300 delay-100 ${
             animationState.isVisible ? "animate-fade-in-up" : "opacity-0"
           }`}
         >
           <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">
-            Historia wersji
+            Treść opisu
           </h2>
-          <ChangeHistory
-            versions={historyState.versions}
-            onSelect={selectVersion}
-            selectedVersion={historyState.selectedVersion}
+          <RichTextEditor
+            value={{
+              content_pl: formState.content_pl,
+              content_en: formState.content_en,
+            }}
+            onChange={(val) => {
+              updateContent("pl", val.content_pl);
+              updateContent("en", val.content_en);
+            }}
+            disabled={!permissions.canEdit}
           />
+        </div>
 
-          {/* Podgląd zmian */}
-          {historyState.selectedVersion && (
-            <div className="mt-4">
-              <h3 className="text-md font-medium mb-2">
-                Zmiany w wybranej wersji
-              </h3>
-              <SimpleDiffViewer
-                changes={generateDiff(
-                  historyState.versions[historyState.versions.length - 1],
-                  historyState.selectedVersion,
-                )}
-              />
+        {/* Formularz oceny */}
+        <div
+          className={`bg-white border border-gray-200 rounded-lg p-4 sm:p-6 transition-all duration-300 delay-200 ${
+            animationState.isVisible ? "animate-fade-in-up" : "opacity-0"
+          }`}
+        >
+          <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">
+            Ocena psa
+          </h2>
+          <EvaluationForm
+            value={formState.evaluation}
+            onChange={updateEvaluation}
+            dogClass={formState.evaluation.dog_class}
+            disabled={!permissions.canEdit}
+            errors={validationResult.errors}
+          />
+        </div>
+
+        {/* Historia wersji */}
+        {mode === "edit" && historyState.versions.length > 0 && (
+          <div
+            className={`bg-white border border-gray-200 rounded-lg p-4 sm:p-6 transition-all duration-300 delay-300 ${
+              animationState.isVisible ? "animate-fade-in-up" : "opacity-0"
+            }`}
+          >
+            <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">
+              Historia wersji
+            </h2>
+            <ChangeHistory
+              versions={historyState.versions}
+              onSelect={selectVersion}
+              selectedVersion={historyState.selectedVersion}
+            />
+
+            {/* Podgląd zmian */}
+            {historyState.selectedVersion && (
+              <div className="mt-4">
+                <h3 className="text-md font-medium mb-2">
+                  Zmiany w wybranej wersji
+                </h3>
+                <SimpleDiffViewer
+                  changes={generateDiff(
+                    historyState.versions[historyState.versions.length - 1],
+                    historyState.selectedVersion,
+                  )}
+                />
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Przyciski akcji */}
+        <div
+          className={`bg-white border border-gray-200 rounded-lg p-4 sm:p-6 transition-all duration-300 delay-400 ${
+            animationState.isVisible ? "animate-fade-in-up" : "opacity-0"
+          }`}
+        >
+          <ActionButtons
+            onSave={handleSave}
+            onFinalize={handleFinalize}
+            onCancel={() => handleConfirmAction(() => window.history.back())}
+            disabled={!permissions.canEdit}
+            isDirty={saveState.isDirty}
+            isSaving={saveState.isSaving}
+          />
+          {/* Status zapisu */}
+          {saveState.lastSaved && (
+            <div
+              className={`mt-3 text-sm text-gray-600 transition-all duration-300 ${
+                animationState.showSuccess ? "animate-fade-in" : ""
+              }`}
+            >
+              Ostatnio zapisano:{" "}
+              {new Date(saveState.lastSaved).toLocaleString()}
+            </div>
+          )}
+          {/* Błędy */}
+          {saveState.error && (
+            <div
+              className={`mt-3 p-3 bg-red-50 border border-red-200 rounded-lg transition-all duration-300 ${
+                animationState.showError ? "animate-shake" : ""
+              }`}
+            >
+              <div className="flex items-start">
+                <div className="flex-shrink-0">
+                  <svg
+                    className="h-5 w-5 text-red-400"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-red-800">
+                    Błąd podczas zapisywania
+                  </h3>
+                  <div className="mt-2 text-sm text-red-700">
+                    <p>{saveState.error}</p>
+                  </div>
+                  <div className="mt-3">
+                    <button
+                      type="button"
+                      onClick={() => setError("")}
+                      className="text-sm text-red-600 hover:text-red-500 font-medium"
+                    >
+                      Zamknij
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </div>
-      )}
-
-      {/* Przyciski akcji */}
-      <div
-        className={`bg-white border border-gray-200 rounded-lg p-4 sm:p-6 transition-all duration-300 delay-400 ${
-          animationState.isVisible ? "animate-fade-in-up" : "opacity-0"
-        }`}
-      >
-        <ActionButtons
-          onSave={handleSave}
-          onFinalize={handleFinalize}
-          onCancel={handleCancel}
-          disabled={!permissions.canEdit}
-          isDirty={permissions.canEdit}
-          isSaving={saveState.isSaving}
-        />
-        {/* Status zapisu */}
-        {saveState.lastSaved && (
-          <div
-            className={`mt-3 text-sm text-gray-600 transition-all duration-300 ${
-              animationState.showSuccess ? "animate-fade-in" : ""
-            }`}
-          >
-            Ostatnio zapisano: {new Date(saveState.lastSaved).toLocaleString()}
-          </div>
-        )}
-        {/* Błędy */}
-        {saveState.error && (
-          <div
-            className={`mt-3 p-3 bg-red-50 border border-red-200 rounded-lg transition-all duration-300 ${
-              animationState.showError ? "animate-shake" : ""
-            }`}
-          >
-            <p className="text-sm text-red-700">{saveState.error}</p>
-          </div>
-        )}
       </div>
-    </div>
+    </FormWithConfirmation>
   );
 }

@@ -400,7 +400,7 @@ export interface DescriptionResponseDto
     Description,
     "show_id" | "dog_id" | "judge_id" | "secretary_id"
   > {
-  show: Pick<Show, "id" | "name" | "show_date" | "show_type">;
+  show: Pick<Show, "id" | "name" | "show_date" | "show_type" | "status">;
   dog: {
     id: string;
     name: string;
