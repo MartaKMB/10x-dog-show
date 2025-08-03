@@ -11,6 +11,108 @@ const DEFAULT_USER = {
   role: "secretary" as const,
 };
 
+// Schema for query parameters
+const descriptionQuerySchema = z.object({
+  show_id: z.string().uuid().optional(),
+  judge_id: z.string().uuid().optional(),
+  secretary_id: z.string().uuid().optional(),
+  is_final: z
+    .string()
+    .transform((val) => val === "true")
+    .optional(),
+  language: z.enum(["pl", "en"]).optional(),
+  page: z
+    .string()
+    .transform((val) => parseInt(val, 10))
+    .default("1"),
+  limit: z
+    .string()
+    .transform((val) => parseInt(val, 10))
+    .default("20"),
+});
+
+export const GET: APIRoute = async ({ url }) => {
+  try {
+    // Parse and validate query parameters
+    const urlParams = new URL(url).searchParams;
+    const queryParams: Record<string, string> = {};
+
+    for (const [key, value] of urlParams.entries()) {
+      queryParams[key] = value;
+    }
+
+    const validatedParams = descriptionQuerySchema.parse(queryParams);
+
+    // Validate pagination limits
+    if (validatedParams.limit > 100) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            code: "VALIDATION_ERROR",
+            message: "Limit cannot exceed 100 items per page",
+          },
+          timestamp: new Date().toISOString(),
+          request_id: crypto.randomUUID(),
+        } as ErrorResponseDto),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
+
+    // Get descriptions using service
+    const descriptionService = new DescriptionService(supabaseClient);
+    const result = await descriptionService.list(validatedParams);
+
+    return new Response(JSON.stringify(result), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error("Error fetching descriptions:", error);
+
+    // Handle validation errors
+    if (error instanceof z.ZodError) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            code: "VALIDATION_ERROR",
+            message: "Invalid query parameters",
+            details: error.errors.map((err) => ({
+              field: err.path.join("."),
+              message: err.message,
+            })),
+          },
+          timestamp: new Date().toISOString(),
+          request_id: crypto.randomUUID(),
+        } as ErrorResponseDto),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
+
+    // Handle other errors
+    return new Response(
+      JSON.stringify({
+        error: {
+          code: "INTERNAL_ERROR",
+          message: "Internal server error",
+        },
+        timestamp: new Date().toISOString(),
+        request_id: crypto.randomUUID(),
+      } as ErrorResponseDto),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+  }
+};
+
 export const POST: APIRoute = async ({ request }) => {
   try {
     // Parse request body
