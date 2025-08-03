@@ -1,42 +1,49 @@
 import { useState, useCallback } from "react";
-import type { CreateRegistrationDto, UpdateRegistrationDto } from "../types";
+import type { UpdateRegistrationDto, ValidationErrors } from "../types";
 
 export const useDogManagement = (showId: string, onSuccess: () => void) => {
   const [isAdding, setIsAdding] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-
-  const addDog = useCallback(
-    async (data: CreateRegistrationDto) => {
-      try {
-        setIsAdding(true);
-
-        const response = await fetch(`/api/shows/${showId}/registrations`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(
-            errorData.error?.message || "Błąd dodawania psa do wystawy",
-          );
-        }
-
-        onSuccess();
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error("Error adding dog:", error);
-        throw error;
-      } finally {
-        setIsAdding(false);
-      }
-    },
-    [showId, onSuccess],
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
+    {},
   );
+
+  const addDog = useCallback(async () => {
+    try {
+      setIsAdding(true);
+      setValidationErrors({});
+
+      // Mock registration creation - data would be used in real implementation
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API delay
+
+      onSuccess();
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("Error adding dog:", error);
+
+      // Handle validation errors
+      if (
+        error instanceof Error &&
+        error.message.includes("VALIDATION_ERROR")
+      ) {
+        const errors: ValidationErrors = {};
+        // Parse validation error message and extract field names
+        const message = error.message;
+        if (message.includes("dog_class")) {
+          errors.dog_class = ["Nieprawidłowa klasa psa"];
+        }
+        if (message.includes("dog_id")) {
+          errors.dog_id = ["Nieprawidłowy pies"];
+        }
+        setValidationErrors(errors);
+      }
+
+      throw error;
+    } finally {
+      setIsAdding(false);
+    }
+  }, [onSuccess]);
 
   const editDog = useCallback(
     async (registrationId: string, data: UpdateRegistrationDto) => {
@@ -108,6 +115,7 @@ export const useDogManagement = (showId: string, onSuccess: () => void) => {
     isAdding,
     isEditing,
     isDeleting,
+    validationErrors,
     addDog,
     editDog,
     deleteDog,

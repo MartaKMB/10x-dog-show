@@ -615,3 +615,78 @@ export interface DescriptionVersionDto {
 export interface DescriptionVersionsResponseDto {
   versions: DescriptionVersionDto[];
 }
+
+// =============================================================================
+// SHOW DETAILS VIEW TYPES
+// =============================================================================
+
+export interface ShowDetailsViewModel {
+  show: ShowDetailResponseDto | null;
+  registrations: RegistrationResponseDto[];
+  stats: ShowStats;
+  canEdit: boolean;
+  canDelete: boolean;
+  isLoading: boolean;
+  error: string | null;
+  filters: FilterState;
+}
+
+export interface ShowStats {
+  totalDogs: number;
+  paidRegistrations: number;
+  unpaidRegistrations: number;
+  byClass: Record<DogClass, number>;
+  byGender: Record<DogGender, number>;
+  byBreedGroup: Record<FCIGroup, number>;
+  revenue: {
+    total: number;
+    paid: number;
+    outstanding: number;
+  };
+}
+
+export interface FilterState {
+  dogClass?: DogClass;
+  isPaid?: boolean;
+  search?: string;
+  gender?: DogGender;
+  breedId?: string;
+}
+
+export interface DogCardViewModel {
+  registration: RegistrationResponseDto;
+  canEdit: boolean;
+  canDelete: boolean;
+  isExpanded: boolean;
+  isProcessing: boolean;
+}
+
+export type ValidationErrors = Record<string, string[]>;
+
+// =============================================================================
+// SHOW ACTIONS TYPES
+// =============================================================================
+
+export interface ShowActionsState {
+  isDeleting: boolean;
+  isUpdating: boolean;
+  isStatusUpdating: boolean;
+}
+
+export interface DogManagementState {
+  isAdding: boolean;
+  isEditing: boolean;
+  isDeleting: boolean;
+  selectedRegistration: RegistrationResponseDto | null;
+}
+
+// =============================================================================
+// MODAL STATE TYPES
+// =============================================================================
+
+export interface ModalState {
+  isAddModalOpen: boolean;
+  isEditModalOpen: boolean;
+  isDeleteModalOpen: boolean;
+  selectedRegistration: RegistrationResponseDto | null;
+}

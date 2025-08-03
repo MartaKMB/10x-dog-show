@@ -1,6 +1,5 @@
 import { useState, useCallback } from "react";
 import type { CreateShowDto, VenueResponseDto } from "../types";
-import { supabaseClient as supabase } from "../db/supabase.client";
 
 interface ShowCreatorState {
   venues: VenueResponseDto[];
@@ -25,19 +24,49 @@ export const useShowCreator = () => {
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      const { data: venues, error } = await supabase
-        .from("venues")
-        .select("*")
-        .eq("is_active", true)
-        .order("name");
+      // Mock venues data for development
+      const mockVenues: VenueResponseDto[] = [
+        {
+          id: "550e8400-e29b-41d4-a716-446655440201",
+          name: "Centrum Wystawowe EXPO XXI",
+          address: "ul. Prądzyńskiego 12/14",
+          city: "Warszawa",
+          postal_code: "01-222",
+          country: "Polska",
+          is_active: true,
+          created_at: "2024-01-01T00:00:00Z",
+          updated_at: "2024-01-01T00:00:00Z",
+        },
+        {
+          id: "550e8400-e29b-41d4-a716-446655440202",
+          name: "Międzynarodowe Centrum Kongresowe",
+          address: "plac Sławika i Antalla 1",
+          city: "Katowice",
+          postal_code: "40-163",
+          country: "Polska",
+          is_active: true,
+          created_at: "2024-01-01T00:00:00Z",
+          updated_at: "2024-01-01T00:00:00Z",
+        },
+        {
+          id: "550e8400-e29b-41d4-a716-446655440203",
+          name: "Centrum Targowo-Kongresowe",
+          address: "ul. Głogowska 14",
+          city: "Poznań",
+          postal_code: "60-734",
+          country: "Polska",
+          is_active: true,
+          created_at: "2024-01-01T00:00:00Z",
+          updated_at: "2024-01-01T00:00:00Z",
+        },
+      ];
 
-      if (error) {
-        throw new Error(error.message);
-      }
+      // Simulate API delay
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       setState((prev) => ({
         ...prev,
-        venues: venues || [],
+        venues: mockVenues,
         isLoading: false,
       }));
     } catch (error) {
@@ -58,40 +87,26 @@ export const useShowCreator = () => {
   }, []);
 
   const createShow = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async (showData: CreateShowDto): Promise<CreateShowResult> => {
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
       try {
-        // Get current user
-        const {
-          data: { user },
-          error: authError,
-        } = await supabase.auth.getUser();
+        // Mock show creation for development - showData would be used in real implementation
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API delay
 
-        if (authError || !user) {
-          throw new Error("Brak autoryzacji. Zaloguj się ponownie.");
-        }
-
-        // Create show with organizer_id set to current user
-        const { data: show, error } = await supabase
-          .from("shows")
-          .insert({
-            ...showData,
-            organizer_id: user.id,
-            status: "draft", // Always start as draft
-          })
-          .select()
-          .single();
-
-        if (error) {
-          throw new Error(error.message);
-        }
+        // Generate mock show ID
+        const mockShowId =
+          "mock-show-" +
+          Date.now() +
+          "-" +
+          Math.random().toString(36).substr(2, 9);
 
         setState((prev) => ({ ...prev, isLoading: false }));
 
         return {
           success: true,
-          showId: show.id,
+          showId: mockShowId,
         };
       } catch (error) {
         const errorMessage =

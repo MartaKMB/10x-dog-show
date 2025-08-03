@@ -1,10 +1,10 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { ShowService } from "../../../../lib/services/showService";
+import { RegistrationService } from "../../../../lib/services/registrationService";
 import {
   createRegistrationSchema,
   registrationQuerySchema,
-} from "../../../../lib/validation/showSchemas";
+} from "../../../../lib/validation/registrationSchemas";
 import { supabaseClient } from "../../../../db/supabase.client";
 import type { ErrorResponseDto } from "../../../../types";
 
@@ -48,8 +48,8 @@ export const GET: APIRoute = async ({ params, request }) => {
     const validatedParams = registrationQuerySchema.parse(queryParams);
 
     // Get registrations using service
-    const showService = new ShowService(supabaseClient);
-    const registrations = await showService.getRegistrations(
+    const registrationService = new RegistrationService(supabaseClient);
+    const registrations = await registrationService.getRegistrations(
       showId,
       validatedParams,
     );
@@ -133,8 +133,8 @@ export const POST: APIRoute = async ({ params, request }) => {
     const validatedData = createRegistrationSchema.parse(body);
 
     // Create registration using service
-    const showService = new ShowService(supabaseClient);
-    const registration = await showService.createRegistration(
+    const registrationService = new RegistrationService(supabaseClient);
+    const registration = await registrationService.createRegistration(
       showId,
       validatedData,
     );

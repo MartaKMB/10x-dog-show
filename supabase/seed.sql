@@ -31,8 +31,7 @@ INSERT INTO dictionary.venues (name, address, city, postal_code, country, is_act
 ('Międzynarodowe Centrum Kongresowe', 'plac Sławika i Antalla 1', 'Katowice', '40-163', 'Polska', true),
 ('Centrum Targowo-Kongresowe', 'ul. Głogowska 14', 'Poznań', '60-734', 'Polska', true),
 ('Centrum Kongresowe ICE', 'ul. Marii Konopnickiej 17', 'Kraków', '30-302', 'Polska', true),
-('Centrum Wystawienniczo-Kongresowe', 'ul. Marszałkowska 104/122', 'Warszawa', '00-017', 'Polska', true)
-ON CONFLICT DO NOTHING;
+('Centrum Wystawienniczo-Kongresowe', 'ul. Marszałkowska 104/122', 'Warszawa', '00-017', 'Polska', true);
 
 -- =============================================================================
 -- 3. INSERT JUDGES
@@ -56,8 +55,7 @@ INSERT INTO dictionary.judge_specializations (judge_id, fci_group, is_active) VA
 ((SELECT id FROM dictionary.judges WHERE license_number = 'JUDGE-002'), 'G8', true),
 ((SELECT id FROM dictionary.judges WHERE license_number = 'JUDGE-003'), 'G1', true),
 ((SELECT id FROM dictionary.judges WHERE license_number = 'JUDGE-004'), 'G2', true),
-((SELECT id FROM dictionary.judges WHERE license_number = 'JUDGE-005'), 'G5', true)
-ON CONFLICT DO NOTHING;
+((SELECT id FROM dictionary.judges WHERE license_number = 'JUDGE-005'), 'G5', true);
 
 -- =============================================================================
 -- 5. INSERT USERS (create test users in auth.users)
@@ -103,8 +101,7 @@ INSERT INTO auth.users (
     now(),
     now(),
     now()
-)
-ON CONFLICT (id) DO NOTHING;
+);
 
 -- =============================================================================
 -- 6. INSERT SHOWS
@@ -186,8 +183,7 @@ INSERT INTO dog_shows.owners (
 ('Katarzyna', 'Kaczmarek', 'katarzyna.kaczmarek@example.com', '+48 987 654 321', 'ul. Dębowa 22', 'Kraków', '30-001', 'Polska', 'Hodowla Kaczmarek', 'pl', true, '2024-01-01'),
 ('Andrzej', 'Pawlak', 'andrzej.pawlak@example.com', '+48 555 123 456', 'ul. Lipowa 8', 'Poznań', '60-001', 'Polska', 'Hodowla Pawlak', 'pl', true, '2024-01-01'),
 ('Ewa', 'Michalska', 'ewa.michalska@example.com', '+48 777 888 999', 'ul. Brzozowa 12', 'Wrocław', '50-001', 'Polska', 'Hodowla Michalska', 'pl', true, '2024-01-01'),
-('Robert', 'Jankowski', 'robert.jankowski@example.com', '+48 111 222 333', 'ul. Sosnowa 5', 'Gdańsk', '80-001', 'Polska', 'Hodowla Jankowski', 'pl', true, '2024-01-01')
-ON CONFLICT (email) DO NOTHING;
+('Robert', 'Jankowski', 'robert.jankowski@example.com', '+48 111 222 333', 'ul. Sosnowa 5', 'Gdańsk', '80-001', 'Polska', 'Hodowla Jankowski', 'pl', true, '2024-01-01');
 
 -- =============================================================================
 -- 8. INSERT DOGS

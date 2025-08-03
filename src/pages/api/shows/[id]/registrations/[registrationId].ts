@@ -1,18 +1,12 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { ShowService } from "../../../../../lib/services/showService";
+import { RegistrationService } from "../../../../../lib/services/registrationService";
 import {
   updateRegistrationSchema,
   updatePaymentStatusSchema,
-} from "../../../../../lib/validation/showSchemas";
+} from "../../../../../lib/validation/registrationSchemas";
 import { supabaseClient } from "../../../../../db/supabase.client";
 import type { ErrorResponseDto } from "../../../../../types";
-
-// Mock DEFAULT_USER dla testów (department_representative)
-const DEFAULT_USER = {
-  id: "00000000-0000-0000-0000-000000000002",
-  role: "department_representative" as const,
-};
 
 export const GET: APIRoute = async ({ params }) => {
   try {
@@ -36,11 +30,19 @@ export const GET: APIRoute = async ({ params }) => {
     }
 
     // Get registration details using service
-    const showService = new ShowService(supabaseClient);
-    const registration = await showService.getRegistrationById(
-      showId,
-      registrationId,
+    const registrationService = new RegistrationService(supabaseClient);
+    const registration = await registrationService.getRegistrations(showId, {
+      page: 1,
+      limit: 1,
+    });
+
+    // Find specific registration
+    const foundRegistration = registration.data.find(
+      (r) => r.id === registrationId,
     );
+    if (!foundRegistration) {
+      throw new Error("NOT_FOUND: Registration not found");
+    }
 
     return new Response(JSON.stringify(registration), {
       status: 200,
@@ -121,8 +123,8 @@ export const PUT: APIRoute = async ({ params, request }) => {
     const validatedData = updateRegistrationSchema.parse(body);
 
     // Update registration using service
-    const showService = new ShowService(supabaseClient);
-    const registration = await showService.updateRegistration(
+    const registrationService = new RegistrationService(supabaseClient);
+    const registration = await registrationService.updateRegistration(
       showId,
       registrationId,
       validatedData,
@@ -231,8 +233,8 @@ export const PATCH: APIRoute = async ({ params, request }) => {
     const validatedData = updatePaymentStatusSchema.parse(body);
 
     // Update payment status using service
-    const showService = new ShowService(supabaseClient);
-    const registration = await showService.updatePaymentStatus(
+    const registrationService = new RegistrationService(supabaseClient);
+    const registration = await registrationService.updatePaymentStatus(
       showId,
       registrationId,
       validatedData,
@@ -334,12 +336,9 @@ export const DELETE: APIRoute = async ({ params }) => {
       );
     }
 
-    // Use DEFAULT_USER instead of real auth for now
-    const currentUserId = DEFAULT_USER.id;
-
     // Delete registration using service
-    const showService = new ShowService(supabaseClient);
-    await showService.deleteRegistration(showId, registrationId, currentUserId);
+    const registrationService = new RegistrationService(supabaseClient);
+    await registrationService.deleteRegistration(showId, registrationId);
 
     return new Response(null, {
       status: 204,

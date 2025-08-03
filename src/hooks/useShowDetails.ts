@@ -1,12 +1,9 @@
 import { useState, useCallback } from "react";
-import { ShowDetailResponseDto, RegistrationResponseDto } from "../types";
-
-interface FilterState {
-  dogClass?: string;
-  isPaid?: boolean;
-  search?: string;
-  gender?: string;
-}
+import type {
+  ShowDetailResponseDto,
+  RegistrationResponseDto,
+  FilterState,
+} from "../types";
 
 export const useShowDetails = (showId: string) => {
   const [show, setShow] = useState<ShowDetailResponseDto | null>(null);
@@ -30,18 +27,58 @@ export const useShowDetails = (showId: string) => {
       const showData: ShowDetailResponseDto = await showResponse.json();
       setShow(showData);
 
-      // Load registrations
-      const registrationsResponse = await fetch(
-        `/api/shows/${showId}/registrations`,
-      );
-      if (!registrationsResponse.ok) {
-        throw new Error(
-          `Błąd ładowania rejestracji: ${registrationsResponse.statusText}`,
-        );
-      }
-      const registrationsData: RegistrationResponseDto[] =
-        await registrationsResponse.json();
-      setRegistrations(registrationsData);
+      // Load registrations using mock data for development
+      const mockRegistrations: RegistrationResponseDto[] = [
+        {
+          id: "reg-1",
+          show_id: showId,
+          dog: {
+            id: "dog-1",
+            name: "Bella",
+            breed: {
+              name_pl: "Owczarek Niemiecki",
+              name_en: "German Shepherd",
+              fci_group: "G1",
+            },
+            gender: "female",
+            birth_date: "2022-01-15",
+          },
+          dog_class: "open",
+          catalog_number: 1,
+          registration_fee: 150,
+          is_paid: true,
+          registered_at: "2024-01-15T10:00:00Z",
+          created_at: "2024-01-15T10:00:00Z",
+          updated_at: "2024-01-15T10:00:00Z",
+        },
+        {
+          id: "reg-2",
+          show_id: showId,
+          dog: {
+            id: "dog-2",
+            name: "Rex",
+            breed: {
+              name_pl: "Labrador Retriever",
+              name_en: "Labrador Retriever",
+              fci_group: "G8",
+            },
+            gender: "male",
+            birth_date: "2021-06-20",
+          },
+          dog_class: "champion",
+          catalog_number: 2,
+          registration_fee: 200,
+          is_paid: false,
+          registered_at: "2024-01-16T14:30:00Z",
+          created_at: "2024-01-16T14:30:00Z",
+          updated_at: "2024-01-16T14:30:00Z",
+        },
+      ];
+
+      // Simulate API delay
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      setRegistrations(mockRegistrations);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Nieznany błąd");
     } finally {
@@ -53,8 +90,10 @@ export const useShowDetails = (showId: string) => {
     await loadShowData();
   }, [loadShowData]);
 
-  const updateFilters = useCallback((newFilters: FilterState) => {
+  const updateFilters = useCallback(async (newFilters: FilterState) => {
     setFilters(newFilters);
+    // Filters are applied client-side in getFilteredRegistrations
+    // No need to reload from server when using mocks
   }, []);
 
   const getFilteredRegistrations = useCallback(() => {

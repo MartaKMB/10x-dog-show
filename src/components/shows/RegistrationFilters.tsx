@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from "react";
-
-interface FilterState {
-  dogClass?: string;
-  isPaid?: boolean;
-  search?: string;
-  gender?: string;
-}
+import type { FilterState } from "../../types";
 
 interface RegistrationFiltersProps {
   onFiltersChange: (filters: FilterState) => void;
@@ -56,14 +50,14 @@ const RegistrationFilters: React.FC<RegistrationFiltersProps> = ({
   };
 
   const dogClasses = [
-    { value: "baby", label: "Baby" },
-    { value: "puppy", label: "Szczenię" },
-    { value: "junior", label: "Junior" },
-    { value: "intermediate", label: "Młodzież" },
-    { value: "open", label: "Otwarta" },
-    { value: "working", label: "Pracująca" },
-    { value: "champion", label: "Champion" },
-    { value: "veteran", label: "Weteran" },
+    { value: "baby" as const, label: "Baby" },
+    { value: "puppy" as const, label: "Szczenię" },
+    { value: "junior" as const, label: "Junior" },
+    { value: "intermediate" as const, label: "Młodzież" },
+    { value: "open" as const, label: "Otwarta" },
+    { value: "working" as const, label: "Pracująca" },
+    { value: "champion" as const, label: "Champion" },
+    { value: "veteran" as const, label: "Weteran" },
   ];
 
   const hasActiveFilters = Object.values(localFilters).some(

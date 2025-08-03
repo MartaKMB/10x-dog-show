@@ -50,9 +50,18 @@ const ShowsListView: React.FC<ShowsListViewProps> = () => {
 
   const { shows, pagination, isLoading, error, loadShows } = useShowsList();
 
+  // Load shows on component mount
   useEffect(() => {
     loadShows(viewModel.filters, viewModel.pagination);
-  }, [loadShows, viewModel.filters, viewModel.pagination]);
+  }, [loadShows]); // Include loadShows in dependencies since it's now stable
+
+  useEffect(() => {
+    setViewModel((prev) => ({
+      ...prev,
+      isLoading,
+      error,
+    }));
+  }, [isLoading, error]);
 
   useEffect(() => {
     if (shows && pagination) {
@@ -60,21 +69,9 @@ const ShowsListView: React.FC<ShowsListViewProps> = () => {
         ...prev,
         shows,
         pagination,
-        isLoading: false,
-        error: null,
       }));
     }
   }, [shows, pagination]);
-
-  useEffect(() => {
-    if (error) {
-      setViewModel((prev) => ({
-        ...prev,
-        error,
-        isLoading: false,
-      }));
-    }
-  }, [error]);
 
   const handleFilterChange = (newFilters: Partial<ShowFilters>) => {
     const updatedFilters = { ...viewModel.filters, ...newFilters };

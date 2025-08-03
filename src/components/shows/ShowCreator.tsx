@@ -55,6 +55,26 @@ const ShowCreator: React.FC<ShowCreatorProps> = () => {
     loadVenues();
   }, [loadVenues]);
 
+  function isStepCompleted(step: number): boolean {
+    switch (step) {
+      case 1:
+        return !!(
+          formData.name &&
+          formData.showType &&
+          formData.showDate &&
+          formData.registrationDeadline
+        );
+      case 2:
+        return !!formData.venueId;
+      case 3:
+        return true; // Optional fields
+      case 4:
+        return true; // Optional field
+      default:
+        return false;
+    }
+  }
+
   const steps: ShowCreatorStep[] = [
     {
       id: 1,
@@ -87,26 +107,6 @@ const ShowCreator: React.FC<ShowCreatorProps> = () => {
       isCompleted: false,
     },
   ];
-
-  function isStepCompleted(step: number): boolean {
-    switch (step) {
-      case 1:
-        return !!(
-          formData.name &&
-          formData.showType &&
-          formData.showDate &&
-          formData.registrationDeadline
-        );
-      case 2:
-        return !!formData.venueId;
-      case 3:
-        return true; // Optional fields
-      case 4:
-        return true; // Optional field
-      default:
-        return false;
-    }
-  }
 
   const validateCurrentStep = (): boolean => {
     const newErrors: Record<string, string> = {};

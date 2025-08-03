@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import type {
   ShowDetailResponseDto,
   RegistrationResponseDto,
+  ShowStats as ShowStatsType,
+  FilterState,
 } from "../../types";
 import ShowHeader from "./ShowHeader";
 import ShowStats from "./ShowStats.tsx";
@@ -25,27 +27,12 @@ interface ShowDetailsViewProps {
 interface ShowDetailsViewModel {
   show: ShowDetailResponseDto | null;
   registrations: RegistrationResponseDto[];
-  stats: ShowStats;
+  stats: ShowStatsType;
   canEdit: boolean;
   canDelete: boolean;
   isLoading: boolean;
   error: string | null;
   filters: FilterState;
-}
-
-interface ShowStats {
-  totalDogs: number;
-  paidRegistrations: number;
-  unpaidRegistrations: number;
-  byClass: Record<string, number>;
-  byGender: Record<string, number>;
-}
-
-interface FilterState {
-  dogClass?: string;
-  isPaid?: boolean;
-  search?: string;
-  gender?: string;
 }
 
 const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({ showId }) => {
@@ -56,8 +43,14 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({ showId }) => {
       totalDogs: 0,
       paidRegistrations: 0,
       unpaidRegistrations: 0,
-      byClass: {},
-      byGender: {},
+      byClass: {} as Record<string, number>,
+      byGender: {} as Record<string, number>,
+      byBreedGroup: {} as Record<string, number>,
+      revenue: {
+        total: 0,
+        paid: 0,
+        outstanding: 0,
+      },
     },
     canEdit: false,
     canDelete: false,
@@ -119,11 +112,15 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({ showId }) => {
     }
   }, [error]);
 
-  const calculateStats = (regs: RegistrationResponseDto[]): ShowStats => {
+  const calculateStats = (regs: RegistrationResponseDto[]): ShowStatsType => {
     const byClass: Record<string, number> = {};
     const byGender: Record<string, number> = {};
+    const byBreedGroup: Record<string, number> = {};
     let paidCount = 0;
     let unpaidCount = 0;
+    let totalRevenue = 0;
+    let paidRevenue = 0;
+    let outstandingRevenue = 0;
 
     regs.forEach((reg) => {
       // Count by class
@@ -132,11 +129,20 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({ showId }) => {
       // Count by gender
       byGender[reg.dog.gender] = (byGender[reg.dog.gender] || 0) + 1;
 
-      // Count by payment status
+      // Count by breed group
+      const fciGroup = reg.dog.breed.fci_group;
+      byBreedGroup[fciGroup] = (byBreedGroup[fciGroup] || 0) + 1;
+
+      // Count by payment status and calculate revenue
+      const fee = reg.registration_fee || 0;
+      totalRevenue += fee;
+
       if (reg.is_paid) {
         paidCount++;
+        paidRevenue += fee;
       } else {
         unpaidCount++;
+        outstandingRevenue += fee;
       }
     });
 
@@ -146,6 +152,12 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({ showId }) => {
       unpaidRegistrations: unpaidCount,
       byClass,
       byGender,
+      byBreedGroup,
+      revenue: {
+        total: totalRevenue,
+        paid: paidRevenue,
+        outstanding: outstandingRevenue,
+      },
     };
   };
 
