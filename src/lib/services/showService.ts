@@ -49,6 +49,169 @@ const MOCK_DATA = {
 export class ShowService {
   constructor(private supabase: SupabaseClient<any>) {}
 
+  /**
+   * Validates if dog age matches the selected class
+   * @param birthDate Dog's birth date
+   * @param dogClass Selected dog class
+   * @param showDate Show date for age calculation
+   * @returns true if valid, throws error if invalid
+   */
+  private validateDogClassByAge(
+    birthDate: string,
+    dogClass: string,
+    showDate: string,
+  ): boolean {
+    const birth = new Date(birthDate);
+    const show = new Date(showDate);
+    const ageInMonths =
+      (show.getTime() - birth.getTime()) / (1000 * 60 * 60 * 24 * 30.44);
+
+    switch (dogClass) {
+      case "baby":
+        if (ageInMonths < 3 || ageInMonths >= 6) {
+          throw new Error(
+            `BUSINESS_RULE_ERROR: Dog must be 3-6 months old for baby class. Current age: ${Math.floor(ageInMonths)} months`,
+          );
+        }
+        break;
+      case "puppy":
+        if (ageInMonths < 6 || ageInMonths >= 9) {
+          throw new Error(
+            `BUSINESS_RULE_ERROR: Dog must be 6-9 months old for puppy class. Current age: ${Math.floor(ageInMonths)} months`,
+          );
+        }
+        break;
+      case "junior":
+        if (ageInMonths < 9 || ageInMonths >= 18) {
+          throw new Error(
+            `BUSINESS_RULE_ERROR: Dog must be 9-18 months old for junior class. Current age: ${Math.floor(ageInMonths)} months`,
+          );
+        }
+        break;
+      case "intermediate":
+        if (ageInMonths < 15 || ageInMonths >= 24) {
+          throw new Error(
+            `BUSINESS_RULE_ERROR: Dog must be 15-24 months old for intermediate class. Current age: ${Math.floor(ageInMonths)} months`,
+          );
+        }
+        break;
+      case "open":
+        if (ageInMonths < 15) {
+          throw new Error(
+            `BUSINESS_RULE_ERROR: Dog must be at least 15 months old for open class. Current age: ${Math.floor(ageInMonths)} months`,
+          );
+        }
+        break;
+      case "working":
+        if (ageInMonths < 15) {
+          throw new Error(
+            `BUSINESS_RULE_ERROR: Dog must be at least 15 months old for working class. Current age: ${Math.floor(ageInMonths)} months`,
+          );
+        }
+        break;
+      case "champion":
+        if (ageInMonths < 15) {
+          throw new Error(
+            `BUSINESS_RULE_ERROR: Dog must be at least 15 months old for champion class. Current age: ${Math.floor(ageInMonths)} months`,
+          );
+        }
+        break;
+      case "veteran":
+        if (ageInMonths < 96) {
+          // 8 years
+          throw new Error(
+            `BUSINESS_RULE_ERROR: Dog must be at least 8 years old for veteran class. Current age: ${Math.floor(ageInMonths / 12)} years`,
+          );
+        }
+        break;
+      default:
+        throw new Error(`BUSINESS_RULE_ERROR: Invalid dog class: ${dogClass}`);
+    }
+
+    return true;
+  }
+
+  /**
+   * Validates if show is in editable state
+   * @param showStatus Current show status
+   * @param operation Operation being performed
+   * @returns true if valid, throws error if invalid
+   */
+  private validateShowEditable(showStatus: string, operation: string): boolean {
+    const nonEditableStatuses = ["in_progress", "completed", "cancelled"];
+
+    if (nonEditableStatuses.includes(showStatus)) {
+      throw new Error(
+        `BUSINESS_RULE_ERROR: Cannot ${operation} for shows with status '${showStatus}'`,
+      );
+    }
+
+    return true;
+  }
+
+  /**
+   * Validates participant limits
+   * @param showId Show ID
+   * @param currentCount Current registration count
+   * @param maxParticipants Maximum allowed participants
+   * @returns true if valid, throws error if invalid
+   */
+  private validateParticipantLimit(
+    currentCount: number,
+    maxParticipants: number | null,
+  ): boolean {
+    if (maxParticipants && currentCount >= maxParticipants) {
+      throw new Error(
+        `CONFLICT: Maximum participants limit (${maxParticipants}) reached for this show`,
+      );
+    }
+
+    return true;
+  }
+
+  /**
+   * Validates if dog is already registered for the show
+   * @param showId Show ID
+   * @param dogId Dog ID
+   * @returns true if not registered, throws error if already registered
+   */
+  private validateNoDuplicateRegistration(
+    showId: string,
+    dogId: string,
+  ): boolean {
+    // Mock: Check if dog is already registered
+    // In real implementation, this would query the database
+    const existingRegistrations =
+      MOCK_DATA.shows.find((s) => s.id === showId)?.registrations || [];
+
+    const isAlreadyRegistered = existingRegistrations.some(
+      (reg: any) => reg.dog_id === dogId,
+    );
+
+    if (isAlreadyRegistered) {
+      throw new Error(`CONFLICT: Dog is already registered for this show`);
+    }
+
+    return true;
+  }
+
+  /**
+   * Validates if show accepts registrations
+   * @param showStatus Current show status
+   * @returns true if valid, throws error if invalid
+   */
+  private validateShowAcceptsRegistrations(showStatus: string): boolean {
+    const registrationStatuses = ["draft", "open_for_registration"];
+
+    if (!registrationStatuses.includes(showStatus)) {
+      throw new Error(
+        `BUSINESS_RULE_ERROR: Show is not accepting registrations. Current status: '${showStatus}'`,
+      );
+    }
+
+    return true;
+  }
+
   async create(
     data: CreateShowInput,
     organizerId: string,
@@ -226,24 +389,166 @@ export class ShowService {
     return this.formatResponse(show);
   }
 
-  async getRegistrations(): Promise<any[]> {
-    // Mock: Return empty array for now
-    return [];
+  async getRegistrations(showId: string, params?: any): Promise<any> {
+    // Mock: Return registrations with pagination
+    const registrations = [
+      {
+        id: "reg-1",
+        show_id: showId,
+        dog: {
+          id: "dog-1",
+          name: "Bella",
+          breed: {
+            name_pl: "Labrador retriever",
+            name_en: "Labrador Retriever",
+            fci_group: "G8" as const,
+          },
+          gender: "female" as const,
+          birth_date: "2022-05-15",
+        },
+        dog_class: "open" as const,
+        catalog_number: 45,
+        registration_fee: 150.0,
+        is_paid: true,
+        payment_date: "2024-01-15T10:30:00Z",
+        registered_at: "2024-01-15T10:30:00Z",
+        created_at: "2024-01-15T10:30:00Z",
+        updated_at: "2024-01-15T10:30:00Z",
+      },
+      {
+        id: "reg-2",
+        show_id: showId,
+        dog: {
+          id: "dog-2",
+          name: "Max",
+          breed: {
+            name_pl: "Owczarek niemiecki",
+            name_en: "German Shepherd",
+            fci_group: "G1" as const,
+          },
+          gender: "male" as const,
+          birth_date: "2021-08-20",
+        },
+        dog_class: "champion" as const,
+        catalog_number: 12,
+        registration_fee: 150.0,
+        is_paid: false,
+        payment_date: null,
+        registered_at: "2024-01-16T14:20:00Z",
+        created_at: "2024-01-16T14:20:00Z",
+        updated_at: "2024-01-16T14:20:00Z",
+      },
+    ];
+
+    // Apply filters if provided
+    let filteredRegistrations = registrations;
+
+    if (params) {
+      if (params.dog_class) {
+        filteredRegistrations = filteredRegistrations.filter(
+          (reg) => reg.dog_class === params.dog_class,
+        );
+      }
+
+      if (params.is_paid !== undefined) {
+        filteredRegistrations = filteredRegistrations.filter(
+          (reg) => reg.is_paid === params.is_paid,
+        );
+      }
+
+      if (params.breed_id) {
+        filteredRegistrations = filteredRegistrations.filter(
+          (reg) => reg.dog.id === params.breed_id,
+        );
+      }
+
+      if (params.gender) {
+        filteredRegistrations = filteredRegistrations.filter(
+          (reg) => reg.dog.gender === params.gender,
+        );
+      }
+
+      if (params.search) {
+        const searchLower = params.search.toLowerCase();
+        filteredRegistrations = filteredRegistrations.filter(
+          (reg) =>
+            reg.dog.name.toLowerCase().includes(searchLower) ||
+            reg.dog.breed.name_pl.toLowerCase().includes(searchLower) ||
+            reg.dog.breed.name_en.toLowerCase().includes(searchLower),
+        );
+      }
+    }
+
+    // Apply pagination
+    const page = params?.page || 1;
+    const limit = params?.limit || 20;
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedRegistrations = filteredRegistrations.slice(
+      startIndex,
+      endIndex,
+    );
+
+    return {
+      registrations: paginatedRegistrations,
+      pagination: {
+        page,
+        limit,
+        total: filteredRegistrations.length,
+        pages: Math.ceil(filteredRegistrations.length / limit),
+      },
+    };
   }
 
   async createRegistration(showId: string, data: any): Promise<any> {
-    // Mock: Create registration
+    // 1. Validate show exists and is in registration state
+    const show = MOCK_DATA.shows.find((s) => s.id === showId);
+    if (!show) {
+      throw new Error("NOT_FOUND: Show not found");
+    }
+
+    // 2. Validate show accepts registrations
+    this.validateShowAcceptsRegistrations(show.status);
+
+    // 3. Validate dog age vs class
+    // Mock dog data - in real implementation this would come from database
+    const mockDog = {
+      id: data.dog_id,
+      birth_date: "2022-05-15", // Mock birth date
+    };
+    this.validateDogClassByAge(
+      mockDog.birth_date,
+      data.dog_class,
+      show.show_date,
+    );
+
+    // 4. Validate no duplicate registration
+    this.validateNoDuplicateRegistration(showId, data.dog_id);
+
+    // 5. Validate participant limit
+    const currentRegistrations =
+      MOCK_DATA.shows.find((s) => s.id === showId)?.registrations?.length || 0;
+    this.validateParticipantLimit(currentRegistrations, show.max_participants);
+
+    // 6. Create registration
     const registration = {
       id: crypto.randomUUID(),
       show_id: showId,
       dog_id: data.dog_id,
       dog_class: data.dog_class,
-      registration_fee: data.registration_fee || null,
+      registration_fee: data.registration_fee || show.entry_fee || null,
       is_paid: false,
       registered_at: new Date().toISOString(),
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
+
+    // 7. Add to mock data (in real implementation this would be saved to database)
+    if (!show.registrations) {
+      show.registrations = [];
+    }
+    show.registrations.push(registration);
+
     return registration;
   }
 
@@ -252,23 +557,169 @@ export class ShowService {
     registrationId: string,
     data: any,
   ): Promise<any> {
-    // Mock: Update registration
+    // 1. Validate show exists and is editable
+    const show = MOCK_DATA.shows.find((s) => s.id === showId);
+    if (!show) {
+      throw new Error("NOT_FOUND: Show not found");
+    }
+
+    // 2. Validate show is editable
+    this.validateShowEditable(show.status, "update registration");
+
+    // 3. Validate registration exists
+    const existingRegistration = show.registrations?.find(
+      (reg: any) => reg.id === registrationId,
+    );
+    if (!existingRegistration) {
+      throw new Error("NOT_FOUND: Registration not found");
+    }
+
+    // 4. Validate dog age vs class if class is being updated
+    if (data.dog_class && data.dog_class !== existingRegistration.dog_class) {
+      const mockDog = {
+        id: existingRegistration.dog_id,
+        birth_date: "2022-05-15", // Mock birth date
+      };
+      this.validateDogClassByAge(
+        mockDog.birth_date,
+        data.dog_class,
+        show.show_date,
+      );
+    }
+
+    // 5. Update registration
+    const updatedRegistration = {
+      ...existingRegistration,
+      ...data,
+      updated_at: new Date().toISOString(),
+    };
+
+    // 6. Update in mock data
+    const registrationIndex = show.registrations?.findIndex(
+      (reg: any) => reg.id === registrationId,
+    );
+    if (registrationIndex !== undefined && registrationIndex !== -1) {
+      show.registrations[registrationIndex] = updatedRegistration;
+    }
+
+    return updatedRegistration;
+  }
+
+  async deleteRegistration(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    showId?: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    registrationId?: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    currentUserId?: string,
+  ): Promise<void> {
+    // Mock: Delete registration (no-op for now)
+  }
+
+  async getRegistrationById(
+    showId: string,
+    registrationId: string,
+  ): Promise<any> {
+    // Mock: Get registration by ID
     const registration = {
       id: registrationId,
       show_id: showId,
-      dog_id: "mock-dog-id",
-      dog_class: data.dog_class || "open",
+      dog: {
+        id: "mock-dog-id",
+        name: "Mock Dog",
+        breed: {
+          name_pl: "Labrador retriever",
+          name_en: "Labrador Retriever",
+          fci_group: "G8" as const,
+        },
+        gender: "male" as const,
+        birth_date: "2022-05-15",
+      },
+      dog_class: "open" as const,
+      catalog_number: 45,
       registration_fee: 150.0,
-      is_paid: data.is_paid || false,
-      registered_at: new Date().toISOString(),
-      created_at: new Date().toISOString(),
+      is_paid: true,
+      payment_date: "2024-01-15T10:30:00Z",
+      registered_at: "2024-01-15T10:30:00Z",
+      created_at: "2024-01-15T10:30:00Z",
+      updated_at: "2024-01-15T10:30:00Z",
+    };
+    return registration;
+  }
+
+  async updatePaymentStatus(
+    showId: string,
+    registrationId: string,
+    data: any,
+  ): Promise<any> {
+    // Mock: Update payment status
+    const registration = {
+      id: registrationId,
+      show_id: showId,
+      dog: {
+        id: "mock-dog-id",
+        name: "Mock Dog",
+        breed: {
+          name_pl: "Labrador retriever",
+          name_en: "Labrador Retriever",
+          fci_group: "G8" as const,
+        },
+        gender: "male" as const,
+        birth_date: "2022-05-15",
+      },
+      dog_class: "open" as const,
+      catalog_number: 45,
+      registration_fee: 150.0,
+      is_paid: data.is_paid,
+      payment_date:
+        data.payment_date || (data.is_paid ? new Date().toISOString() : null),
+      payment_method: data.payment_method,
+      registered_at: "2024-01-15T10:30:00Z",
+      created_at: "2024-01-15T10:30:00Z",
       updated_at: new Date().toISOString(),
     };
     return registration;
   }
 
-  async deleteRegistration(): Promise<void> {
-    // Mock: Delete registration (no-op for now)
+  async getRegistrationStats(): Promise<any> {
+    // Mock: Get registration statistics
+    const stats = {
+      total: 45,
+      paid: 38,
+      unpaid: 7,
+      by_class: {
+        baby: 5,
+        puppy: 8,
+        junior: 12,
+        intermediate: 0,
+        open: 15,
+        working: 0,
+        champion: 5,
+        veteran: 0,
+      },
+      by_gender: {
+        male: 25,
+        female: 20,
+      },
+      by_breed_group: {
+        G1: 8,
+        G2: 0,
+        G3: 0,
+        G4: 0,
+        G5: 0,
+        G6: 0,
+        G7: 0,
+        G8: 15,
+        G9: 12,
+        G10: 10,
+      },
+      revenue: {
+        total: 2250.0,
+        paid: 1900.0,
+        outstanding: 350.0,
+      },
+    };
+    return stats;
   }
 
   private async formatResponse(

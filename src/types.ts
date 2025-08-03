@@ -363,6 +363,26 @@ export interface UpdateRegistrationDto {
   is_paid?: boolean;
 }
 
+export interface UpdatePaymentStatusDto {
+  is_paid: boolean;
+  payment_date?: string;
+  payment_method?: string;
+}
+
+export interface RegistrationStatsDto {
+  total: number;
+  paid: number;
+  unpaid: number;
+  by_class: Record<DogClass, number>;
+  by_gender: Record<DogGender, number>;
+  by_breed_group: Record<FCIGroup, number>;
+  revenue: {
+    total: number;
+    paid: number;
+    outstanding: number;
+  };
+}
+
 // =============================================================================
 // DESCRIPTIONS MANAGEMENT DTOs
 // =============================================================================
@@ -518,6 +538,9 @@ export interface OwnerQueryParams {
 export interface RegistrationQueryParams {
   dog_class?: DogClass;
   is_paid?: boolean;
+  breed_id?: string;
+  gender?: DogGender;
+  search?: string;
   page?: number;
   limit?: number;
 }

@@ -3,18 +3,12 @@ import { z } from "zod";
 import { ShowService } from "../../../../lib/services/showService";
 import {
   createRegistrationSchema,
-  updateRegistrationSchema,
+  registrationQuerySchema,
 } from "../../../../lib/validation/showSchemas";
 import { supabaseClient } from "../../../../db/supabase.client";
 import type { ErrorResponseDto } from "../../../../types";
 
-// Mock DEFAULT_USER dla testów (department_representative)
-const DEFAULT_USER = {
-  id: "00000000-0000-0000-0000-000000000002",
-  role: "department_representative" as const,
-};
-
-export const GET: APIRoute = async ({ params }) => {
+export const GET: APIRoute = async ({ params, request }) => {
   try {
     const { id: showId } = params;
 
@@ -35,9 +29,30 @@ export const GET: APIRoute = async ({ params }) => {
       );
     }
 
+    // Parse query parameters
+    const url = new URL(request.url);
+    const queryParams: Record<string, unknown> = {};
+
+    // Convert query parameters
+    for (const [key, value] of url.searchParams.entries()) {
+      if (key === "page" || key === "limit") {
+        queryParams[key] = parseInt(value, 10);
+      } else if (key === "is_paid") {
+        queryParams[key] = value === "true";
+      } else {
+        queryParams[key] = value;
+      }
+    }
+
+    // Validate query parameters
+    const validatedParams = registrationQuerySchema.parse(queryParams);
+
     // Get registrations using service
     const showService = new ShowService(supabaseClient);
-    const registrations = await showService.getRegistrations(showId);
+    const registrations = await showService.getRegistrations(
+      showId,
+      validatedParams,
+    );
 
     return new Response(JSON.stringify(registrations), {
       status: 200,
@@ -117,15 +132,11 @@ export const POST: APIRoute = async ({ params, request }) => {
     // Validate input data
     const validatedData = createRegistrationSchema.parse(body);
 
-    // Use DEFAULT_USER instead of real auth for now
-    const currentUserId = DEFAULT_USER.id;
-
     // Create registration using service
     const showService = new ShowService(supabaseClient);
     const registration = await showService.createRegistration(
       showId,
       validatedData,
-      currentUserId,
     );
 
     return new Response(JSON.stringify(registration), {

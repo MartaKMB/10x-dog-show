@@ -130,6 +130,35 @@ export const updateRegistrationSchema = z.object({
   is_paid: z.boolean().optional(),
 });
 
+// Schema for updating payment status
+export const updatePaymentStatusSchema = z.object({
+  is_paid: z.boolean(),
+  payment_date: z.string().datetime().optional(),
+  payment_method: z.string().max(50).optional(),
+});
+
+// Schema for registration query parameters
+export const registrationQuerySchema = z.object({
+  dog_class: z
+    .enum([
+      "baby",
+      "puppy",
+      "junior",
+      "intermediate",
+      "open",
+      "working",
+      "champion",
+      "veteran",
+    ])
+    .optional(),
+  is_paid: z.boolean().optional(),
+  breed_id: z.string().uuid().optional(),
+  gender: z.enum(["male", "female"]).optional(),
+  search: z.string().max(100).optional(),
+  page: z.number().min(1).default(1),
+  limit: z.number().min(1).max(100).default(20),
+});
+
 // Type inference for validated data
 export type CreateShowInput = z.infer<typeof createShowSchema>;
 export type UpdateShowInput = z.infer<typeof updateShowSchema>;
@@ -137,3 +166,7 @@ export type ShowQueryInput = z.infer<typeof showQuerySchema>;
 export type UpdateShowStatusInput = z.infer<typeof updateShowStatusSchema>;
 export type CreateRegistrationInput = z.infer<typeof createRegistrationSchema>;
 export type UpdateRegistrationInput = z.infer<typeof updateRegistrationSchema>;
+export type UpdatePaymentStatusInput = z.infer<
+  typeof updatePaymentStatusSchema
+>;
+export type RegistrationQueryInput = z.infer<typeof registrationQuerySchema>;
