@@ -1,407 +1,738 @@
-# API Endpoint Implementation Plan: POST /shows
+# API Endpoint Implementation Plan: Show Management + Show Registration
 
-## 1. Przegląd punktu końcowego
+## 1. Przegląd punktów końcowych
 
-Endpoint `POST /shows` służy do tworzenia nowych wystaw psów w systemie 10x Dog Show. Tylko użytkownicy z rolą `department_representative` mogą tworzyć wystawy. Nowo utworzona wystawa automatycznie otrzymuje status `draft` i jest przypisana do organizatora (bieżącego użytkownika).
+Kompleksowy system zarządzania wystawami psów i rejestracji psów na wystawy. System obejmuje pełny cykl życia wystawy od tworzenia przez zarządzanie rejestracjami aż po zakończenie wystawy.
 
-## 2. Szczegóły żądania
+### Show Management
+- Tworzenie, edycja, przeglądanie i usuwanie wystaw
+- Zarządzanie statusem wystawy (draft, open_for_registration, etc.)
+- Konfiguracja parametrów wystawy (daty, lokalizacja, opłaty)
+- Statystyki i raporty wystaw
 
-- **Metoda HTTP**: POST
-- **Struktura URL**: `/api/shows`
-- **Parametry wymagane**:
-  - `name`: Nazwa wystawy (string, max 200 znaków)
-  - `show_type`: Typ wystawy (`national` | `international`)
-  - `show_date`: Data wystawy (ISO 8601 date)
-  - `registration_deadline`: Termin rejestracji (ISO 8601 date)
-  - `venue_id`: ID obiektu (UUID)
-  - `language`: Język (`pl` | `en`)
-- **Parametry opcjonalne**:
-  - `max_participants`: Maksymalna liczba uczestników (integer)
-  - `entry_fee`: Opłata wpisowa (decimal, 2 miejsca po przecinku)
-  - `description`: Opis wystawy (text)
-- **Request Body**: JSON zgodny ze schematem `CreateShowDto`
+### Show Registration Management
+- Rejestracja psów na wystawy
+- Zarządzanie listą uczestników
+- Filtrowanie i wyszukiwanie rejestracji
+- Statystyki rejestracji (opłacone/nieopłacone, podział według klas)
+
+## 2. Szczegóły żądań
+
+### 2.1 Show Management Endpoints
+
+#### GET /shows
+- **Metoda HTTP:** GET
+- **Struktura URL:** `/api/shows`
+- **Parametry query:**
+  - `status` (optional): Filtr po statusie wystawy
+  - `show_type` (optional): Filtr po typie wystawy (national/international)
+  - `from_date` (optional): Filtr wystaw od daty (ISO 8601)
+  - `to_date` (optional): Filtr wystaw do daty (ISO 8601)
+  - `organizer_id` (optional): Filtr po organizatorze
+  - `page` (optional): Numer strony (default: 1)
+  - `limit` (optional): Elementów na stronę (default: 20, max: 100)
+- **Autoryzacja:** Wszyscy uwierzytelnieni użytkownicy
+
+#### GET /shows/{id}
+- **Metoda HTTP:** GET
+- **Struktura URL:** `/api/shows/{id}`
+- **Parametry:** `id` (UUID) - Identyfikator wystawy
+- **Autoryzacja:** Wszyscy uwierzytelnieni użytkownicy
+
+#### POST /shows
+- **Metoda HTTP:** POST
+- **Struktura URL:** `/api/shows`
+- **Request Body:** CreateShowDto
+- **Autoryzacja:** Przedstawiciele oddziałów (rola: department_representative)
+
+#### PUT /shows/{id}
+- **Metoda HTTP:** PUT
+- **Struktura URL:** `/api/shows/{id}`
+- **Request Body:** UpdateShowDto
+- **Autoryzacja:** Przedstawiciele oddziałów (tylko przed rozpoczęciem wystawy)
+
+#### PATCH /shows/{id}/status
+- **Metoda HTTP:** PATCH
+- **Struktura URL:** `/api/shows/{id}/status`
+- **Request Body:** UpdateShowStatusDto
+- **Autoryzacja:** Przedstawiciele oddziałów
+
+#### DELETE /shows/{id}
+- **Metoda HTTP:** DELETE
+- **Struktura URL:** `/api/shows/{id}`
+- **Autoryzacja:** Przedstawiciele oddziałów (tylko przed rozpoczęciem wystawy)
+
+### 2.2 Show Registration Management Endpoints
+
+#### GET /shows/{showId}/registrations
+- **Metoda HTTP:** GET
+- **Struktura URL:** `/api/shows/{showId}/registrations`
+- **Parametry query:**
+  - `dog_class` (optional): Filtr po klasie psa
+  - `is_paid` (optional): Filtr po statusie płatności
+  - `breed_id` (optional): Filtr po rasie
+  - `gender` (optional): Filtr po płci
+  - `search` (optional): Wyszukiwanie w nazwie psa lub właściciela
+  - `page` (optional): Numer strony (default: 1)
+  - `limit` (optional): Elementów na stronę (default: 20, max: 100)
+- **Autoryzacja:** Wszyscy uwierzytelnieni użytkownicy
+
+#### POST /shows/{showId}/registrations
+- **Metoda HTTP:** POST
+- **Struktura URL:** `/api/shows/{showId}/registrations`
+- **Request Body:** CreateRegistrationDto
+- **Autoryzacja:** Przedstawiciele oddziałów i sekretarze
+
+#### GET /shows/{showId}/registrations/{registrationId}
+- **Metoda HTTP:** GET
+- **Struktura URL:** `/api/shows/{showId}/registrations/{registrationId}`
+- **Parametry:** `showId` (UUID), `registrationId` (UUID)
+- **Autoryzacja:** Wszyscy uwierzytelnieni użytkownicy
+
+#### PUT /shows/{showId}/registrations/{registrationId}
+- **Metoda HTTP:** PUT
+- **Struktura URL:** `/api/shows/{showId}/registrations/{registrationId}`
+- **Request Body:** UpdateRegistrationDto
+- **Autoryzacja:** Przedstawiciele oddziałów (tylko przed rozpoczęciem wystawy)
+
+#### DELETE /shows/{showId}/registrations/{registrationId}
+- **Metoda HTTP:** DELETE
+- **Struktura URL:** `/api/shows/{showId}/registrations/{registrationId}`
+- **Autoryzacja:** Przedstawiciele oddziałów (tylko przed rozpoczęciem wystawy)
+
+#### PATCH /shows/{showId}/registrations/{registrationId}/payment
+- **Metoda HTTP:** PATCH
+- **Struktura URL:** `/api/shows/{showId}/registrations/{registrationId}/payment`
+- **Request Body:** UpdatePaymentStatusDto
+- **Autoryzacja:** Przedstawiciele oddziałów
+
+#### GET /shows/{showId}/registrations/stats
+- **Metoda HTTP:** GET
+- **Struktura URL:** `/api/shows/{showId}/registrations/stats`
+- **Autoryzacja:** Wszyscy uwierzytelnieni użytkownicy
 
 ## 3. Wykorzystywane typy
 
-### DTOs i Command Modele:
-- `CreateShowDto` - walidacja danych wejściowych
-- `Show` - reprezentacja encji w bazie danych
-- `ShowResponseDto` - format odpowiedzi API
-- `ErrorResponseDto` - obsługa błędów
+### 3.1 Show Management DTOs
 
-### Typy pomocnicze:
-- `ShowType` - enum typów wystaw
-- `ShowStatus` - enum statusów wystaw
-- `Language` - enum języków
+```typescript
+// Query Parameters
+ShowQueryParams {
+  status?: ShowStatus;
+  show_type?: ShowType;
+  from_date?: string;
+  to_date?: string;
+  organizer_id?: string;
+  page?: number;
+  limit?: number;
+}
 
-## 4. Szczegóły odpowiedzi
+// Request DTOs
+CreateShowDto {
+  name: string;
+  show_type: ShowType;
+  show_date: string;
+  registration_deadline: string;
+  venue_id: string;
+  max_participants?: number;
+  entry_fee?: number;
+  description?: string;
+  language: Language;
+}
 
-### Sukces (201 Created):
-```json
-{
-  "id": "uuid",
-  "name": "National Dog Show Warsaw 2024",
-  "show_type": "national",
-  "status": "draft",
-  "show_date": "2024-03-15",
-  "registration_deadline": "2024-03-01",
-  "venue_id": "uuid",
-  "organizer_id": "uuid",
-  "max_participants": 200,
-  "entry_fee": 50.00,
-  "description": "Annual national dog show featuring all FCI groups",
-  "language": "pl",
-  "created_at": "2024-01-15T10:30:00Z"
+UpdateShowDto {
+  name?: string;
+  show_date?: string;
+  registration_deadline?: string;
+  venue_id?: string;
+  max_participants?: number;
+  entry_fee?: number;
+  description?: string;
+}
+
+UpdateShowStatusDto {
+  status: ShowStatus;
+}
+
+// Response DTOs
+ShowResponseDto {
+  id: string;
+  name: string;
+  show_type: ShowType;
+  status: ShowStatus;
+  show_date: string;
+  registration_deadline: string;
+  venue: VenueSummaryDto;
+  organizer: UserSummaryDto;
+  max_participants?: number;
+  registered_dogs: number;
+  entry_fee?: number;
+  description?: string;
+  language: Language;
+  created_at: string;
+  updated_at: string;
+}
+
+ShowDetailResponseDto extends ShowResponseDto {
+  venue: VenueDetailDto;
+  organizer: UserDetailDto;
+  stats: ShowStatsDto;
+}
+
+ShowStatsDto {
+  total_registrations: number;
+  paid_registrations: number;
+  unpaid_registrations: number;
+  by_class: Record<DogClass, number>;
+  by_gender: Record<DogGender, number>;
+  by_breed_group: Record<FCIGroup, number>;
+}
+
+PaginatedResponseDto<ShowResponseDto>;
+```
+
+### 3.2 Show Registration Management DTOs
+
+```typescript
+// Query Parameters
+RegistrationQueryParams {
+  dog_class?: DogClass;
+  is_paid?: boolean;
+  breed_id?: string;
+  gender?: DogGender;
+  search?: string;
+  page?: number;
+  limit?: number;
+}
+
+// Request DTOs
+CreateRegistrationDto {
+  dog_id: string;
+  dog_class: DogClass;
+  registration_fee?: number;
+  notes?: string;
+}
+
+UpdateRegistrationDto {
+  dog_class?: DogClass;
+  registration_fee?: number;
+  notes?: string;
+}
+
+UpdatePaymentStatusDto {
+  is_paid: boolean;
+  payment_date?: string;
+  payment_method?: string;
+}
+
+// Response DTOs
+RegistrationResponseDto {
+  id: string;
+  show_id: string;
+  dog: DogSummaryDto;
+  dog_class: DogClass;
+  catalog_number?: number;
+  registration_fee: number;
+  is_paid: boolean;
+  payment_date?: string;
+  notes?: string;
+  registered_at: string;
+}
+
+RegistrationDetailResponseDto extends RegistrationResponseDto {
+  dog: DogDetailDto;
+  owner: OwnerDetailDto;
+}
+
+RegistrationStatsDto {
+  total: number;
+  paid: number;
+  unpaid: number;
+  by_class: Record<DogClass, number>;
+  by_gender: Record<DogGender, number>;
+  by_breed_group: Record<FCIGroup, number>;
+  revenue: {
+    total: number;
+    paid: number;
+    outstanding: number;
+  };
+}
+
+PaginatedResponseDto<RegistrationResponseDto>;
+```
+
+### 3.3 Wspólne typy
+
+```typescript
+// Enums
+ShowStatus: 'draft' | 'open_for_registration' | 'registration_closed' | 'in_progress' | 'completed' | 'cancelled';
+ShowType: 'national' | 'international';
+DogClass: 'baby' | 'puppy' | 'junior' | 'intermediate' | 'open' | 'working' | 'champion' | 'veteran';
+DogGender: 'male' | 'female';
+FCIGroup: 'G1' | 'G2' | 'G3' | 'G4' | 'G5' | 'G6' | 'G7' | 'G8' | 'G9' | 'G10';
+Language: 'pl' | 'en';
+
+// Summary DTOs
+VenueSummaryDto {
+  id: string;
+  name: string;
+  city: string;
+}
+
+VenueDetailDto extends VenueSummaryDto {
+  address: string;
+  postal_code: string;
+  country: string;
+}
+
+UserSummaryDto {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+}
+
+UserDetailDto extends UserSummaryDto {
+  role: UserRole;
+  phone?: string;
+}
+
+DogSummaryDto {
+  id: string;
+  name: string;
+  breed: BreedSummaryDto;
+  gender: DogGender;
+  birth_date: string;
+}
+
+DogDetailDto extends DogSummaryDto {
+  microchip_number: string;
+  kennel_club_number?: string;
+  kennel_name?: string;
+  father_name?: string;
+  mother_name?: string;
+}
+
+OwnerDetailDto {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone?: string;
+  address: string;
+  city: string;
+  postal_code?: string;
+  country: string;
+  kennel_name?: string;
+}
+
+BreedSummaryDto {
+  id: string;
+  name_pl: string;
+  name_en: string;
+  fci_group: FCIGroup;
 }
 ```
 
-### Kody błędów:
-- `400 Bad Request`: Nieprawidłowe dane wejściowe
-- `401 Unauthorized`: Brak autoryzacji
-- `403 Forbidden`: Brak uprawnień (nie department_representative)
-- `404 Not Found`: Obiekt nie istnieje
-- `500 Internal Server Error`: Błąd serwera
+## 4. Szczegóły odpowiedzi
+
+### 4.1 Kody statusu HTTP
+- **200 OK:** Pomyślne operacje odczytu i aktualizacji
+- **201 Created:** Pomyślne utworzenie nowego zasobu
+- **400 Bad Request:** Błędy walidacji danych wejściowych
+- **401 Unauthorized:** Brak lub nieprawidłowy token uwierzytelniający
+- **403 Forbidden:** Brak uprawnień do wykonania operacji
+- **404 Not Found:** Zasób nie został znaleziony
+- **409 Conflict:** Rejestracja już istnieje, limit uczestników przekroczony
+- **422 Unprocessable Entity:** Wystawa rozpoczęta, nie można edytować
+- **500 Internal Server Error:** Błędy serwera
+
+### 4.2 Przykłady odpowiedzi
+
+#### GET /shows (200 OK)
+```json
+{
+  "shows": [
+    {
+      "id": "uuid",
+      "name": "National Dog Show Warsaw 2024",
+      "show_type": "national",
+      "status": "open_for_registration",
+      "show_date": "2024-03-15",
+      "registration_deadline": "2024-03-01",
+      "venue": {
+        "id": "uuid",
+        "name": "Warsaw Expo Center",
+        "city": "Warsaw"
+      },
+      "organizer": {
+        "id": "uuid",
+        "first_name": "John",
+        "last_name": "Doe",
+        "email": "john@example.com"
+      },
+      "max_participants": 200,
+      "registered_dogs": 45,
+      "entry_fee": 50.00,
+      "language": "pl",
+      "created_at": "2024-01-15T10:30:00Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 20,
+    "total": 12,
+    "pages": 1
+  }
+}
+```
+
+#### GET /shows/{showId}/registrations (200 OK)
+```json
+{
+  "registrations": [
+    {
+      "id": "uuid",
+      "show_id": "uuid",
+      "dog": {
+        "id": "uuid",
+        "name": "Bella",
+        "breed": {
+          "name_pl": "Labrador retriever",
+          "fci_group": "G8"
+        },
+        "gender": "female",
+        "birth_date": "2022-05-15"
+      },
+      "dog_class": "open",
+      "catalog_number": 45,
+      "registration_fee": 50.00,
+      "is_paid": true,
+      "payment_date": "2024-01-15T10:30:00Z",
+      "registered_at": "2024-01-15T10:30:00Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 20,
+    "total": 45,
+    "pages": 3
+  }
+}
+```
+
+#### GET /shows/{showId}/registrations/stats (200 OK)
+```json
+{
+  "total": 45,
+  "paid": 38,
+  "unpaid": 7,
+  "by_class": {
+    "baby": 5,
+    "puppy": 8,
+    "junior": 12,
+    "open": 15,
+    "champion": 5
+  },
+  "by_gender": {
+    "male": 25,
+    "female": 20
+  },
+  "by_breed_group": {
+    "G1": 8,
+    "G8": 15,
+    "G9": 12,
+    "G10": 10
+  },
+  "revenue": {
+    "total": 2250.00,
+    "paid": 1900.00,
+    "outstanding": 350.00
+  }
+}
+```
 
 ## 5. Przepływ danych
 
-1. **Walidacja autoryzacji**: Sprawdzenie JWT token i roli użytkownika
-2. **Parsowanie żądania**: Deserializacja JSON do obiektu
-3. **Walidacja danych**: Walidacja z użyciem Zod schema
-4. **Walidacja biznesowa**: Sprawdzenie logiki biznesowej
-5. **Wstawienie do bazy**: Utworzenie rekordu w tabeli `dog_shows.shows`
-6. **Audyt**: Zapisanie akcji w tabeli audytu
-7. **Odpowiedź**: Zwrócenie utworzonego obiektu
+### 5.1 Show Management Flow
 
-### Interakcje z zewnętrznymi usługami:
-- **Supabase Auth**: Weryfikacja tokenu i roli użytkownika
-- **Supabase Database**: Wstawienie rekordu z RLS
-- **Audit Service**: Logowanie akcji tworzenia
+#### POST /shows:
+1. **Walidacja danych wejściowych** - sprawdzenie wymaganych pól
+2. **Walidacja biznesowa** - daty, lokalizacja, uprawnienia
+3. **Sprawdzenie duplikatu** - czy wystawa o tej nazwie już istnieje
+4. **Transakcja** - utworzenie wystawy z statusem 'draft'
+5. **Audyt** - logowanie operacji
+6. **Odpowiedź** - zwrócenie utworzonej wystawy
+
+#### PUT /shows/{id}:
+1. **Sprawdzenie istnienia** - czy wystawa istnieje
+2. **Walidacja stanu** - czy można edytować (nie rozpoczęta)
+3. **Walidacja uprawnień** - czy użytkownik jest organizatorem
+4. **Aktualizacja** - zapisanie zmian
+5. **Odpowiedź** - zwrócenie zaktualizowanej wystawy
+
+#### PATCH /shows/{id}/status:
+1. **Sprawdzenie istnienia** - czy wystawa istnieje
+2. **Walidacja przejścia** - czy przejście statusu jest dozwolone
+3. **Aktualizacja statusu** - zmiana statusu wystawy
+4. **Akcje dodatkowe** - powiadomienia, generowanie numerów katalogów
+5. **Odpowiedź** - potwierdzenie zmiany statusu
+
+### 5.2 Show Registration Management Flow
+
+#### POST /shows/{showId}/registrations:
+1. **Sprawdzenie wystawy** - czy wystawa istnieje i przyjmuje rejestracje
+2. **Walidacja psa** - czy pies istnieje i spełnia wymagania
+3. **Sprawdzenie limitu** - czy nie przekroczono max_participants
+4. **Sprawdzenie duplikatu** - czy pies już nie jest zarejestrowany
+5. **Walidacja klasy** - czy klasa psa jest odpowiednia dla wieku
+6. **Transakcja** - utworzenie rejestracji
+7. **Odpowiedź** - zwrócenie utworzonej rejestracji
+
+#### PUT /shows/{showId}/registrations/{registrationId}:
+1. **Sprawdzenie rejestracji** - czy rejestracja istnieje
+2. **Walidacja stanu** - czy można edytować (wystawa nie rozpoczęta)
+3. **Walidacja danych** - nowe wartości rejestracji
+4. **Aktualizacja** - zapisanie zmian
+5. **Odpowiedź** - zwrócenie zaktualizowanej rejestracji
+
+#### PATCH /shows/{showId}/registrations/{registrationId}/payment:
+1. **Sprawdzenie rejestracji** - czy rejestracja istnieje
+2. **Aktualizacja płatności** - zmiana statusu płatności
+3. **Logowanie** - zapisanie informacji o płatności
+4. **Odpowiedź** - potwierdzenie aktualizacji płatności
+
+#### GET /shows/{showId}/registrations/stats:
+1. **Sprawdzenie wystawy** - czy wystawa istnieje
+2. **Agregacja danych** - obliczenie statystyk z rejestracji
+3. **Odpowiedź** - zwrócenie statystyk
 
 ## 6. Względy bezpieczeństwa
 
-### Autoryzacja:
-- Wymagany JWT token w headerze `Authorization: Bearer <token>`
-- Tylko użytkownicy z rolą `department_representative` mogą tworzyć wystawy
-- Row Level Security (RLS) zapewnia izolację danych
+### 6.1 Autoryzacja i uwierzytelnianie
+- **JWT Token Validation:** Sprawdzanie tokenu w headerze
+- **Role-based Access Control:** Przedstawiciele oddziałów dla zarządzania, wszyscy dla odczytu
+- **Row Level Security (RLS):** Polityki na poziomie bazy danych
 
-### Walidacja danych:
-- Walidacja formatu dat (ISO 8601)
-- Sprawdzenie relacji dat: `registration_deadline <= show_date`
-- Walidacja UUID dla `venue_id`
-- Sanityzacja stringów (trim, escape)
-- Walidacja długości pól
+### 6.2 Walidacja danych wejściowych
+- **Zod Schemas:** Walidacja wszystkich DTOs
+- **Date Validation:** Sprawdzenie relacji dat (registration_deadline <= show_date)
+- **Business Rule Validation:** Reguły rejestracji i limitów
+- **SQL Injection Prevention:** Parametryzowane zapytania
 
-### Bezpieczeństwo bazy danych:
-- Parametryzowane zapytania SQL
-- RLS policies dla tabeli `shows`
-- Automatyczne ustawienie `organizer_id` na bieżącego użytkownika
+### 6.3 Walidacja biznesowa
+- **Show Status:** Edycja tylko przed rozpoczęciem wystawy
+- **Registration Limits:** Nie przekraczać max_participants
+- **Dog Class Validation:** Zgodność klasy z wiekiem psa
+- **Payment Tracking:** Śledzenie statusu płatności
+
+### 6.4 Rate Limiting
+- **Authenticated requests:** 1000 requests/hour per user
+- **Registration creation:** 100 registrations/hour per user
+- **Show creation:** 10 shows/hour per user
 
 ## 7. Obsługa błędów
 
-### Scenariusze błędów walidacji:
-- **Nieprawidłowy format daty**: 400 Bad Request
-- **Data rejestracji po dacie wystawy**: 400 Bad Request
-- **Nieprawidłowy UUID obiektu**: 400 Bad Request
-- **Brak wymaganych pól**: 400 Bad Request
-- **Nieprawidłowy typ wystawy**: 400 Bad Request
+### 7.1 Typy błędów i kody
+- **VALIDATION_ERROR (400):** Błędy walidacji danych wejściowych
+- **AUTHENTICATION_ERROR (401):** Nieprawidłowy lub wygasły token
+- **AUTHORIZATION_ERROR (403):** Brak uprawnień do operacji
+- **NOT_FOUND (404):** Wystawa/rejestracja nie istnieje
+- **CONFLICT (409):** Rejestracja już istnieje, limit przekroczony
+- **BUSINESS_RULE_ERROR (422):** Wystawa rozpoczęta, nie można edytować
+- **INTERNAL_ERROR (500):** Błędy serwera
 
-### Scenariusze błędów autoryzacji:
-- **Brak tokenu**: 401 Unauthorized
-- **Nieprawidłowy token**: 401 Unauthorized
-- **Token wygasł**: 401 Unauthorized
-- **Brak roli department_representative**: 403 Forbidden
-
-### Scenariusze błędów biznesowych:
-- **Obiekt nie istnieje**: 404 Not Found
-- **Błąd bazy danych**: 500 Internal Server Error
-- **Błąd audytu**: 500 Internal Server Error
-
-### Format odpowiedzi błędów:
+### 7.2 Przykłady błędów
 ```json
+// Limit uczestników przekroczony
+{
+  "error": {
+    "code": "CONFLICT",
+    "message": "Maximum participants limit reached for this show"
+  }
+}
+
+// Wystawa już rozpoczęta
+{
+  "error": {
+    "code": "BUSINESS_RULE_ERROR",
+    "message": "Cannot modify registrations for started shows"
+  }
+}
+
+// Nieprawidłowa klasa psa
 {
   "error": {
     "code": "VALIDATION_ERROR",
-    "message": "The provided data is invalid",
-    "details": [
-      {
-        "field": "registration_deadline",
-        "message": "Registration deadline must be before show date"
-      }
-    ]
-  },
-  "timestamp": "2024-01-15T11:30:00Z",
-  "request_id": "uuid"
+    "message": "Invalid dog class for age",
+    "details": [{"field": "dog_class", "message": "Dog age does not match selected class"}]
+  }
+}
+
+// Rejestracja już istnieje
+{
+  "error": {
+    "code": "CONFLICT",
+    "message": "Dog is already registered for this show"
+  }
 }
 ```
 
 ## 8. Rozważania dotyczące wydajności
 
-### Optymalizacje:
-- Indeksy na kolumnach: `organizer_id`, `show_date`, `status`
-- Walidacja po stronie klienta przed wysłaniem
-- Caching obiektów (venues) w pamięci
-- Asynchroniczne logowanie audytu
+### 8.1 Optymalizacja zapytań
+- **Indexing:** Indeksy na (organizer_id, status), (show_date), (registration_deadline)
+- **JOIN Optimization:** Efektywne JOINy z tabelami venues, users, dogs, owners
+- **Pagination:** Cursor-based pagination dla dużych zbiorów
+- **Query Caching:** Cache dla często używanych danych
 
-### Potencjalne wąskie gardła:
-- Sprawdzanie uprawnień użytkownika
-- Walidacja relacji z tabelą venues
-- Zapisywanie do tabeli audytu
+### 8.2 Strategie buforowania
+- **Redis Cache:** Cache dla wystaw i rejestracji
+- **Stats Caching:** Cache statystyk rejestracji
+- **Response Caching:** Cache odpowiedzi dla operacji odczytu
 
-### Monitoring:
-- Czas odpowiedzi endpointu
-- Liczba błędów walidacji
-- Liczba utworzonych wystaw
-- Wykorzystanie pamięci
+### 8.3 Monitoring wydajności
+- **Query Performance:** Monitorowanie czasu wykonywania zapytań
+- **Registration Rate:** Śledzenie tempa rejestracji
+- **Payment Processing:** Monitorowanie płatności
+- **Error Rate Monitoring:** Śledzenie wskaźników błędów
 
 ## 9. Etapy wdrożenia
 
-### Krok 1: Utworzenie schematów walidacji
-1. Utworzenie pliku `src/lib/validation/showSchemas.ts`
-2. Definicja schematu `createShowSchema` z użyciem Zod
-3. Walidacja wszystkich pól zgodnie ze specyfikacją
-4. Dodanie custom validators dla logiki biznesowej
+### 9.1 Faza 1: Podstawowa infrastruktura
+1. **Setup Validation Schemas**
+   - Utworzenie Zod schemas dla wszystkich DTOs
+   - Implementacja walidacji biznesowej
+   - Testy jednostkowe dla schemas
 
-### Krok 2: Implementacja serwisu
-1. Utworzenie pliku `src/lib/services/showService.ts`
-2. Implementacja klasy `ShowService` z metodą `create`
-3. Logika biznesowa i walidacja
-4. Integracja z Supabase Client
-5. Obsługa błędów i rollback
+2. **Error Handling Infrastructure**
+   - Implementacja centralnego error handler
+   - Utworzenie typów ErrorResponseDto
+   - Setup logging system
 
-### Krok 3: Implementacja endpointu API
-1. Utworzenie pliku `src/pages/api/shows.ts`
-2. Implementacja funkcji `POST` z użyciem Astro APIRoute
-3. Integracja z serwisem i walidacją
-4. Obsługa autoryzacji i uprawnień
-5. Formatowanie odpowiedzi
+3. **Database Connection Setup**
+   - Konfiguracja Supabase client
+   - Implementacja middleware dla context.locals
+   - Setup TypeScript types
 
-### Krok 4: Implementacja audytu
-1. Utworzenie serwisu audytu `src/lib/services/auditService.ts`
-2. Logowanie akcji tworzenia wystawy
-3. Zapisywanie metadanych użytkownika i kontekstu
+### 9.2 Faza 2: Show Management
+1. **ShowService**
+   - Implementacja CRUD operacji dla wystaw
+   - Zarządzanie statusem wystaw
+   - Walidacja uprawnień organizatorów
+   - Statystyki wystaw
 
-### Krok 5: Testy i walidacja
-1. Testy jednostkowe dla serwisu
-2. Testy integracyjne dla endpointu
-3. Testy walidacji i obsługi błędów
-4. Testy wydajnościowe
-5. Testy bezpieczeństwa
+2. **API Endpoints**
+   - GET /shows (z paginacją i filtrami)
+   - GET /shows/{id}
+   - POST /shows
+   - PUT /shows/{id}
+   - PATCH /shows/{id}/status
+   - DELETE /shows/{id}
 
-### Krok 6: Dokumentacja i deployment
-1. Aktualizacja dokumentacji API
-2. Dodanie przykładów użycia
-3. Deployment na środowisko testowe
-4. Monitoring i debugowanie
-5. Deployment na produkcję
+### 9.3 Faza 3: Show Registration Management
+1. **RegistrationService**
+   - Implementacja CRUD operacji dla rejestracji
+   - Walidacja limitów uczestników
+   - Zarządzanie płatnościami
+   - Statystyki rejestracji
 
-### Krok 7: Monitoring i optymalizacja
-1. Konfiguracja alertów dla błędów
-2. Monitoring wydajności
-3. Analiza logów i metryk
-4. Optymalizacja na podstawie danych
-5. Aktualizacja dokumentacji
+2. **API Endpoints**
+   - GET /shows/{showId}/registrations
+   - POST /shows/{showId}/registrations
+   - GET /shows/{showId}/registrations/{registrationId}
+   - PUT /shows/{showId}/registrations/{registrationId}
+   - DELETE /shows/{showId}/registrations/{registrationId}
+   - PATCH /shows/{showId}/registrations/{registrationId}/payment
+   - GET /shows/{showId}/registrations/stats
+
+### 9.4 Faza 4: Security & Testing
+1. **Authentication & Authorization**
+   - JWT token validation
+   - Row Level Security policies
+   - Role-based access control
+
+2. **Input Validation & Sanitization**
+   - Comprehensive input validation
+   - SQL injection prevention
+   - XSS protection
+
+3. **Testing**
+   - Unit tests dla services
+   - Integration tests dla endpoints
+   - Security tests
+   - Performance tests
+
+### 9.5 Faza 5: Performance & Monitoring
+1. **Performance Optimization**
+   - Database indexing
+   - Query optimization
+   - Caching implementation
+
+2. **Monitoring & Logging**
+   - Error tracking
+   - Performance monitoring
+   - Audit logging
+
+3. **Documentation**
+   - API documentation
+   - Code documentation
+   - Deployment guides
+
+### 9.6 Faza 6: Deployment & Maintenance
+1. **Production Deployment**
+   - Environment configuration
+   - Database migrations
+   - Monitoring setup
+
+2. **Maintenance & Updates**
+   - Regular security updates
+   - Performance monitoring
+   - Bug fixes and improvements
 
 ## 10. Pliki do utworzenia/modyfikacji
 
-### Nowe pliki:
-- `src/lib/validation/showSchemas.ts`
-- `src/lib/services/showService.ts`
-- `src/lib/services/auditService.ts`
-- `src/pages/api/shows.ts`
-- `src/lib/hooks/useShowValidation.ts`
+### 10.1 Nowe pliki:
+- `src/lib/validation/showSchemas.ts` (rozszerzenie)
+- `src/lib/validation/registrationSchemas.ts`
+- `src/lib/services/showService.ts` (rozszerzenie)
+- `src/lib/services/registrationService.ts`
+- `src/pages/api/shows.ts` (rozszerzenie)
+- `src/pages/api/shows/[id].ts` (rozszerzenie)
+- `src/pages/api/shows/[id]/registrations.ts`
+- `src/pages/api/shows/[id]/registrations/[registrationId].ts`
+- `src/pages/api/shows/[id]/registrations/stats.ts`
 
-### Modyfikowane pliki:
+### 10.2 Modyfikowane pliki:
 - `src/types.ts` (dodanie brakujących typów)
 - `src/lib/services/errorHandler.ts` (rozszerzenie o nowe błędy)
-- `src/lib/services/permissionService.ts` (dodanie uprawnień dla wystaw)
+- `src/lib/services/permissionService.ts` (dodanie uprawnień dla rejestracji)
 
-### Pliki konfiguracyjne:
-- `supabase/migrations/` (nowa migracja dla indeksów)
+### 10.3 Pliki konfiguracyjne:
+- `supabase/migrations/` (nowe migracje dla indeksów)
 - `package.json` (dodanie zależności testowych)
 
 ## 11. Kryteria akceptacji
 
-### Funkcjonalne:
-- ✅ Endpoint akceptuje prawidłowe dane i tworzy wystawę
-- ✅ Automatyczne ustawienie statusu `draft` i `organizer_id`
-- ✅ Walidacja wszystkich wymaganych i opcjonalnych pól
+### 11.1 Funkcjonalne:
+- ✅ Endpointy akceptują prawidłowe dane i tworzą/aktualizują wystawy
+- ✅ System zarządzania statusem wystaw działa poprawnie
+- ✅ Rejestracje psów są walidowane zgodnie z regułami biznesowymi
+- ✅ Limity uczestników są przestrzegane
+- ✅ Statystyki rejestracji są obliczane poprawnie
 - ✅ Obsługa wszystkich scenariuszy błędów
 - ✅ Logowanie audytu dla każdej akcji
 
-### Niefunkcjonalne:
+### 11.2 Niefunkcjonalne:
 - ✅ Czas odpowiedzi < 500ms dla 95% żądań
 - ✅ Obsługa 1000 żądań na godzinę na użytkownika
-- ✅ 99.9% dostępność endpointu
+- ✅ 99.9% dostępność endpointów
 - ✅ Pełne pokrycie testami (>90%)
 
-### Bezpieczeństwo:
-- ✅ Tylko department_representative może tworzyć wystawy
+### 11.3 Bezpieczeństwo:
+- ✅ Tylko przedstawiciele oddziałów mogą zarządzać wystawami
 - ✅ Wszystkie dane wejściowe są walidowane i sanityzowane
 - ✅ RLS policies chronią dane użytkowników
-- ✅ Brak ekspozycji wrażliwych informacji w błędach 
+- ✅ Brak ekspozycji wrażliwych informacji w błędach
 
-# API Endpoint Implementation Plan: GET /shows
-
-## 1. Przegląd punktu końcowego
-Endpoint służy do pobierania listy wystaw psów z możliwością filtrowania, sortowania i paginacji. Zwraca paginowaną listę wystaw wraz z podstawowymi informacjami o lokalizacji i organizatorze.
-
-## 2. Szczegóły żądania
-- **Metoda HTTP:** GET
-- **Struktura URL:** `/api/shows`
-- **Parametry query:**
-  - **Opcjonalne:**
-    - `status` (ShowStatus): Filtr po statusie wystawy
-    - `show_type` (ShowType): Filtr po typie wystawy (national/international)
-    - `from_date` (string): Filtr wystaw od daty (ISO 8601)
-    - `to_date` (string): Filtr wystaw do daty (ISO 8601)
-    - `organizer_id` (string): Filtr po organizatorze
-    - `page` (number): Numer strony (default: 1)
-    - `limit` (number): Liczba elementów na stronę (default: 20, max: 100)
-
-## 3. Wykorzystywane typy
-- `ShowQueryParams` - parametry zapytania
-- `ShowResponseDto` - pojedynczy obiekt wystawy w odpowiedzi
-- `PaginatedResponseDto<ShowResponseDto>` - paginowana odpowiedź
-- `Show` - główny typ encji z bazy danych
-- `Venue` - typ lokalizacji
-- `User` - typ użytkownika (organizator)
-
-## 4. Szczegóły odpowiedzi
-- **Kod statusu:** 200 OK
-- **Struktura odpowiedzi:**
-```typescript
-{
-  data: ShowResponseDto[],
-  pagination: {
-    page: number,
-    limit: number,
-    total: number,
-    pages: number
-  }
-}
-```
-
-## 5. Przepływ danych
-1. **Walidacja parametrów** - sprawdzenie formatu dat, limitów paginacji
-2. **Autoryzacja** - weryfikacja tokenu JWT i uprawnień użytkownika
-3. **Budowanie zapytania** - konstrukcja SQL z filtrami i paginacją
-4. **Wykonanie zapytania** - pobranie danych z Supabase z RLS
-5. **Transformacja danych** - mapowanie na DTO
-6. **Paginacja** - obliczenie metadanych paginacji
-7. **Zwrócenie odpowiedzi** - sformatowana odpowiedź JSON
-
-## 6. Względy bezpieczeństwa
-- **Autentykacja:** Wymagany token JWT w headerze Authorization
-- **Autoryzacja:** RLS policies w Supabase zapewniają dostęp tylko do odpowiednich danych
-- **Walidacja danych:** 
-  - Walidacja formatu dat (ISO 8601)
-  - Sprawdzenie limitów paginacji (max 100)
-  - Sanityzacja parametrów query
-- **SQL Injection:** Używanie Supabase Client z parametrami
-- **Rate Limiting:** Implementacja rate limitingu na poziomie API
-
-## 7. Obsługa błędów
-- **400 Bad Request:**
-  - Nieprawidłowy format daty
-  - Nieprawidłowe parametry paginacji
-  - Nieprawidłowe wartości enum
-- **401 Unauthorized:**
-  - Brak tokenu JWT
-  - Nieprawidłowy token
-  - Token wygasł
-- **403 Forbidden:**
-  - Brak uprawnień do dostępu do danych
-- **500 Internal Server Error:**
-  - Błąd połączenia z bazą danych
-  - Nieoczekiwany błąd aplikacji
-
-## 8. Rozważania dotyczące wydajności
-- **Indeksy bazy danych:** Wykorzystanie indeksów na polach filtrowania
-- **Paginacja:** Implementacja cursor-based pagination dla dużych zbiorów
-- **Caching:** Cache dla często pobieranych danych
-- **Query optimization:** Minimalizacja liczby zapytań do bazy
-- **Response compression:** Gzip compression dla odpowiedzi
-
-## 9. Etapy wdrożenia
-
-### Krok 1: Utworzenie serwisu
-```typescript
-// src/lib/services/showService.ts
-export class ShowService {
-  async getShows(params: ShowQueryParams): Promise<PaginatedResponseDto<ShowResponseDto>>
-}
-```
-
-### Krok 2: Implementacja walidacji
-```typescript
-// src/lib/validation/showSchemas.ts
-export const showQuerySchema = z.object({
-  status: z.enum(['draft', 'open_for_registration', 'registration_closed', 'in_progress', 'completed', 'cancelled']).optional(),
-  show_type: z.enum(['national', 'international']).optional(),
-  from_date: z.string().datetime().optional(),
-  to_date: z.string().datetime().optional(),
-  organizer_id: z.string().uuid().optional(),
-  page: z.number().min(1).default(1),
-  limit: z.number().min(1).max(100).default(20)
-})
-```
-
-### Krok 3: Implementacja endpointu
-```typescript
-// src/pages/api/shows.ts
-export async function GET(request: Request) {
-  try {
-    // 1. Walidacja parametrów
-    const queryParams = showQuerySchema.parse(searchParams)
-    
-    // 2. Autoryzacja
-    const user = await authenticateUser(request)
-    
-    // 3. Pobranie danych
-    const showService = new ShowService()
-    const result = await showService.getShows(queryParams)
-    
-    // 4. Zwrócenie odpowiedzi
-    return new Response(JSON.stringify(result), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
-    })
-  } catch (error) {
-    return handleApiError(error)
-  }
-}
-```
-
-### Krok 4: Implementacja logiki biznesowej
-```typescript
-// W ShowService
-async getShows(params: ShowQueryParams): Promise<PaginatedResponseDto<ShowResponseDto>> {
-  const { data: shows, count } = await this.supabase
-    .from('shows')
-    .select(`
-      *,
-      venue:venues(id, name, city),
-      organizer:users!organizer_id(id, first_name, last_name)
-    `)
-    .match(this.buildFilters(params))
-    .range(this.calculateRange(params))
-    .order('show_date', { ascending: false })
-  
-  return this.buildPaginatedResponse(shows, count, params)
-}
-```
-
-### Krok 5: Testy
-- Unit tests dla ShowService
-- Integration tests dla endpointu
-- E2E tests dla pełnego flow
-
-### Krok 6: Dokumentacja
-- Aktualizacja API dokumentacji
-- Przykłady użycia
-- Opis kodów błędów
-
-### Krok 7: Monitoring
-- Logowanie błędów
-- Metryki wydajności
-- Alerty dla błędów 5xx 
+Ten plan zapewnia kompleksową implementację systemu zarządzania wystawami i rejestracjami psów z uwzględnieniem wszystkich aspektów bezpieczeństwa, wydajności i niezawodności wymaganych w aplikacji zarządzania wystawami psów. 
