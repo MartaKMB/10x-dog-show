@@ -1,36 +1,36 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { DogService } from "../../../lib/services/dogService";
+import { OwnerService } from "../../../lib/services/ownerService";
 import {
-  dogIdSchema,
-  updateDogSchema,
-} from "../../../lib/validation/dogSchemas";
+  ownerIdSchema,
+  updateOwnerSchema,
+} from "../../../lib/validation/ownerSchemas";
 import { supabaseClient } from "../../../db/supabase.client";
 import type { ErrorResponseDto } from "../../../types";
 
 export const GET: APIRoute = async ({ params }) => {
   try {
-    // Validate dog ID
-    const validatedId = dogIdSchema.parse(params.id);
+    // Validate owner ID
+    const validatedId = ownerIdSchema.parse(params.id);
 
-    // Get dog using service
-    const dogService = new DogService(supabaseClient);
-    const dog = await dogService.getById(validatedId);
+    // Get owner using service
+    const ownerService = new OwnerService(supabaseClient);
+    const owner = await ownerService.getById(validatedId);
 
-    return new Response(JSON.stringify(dog), {
+    return new Response(JSON.stringify(owner), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error("Error fetching dog:", error);
+    console.error("Error fetching owner:", error);
 
     if (error instanceof z.ZodError) {
       return new Response(
         JSON.stringify({
           error: {
             code: "VALIDATION_ERROR",
-            message: "Invalid dog ID format",
+            message: "Invalid owner ID format",
             details: error.errors.map((err) => ({
               field: err.path.join("."),
               message: err.message,
@@ -94,26 +94,26 @@ export const GET: APIRoute = async ({ params }) => {
 
 export const PUT: APIRoute = async ({ params, request }) => {
   try {
-    // Validate dog ID
-    const validatedId = dogIdSchema.parse(params.id);
+    // Validate owner ID
+    const validatedId = ownerIdSchema.parse(params.id);
 
     // Parse request body
     const body = await request.json();
 
     // Validate input data
-    const validatedData = updateDogSchema.parse(body);
+    const validatedData = updateOwnerSchema.parse(body);
 
-    // Update dog using service
-    const dogService = new DogService(supabaseClient);
-    const dog = await dogService.update(validatedId, validatedData);
+    // Update owner using service
+    const ownerService = new OwnerService(supabaseClient);
+    const owner = await ownerService.update(validatedId, validatedData);
 
-    return new Response(JSON.stringify(dog), {
+    return new Response(JSON.stringify(owner), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error("Error updating dog:", error);
+    console.error("Error updating owner:", error);
 
     if (error instanceof z.ZodError) {
       return new Response(
@@ -184,16 +184,16 @@ export const PUT: APIRoute = async ({ params, request }) => {
 
 export const DELETE: APIRoute = async ({ params }) => {
   try {
-    // Validate dog ID
-    const validatedId = dogIdSchema.parse(params.id);
+    // Validate owner ID
+    const validatedId = ownerIdSchema.parse(params.id);
 
-    // Delete dog using service
-    const dogService = new DogService(supabaseClient);
-    await dogService.delete(validatedId);
+    // Delete owner using service
+    const ownerService = new OwnerService(supabaseClient);
+    await ownerService.delete(validatedId);
 
     return new Response(
       JSON.stringify({
-        message: "Dog deleted successfully",
+        message: "Owner deleted successfully",
       }),
       {
         status: 200,
@@ -202,14 +202,14 @@ export const DELETE: APIRoute = async ({ params }) => {
     );
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error("Error deleting dog:", error);
+    console.error("Error deleting owner:", error);
 
     if (error instanceof z.ZodError) {
       return new Response(
         JSON.stringify({
           error: {
             code: "VALIDATION_ERROR",
-            message: "Invalid dog ID format",
+            message: "Invalid owner ID format",
             details: error.errors.map((err) => ({
               field: err.path.join("."),
               message: err.message,
