@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import type { UpdateRegistrationDto, ValidationErrors } from "../types";
 
 export const useDogManagement = (showId: string, onSuccess: () => void) => {
@@ -9,6 +9,12 @@ export const useDogManagement = (showId: string, onSuccess: () => void) => {
     {},
   );
 
+  // Use ref to store the latest onSuccess function
+  const onSuccessRef = useRef(onSuccess);
+  useEffect(() => {
+    onSuccessRef.current = onSuccess;
+  }, [onSuccess]);
+
   const addDog = useCallback(async () => {
     try {
       setIsAdding(true);
@@ -17,7 +23,7 @@ export const useDogManagement = (showId: string, onSuccess: () => void) => {
       // Mock registration creation - data would be used in real implementation
       await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API delay
 
-      onSuccess();
+      onSuccessRef.current();
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error("Error adding dog:", error);
@@ -43,7 +49,7 @@ export const useDogManagement = (showId: string, onSuccess: () => void) => {
     } finally {
       setIsAdding(false);
     }
-  }, [onSuccess]);
+  }, []);
 
   const editDog = useCallback(
     async (registrationId: string, data: UpdateRegistrationDto) => {
@@ -68,7 +74,7 @@ export const useDogManagement = (showId: string, onSuccess: () => void) => {
           );
         }
 
-        onSuccess();
+        onSuccessRef.current();
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error("Error editing dog:", error);
@@ -77,7 +83,7 @@ export const useDogManagement = (showId: string, onSuccess: () => void) => {
         setIsEditing(false);
       }
     },
-    [showId, onSuccess],
+    [showId],
   );
 
   const deleteDog = useCallback(
@@ -99,7 +105,7 @@ export const useDogManagement = (showId: string, onSuccess: () => void) => {
           );
         }
 
-        onSuccess();
+        onSuccessRef.current();
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error("Error deleting dog:", error);
@@ -108,7 +114,7 @@ export const useDogManagement = (showId: string, onSuccess: () => void) => {
         setIsDeleting(false);
       }
     },
-    [showId, onSuccess],
+    [showId],
   );
 
   return {

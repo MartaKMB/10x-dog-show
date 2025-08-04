@@ -205,7 +205,7 @@ export function useDescriptionEditor({
       loadVersions();
     }
     checkPermissions();
-  }, [descriptionId, loadVersions, checkPermissions]);
+  }, [descriptionId]);
 
   return {
     // Stan

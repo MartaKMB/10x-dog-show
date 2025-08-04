@@ -24,7 +24,7 @@ export const useShowCreator = () => {
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      // Mock venues data for development
+      // For now, use mock venues since venues API is not implemented yet
       const mockVenues: VenueResponseDto[] = [
         {
           id: "550e8400-e29b-41d4-a716-446655440201",
@@ -61,9 +61,6 @@ export const useShowCreator = () => {
         },
       ];
 
-      // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
       setState((prev) => ({
         ...prev,
         venues: mockVenues,
@@ -87,26 +84,33 @@ export const useShowCreator = () => {
   }, []);
 
   const createShow = useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async (showData: CreateShowDto): Promise<CreateShowResult> => {
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
       try {
-        // Mock show creation for development - showData would be used in real implementation
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API delay
+        const response = await fetch("/api/shows", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(showData),
+        });
 
-        // Generate mock show ID
-        const mockShowId =
-          "mock-show-" +
-          Date.now() +
-          "-" +
-          Math.random().toString(36).substr(2, 9);
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(
+            errorData.error?.message ||
+              `HTTP error! status: ${response.status}`,
+          );
+        }
+
+        const data = await response.json();
 
         setState((prev) => ({ ...prev, isLoading: false }));
 
         return {
           success: true,
-          showId: mockShowId,
+          showId: data.id,
         };
       } catch (error) {
         const errorMessage =

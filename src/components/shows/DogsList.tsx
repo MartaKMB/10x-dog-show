@@ -201,6 +201,10 @@ const DogsList: React.FC<DogsListProps> = ({
               onAction={(action, _dogId) => {
                 if (action === "edit") onEditDog(registration);
                 if (action === "delete") onDeleteDog(registration);
+                if (action === "create_description") {
+                  // Navigate to description creation page
+                  window.location.href = `/shows/${registration.show_id}/dogs/${registration.dog.id}/description/new`;
+                }
               }}
               userRole="secretary"
               showStatus={showStatus}

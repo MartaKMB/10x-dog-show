@@ -1,26 +1,25 @@
 ---
-// Pobieranie parametrów z URL
+import Layout from "../../../../../../layouts/Layout.astro";
+import { DescriptionEditor } from "../../../../../../components/DescriptionEditor.tsx";
 
 const { showId, dogId } = Astro.params;
 
 if (!showId || !dogId) {
   return Astro.redirect("/404");
 }
-
-import { DescriptionEditor } from "@/components/DescriptionEditor";
 ---
 
-<!doctype html>
-<html lang="pl">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Nowy opis psa</title>
-    <link rel="icon" type="image/png" href="/favicon.png" />
-  </head>
-  <body>
-    <div class="container mx-auto px-4 py-8">
+<Layout title="Nowy opis psa - 10x Dog Show">
+  <div class="space-y-6">
+    <!-- Header -->
+    <div class="bg-white shadow rounded-lg p-6">
+      <h1 class="text-2xl font-bold text-gray-900 mb-2">Nowy opis psa</h1>
+      <p class="text-gray-600">Tworzenie opisu dla psa w wystawie</p>
+    </div>
+
+    <!-- Description Editor -->
+    <div class="bg-white shadow rounded-lg">
       <DescriptionEditor client:load showId={showId} dogId={dogId} mode="create" />
     </div>
-  </body>
-</html>
+  </div>
+</Layout>

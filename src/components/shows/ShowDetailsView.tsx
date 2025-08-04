@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import type {
   ShowDetailResponseDto,
   RegistrationResponseDto,
@@ -81,7 +81,7 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({ showId }) => {
 
   useEffect(() => {
     loadShowData();
-  }, [loadShowData, showId]);
+  }, [showId]);
 
   useEffect(() => {
     if (show && registrations) {
@@ -112,64 +112,73 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({ showId }) => {
     }
   }, [error]);
 
-  const calculateStats = (regs: RegistrationResponseDto[]): ShowStatsType => {
-    const byClass: Record<string, number> = {};
-    const byGender: Record<string, number> = {};
-    const byBreedGroup: Record<string, number> = {};
-    let paidCount = 0;
-    let unpaidCount = 0;
-    let totalRevenue = 0;
-    let paidRevenue = 0;
-    let outstandingRevenue = 0;
+  const calculateStats = useCallback(
+    (regs: RegistrationResponseDto[]): ShowStatsType => {
+      const byClass: Record<string, number> = {};
+      const byGender: Record<string, number> = {};
+      const byBreedGroup: Record<string, number> = {};
+      let paidCount = 0;
+      let unpaidCount = 0;
+      let totalRevenue = 0;
+      let paidRevenue = 0;
+      let outstandingRevenue = 0;
 
-    regs.forEach((reg) => {
-      // Count by class
-      byClass[reg.dog_class] = (byClass[reg.dog_class] || 0) + 1;
+      regs.forEach((reg) => {
+        // Count by class
+        byClass[reg.dog_class] = (byClass[reg.dog_class] || 0) + 1;
 
-      // Count by gender
-      byGender[reg.dog.gender] = (byGender[reg.dog.gender] || 0) + 1;
+        // Count by gender
+        byGender[reg.dog.gender] = (byGender[reg.dog.gender] || 0) + 1;
 
-      // Count by breed group
-      const fciGroup = reg.dog.breed.fci_group;
-      byBreedGroup[fciGroup] = (byBreedGroup[fciGroup] || 0) + 1;
+        // Count by breed group
+        const fciGroup = reg.dog.breed.fci_group;
+        byBreedGroup[fciGroup] = (byBreedGroup[fciGroup] || 0) + 1;
 
-      // Count by payment status and calculate revenue
-      const fee = reg.registration_fee || 0;
-      totalRevenue += fee;
+        // Count by payment status and calculate revenue
+        const fee = reg.registration_fee || 0;
+        totalRevenue += fee;
 
-      if (reg.is_paid) {
-        paidCount++;
-        paidRevenue += fee;
-      } else {
-        unpaidCount++;
-        outstandingRevenue += fee;
-      }
-    });
+        if (reg.is_paid) {
+          paidCount++;
+          paidRevenue += fee;
+        } else {
+          unpaidCount++;
+          outstandingRevenue += fee;
+        }
+      });
 
-    return {
-      totalDogs: regs.length,
-      paidRegistrations: paidCount,
-      unpaidRegistrations: unpaidCount,
-      byClass,
-      byGender,
-      byBreedGroup,
-      revenue: {
-        total: totalRevenue,
-        paid: paidRevenue,
-        outstanding: outstandingRevenue,
-      },
-    };
-  };
+      return {
+        totalDogs: regs.length,
+        paidRegistrations: paidCount,
+        unpaidRegistrations: unpaidCount,
+        byClass,
+        byGender,
+        byBreedGroup,
+        revenue: {
+          total: totalRevenue,
+          paid: paidRevenue,
+          outstanding: outstandingRevenue,
+        },
+      };
+    },
+    [],
+  );
 
-  const canUserEditShow = (show: ShowDetailResponseDto): boolean => {
-    // TODO: Implement user role check
-    return show.status === "draft" || show.status === "open_for_registration";
-  };
+  const canUserEditShow = useCallback(
+    (show: ShowDetailResponseDto): boolean => {
+      // TODO: Implement user role check
+      return show.status === "draft" || show.status === "open_for_registration";
+    },
+    [],
+  );
 
-  const canUserDeleteShow = (show: ShowDetailResponseDto): boolean => {
-    // TODO: Implement user role check
-    return show.status === "draft";
-  };
+  const canUserDeleteShow = useCallback(
+    (show: ShowDetailResponseDto): boolean => {
+      // TODO: Implement user role check
+      return show.status === "draft";
+    },
+    [],
+  );
 
   const handleFiltersChange = (newFilters: FilterState) => {
     updateFilters(newFilters);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import type { ShowResponseDto } from "../../types";
 import ShowCard from "./ShowCard.tsx";
 import LoadingSpinner from "./LoadingSpinner";
@@ -49,11 +49,15 @@ const ShowsListView: React.FC<ShowsListViewProps> = () => {
   });
 
   const { shows, pagination, isLoading, error, loadShows } = useShowsList();
+  const isInitialMount = useRef(true);
 
-  // Load shows on component mount
+  // Load shows on component mount only
   useEffect(() => {
-    loadShows(viewModel.filters, viewModel.pagination);
-  }, [loadShows, viewModel.filters, viewModel.pagination]); // Include all dependencies
+    if (isInitialMount.current) {
+      loadShows(viewModel.filters, viewModel.pagination);
+      isInitialMount.current = false;
+    }
+  }, []); // Empty dependency array - only run on mount
 
   useEffect(() => {
     setViewModel((prev) => ({

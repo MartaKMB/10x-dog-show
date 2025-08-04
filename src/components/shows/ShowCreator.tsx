@@ -153,15 +153,30 @@ const ShowCreator: React.FC<ShowCreatorProps> = () => {
   };
 
   const handleSubmit = async () => {
-    if (!validateCurrentStep()) return;
+    console.log("handleSubmit called, currentStep:", currentStep);
+    console.log("formData:", formData);
 
+    if (!validateCurrentStep()) {
+      console.log("Validation failed");
+      return;
+    }
+
+    console.log("Validation passed, creating show...");
     setIsSubmitting(true);
     try {
+      // Convert dates from YYYY-MM-DD to ISO 8601 format
+      const showDate = new Date(
+        formData.showDate + "T00:00:00.000Z",
+      ).toISOString();
+      const registrationDeadline = new Date(
+        formData.registrationDeadline + "T00:00:00.000Z",
+      ).toISOString();
+
       const showData: CreateShowDto = {
         name: formData.name,
         show_type: formData.showType,
-        show_date: formData.showDate,
-        registration_deadline: formData.registrationDeadline,
+        show_date: showDate,
+        registration_deadline: registrationDeadline,
         venue_id: formData.venueId,
         max_participants: formData.maxParticipants || undefined,
         entry_fee: formData.entryFee || undefined,
@@ -170,6 +185,7 @@ const ShowCreator: React.FC<ShowCreatorProps> = () => {
       };
 
       const result = await createShow(showData);
+
       if (result.success) {
         // Redirect to show details
         window.location.href = `/shows/${result.showId}`;

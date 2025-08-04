@@ -5,11 +5,11 @@ interface Props {
   title?: string;
 }
 
-const { title = "10x Astro Starter" } = Astro.props;
+const { title = "10x Dog Show" } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="pl">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
@@ -18,7 +18,49 @@ const { title = "10x Astro Starter" } = Astro.props;
     <title>{title}</title>
   </head>
   <body>
-    <slot />
+    <div class="min-h-screen bg-gray-50">
+      <!-- Header -->
+      <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between items-center h-16">
+            <!-- Logo -->
+            <div class="flex items-center">
+              <a href="/" class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <span class="text-white font-bold text-sm">10x</span>
+                </div>
+                <span class="text-xl font-semibold text-gray-900">Dog Show</span>
+              </a>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="hidden md:flex space-x-8">
+              <a href="/" class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+                Dashboard
+              </a>
+              <a href="/shows" class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+                Wystawy
+              </a>
+              <a href="/shows/new" class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+                Nowa wystawa
+              </a>
+            </nav>
+
+            <!-- User menu -->
+            <div class="flex items-center space-x-4">
+              <div class="text-sm text-gray-500">
+                Demo User (Department Representative)
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main content -->
+      <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <slot />
+      </main>
+    </div>
   </body>
 </html>
 

@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import type {
   ShowDetailResponseDto,
   RegistrationResponseDto,
@@ -88,7 +88,7 @@ export const useShowDetails = (showId: string) => {
 
   const refreshData = useCallback(async () => {
     await loadShowData();
-  }, [loadShowData]);
+  }, []);
 
   const updateFilters = useCallback(async (newFilters: FilterState) => {
     setFilters(newFilters);
@@ -96,7 +96,7 @@ export const useShowDetails = (showId: string) => {
     // No need to reload from server when using mocks
   }, []);
 
-  const getFilteredRegistrations = useCallback(() => {
+  const filteredRegistrations = useMemo(() => {
     let filtered = [...registrations];
 
     if (filters.dogClass) {
@@ -126,7 +126,7 @@ export const useShowDetails = (showId: string) => {
 
   return {
     show,
-    registrations: getFilteredRegistrations(),
+    registrations: filteredRegistrations,
     allRegistrations: registrations,
     isLoading,
     error,
