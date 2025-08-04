@@ -9,7 +9,7 @@
 -- 1. INSERT BREEDS
 -- =============================================================================
 
-INSERT INTO dictionary.breeds (name_pl, name_en, fci_group, fci_number, is_active) VALUES
+INSERT INTO public.breeds (name_pl, name_en, fci_group, fci_number, is_active) VALUES
 ('Owczarek Niemiecki', 'German Shepherd Dog', 'G1', 166, true),
 ('Labrador Retriever', 'Labrador Retriever', 'G8', 122, true),
 ('Golden Retriever', 'Golden Retriever', 'G8', 111, true),
@@ -50,12 +50,12 @@ ON CONFLICT (license_number) DO NOTHING;
 -- =============================================================================
 
 INSERT INTO dictionary.judge_specializations (judge_id, fci_group, is_active) VALUES
-((SELECT id FROM dictionary.judges WHERE license_number = 'JUDGE-001'), 'G1', true),
-((SELECT id FROM dictionary.judges WHERE license_number = 'JUDGE-001'), 'G2', true),
-((SELECT id FROM dictionary.judges WHERE license_number = 'JUDGE-002'), 'G8', true),
-((SELECT id FROM dictionary.judges WHERE license_number = 'JUDGE-003'), 'G1', true),
-((SELECT id FROM dictionary.judges WHERE license_number = 'JUDGE-004'), 'G2', true),
-((SELECT id FROM dictionary.judges WHERE license_number = 'JUDGE-005'), 'G5', true);
+((SELECT id FROM dictionary.judges WHERE license_number = 'JUDGE-001' LIMIT 1), 'G1', true),
+((SELECT id FROM dictionary.judges WHERE license_number = 'JUDGE-001' LIMIT 1), 'G2', true),
+((SELECT id FROM dictionary.judges WHERE license_number = 'JUDGE-002' LIMIT 1), 'G8', true),
+((SELECT id FROM dictionary.judges WHERE license_number = 'JUDGE-003' LIMIT 1), 'G1', true),
+((SELECT id FROM dictionary.judges WHERE license_number = 'JUDGE-004' LIMIT 1), 'G2', true),
+((SELECT id FROM dictionary.judges WHERE license_number = 'JUDGE-005' LIMIT 1), 'G5', true);
 
 -- =============================================================================
 -- 5. INSERT USERS (create test users in auth.users)
@@ -126,7 +126,7 @@ INSERT INTO dog_shows.shows (
     'open_for_registration',
     '2024-06-15',
     '2024-06-01',
-    (SELECT id FROM dictionary.venues WHERE name = 'Centrum Wystawowe EXPO XXI'),
+    (SELECT id FROM dictionary.venues WHERE name = 'Centrum Wystawowe EXPO XXI' LIMIT 1),
     '00000000-0000-0000-0000-000000000001', -- Placeholder organizer ID
     500,
     'Międzynarodowa wystawa psów rasowych zgodna ze standardami FCI. Wystawa obejmuje wszystkie grupy FCI.',
@@ -139,7 +139,7 @@ INSERT INTO dog_shows.shows (
     'draft',
     '2024-07-20',
     '2024-07-10',
-    (SELECT id FROM dictionary.venues WHERE name = 'Międzynarodowe Centrum Kongresowe'),
+    (SELECT id FROM dictionary.venues WHERE name = 'Międzynarodowe Centrum Kongresowe' LIMIT 1),
     '00000000-0000-0000-0000-000000000001', -- Placeholder organizer ID
     300,
     'Narodowa wystawa psów rasowych w Katowicach.',
@@ -152,7 +152,7 @@ INSERT INTO dog_shows.shows (
     'completed',
     '2024-05-10',
     '2024-05-01',
-    (SELECT id FROM dictionary.venues WHERE name = 'Centrum Targowo-Kongresowe'),
+    (SELECT id FROM dictionary.venues WHERE name = 'Centrum Targowo-Kongresowe' LIMIT 1),
     '00000000-0000-0000-0000-000000000001', -- Placeholder organizer ID
     200,
     'Wystawa psów rasowych w Poznaniu.',
@@ -200,16 +200,16 @@ INSERT INTO dog_shows.dogs (
     father_name, 
     mother_name
 ) VALUES
-('Max', (SELECT id FROM dictionary.breeds WHERE name_pl = 'Owczarek Niemiecki'), 'male', '2022-03-15', '123456789012345', 'ZWPN/123/2022', 'Hodowla Zieliński', 'Ares z Hodowli Zieliński', 'Luna z Hodowli Zieliński'),
-('Luna', (SELECT id FROM dictionary.breeds WHERE name_pl = 'Labrador Retriever'), 'female', '2021-08-20', '234567890123456', 'ZWPN/456/2021', 'Hodowla Kaczmarek', 'Rocky z Hodowli Kaczmarek', 'Bella z Hodowli Kaczmarek'),
-('Rocky', (SELECT id FROM dictionary.breeds WHERE name_pl = 'Golden Retriever'), 'male', '2020-12-10', '345678901234567', 'ZWPN/789/2020', 'Hodowla Pawlak', 'Shadow z Hodowli Pawlak', 'Sunny z Hodowli Pawlak'),
-('Bella', (SELECT id FROM dictionary.breeds WHERE name_pl = 'Border Collie'), 'female', '2023-01-25', '456789012345678', 'ZWPN/012/2023', 'Hodowla Michalska', 'Storm z Hodowli Michalska', 'Rain z Hodowli Michalska'),
-('Shadow', (SELECT id FROM dictionary.breeds WHERE name_pl = 'Husky Syberyjski'), 'male', '2021-06-05', '567890123456789', 'ZWPN/345/2021', 'Hodowla Jankowski', 'Blizzard z Hodowli Jankowski', 'Aurora z Hodowli Jankowski'),
-('Sunny', (SELECT id FROM dictionary.breeds WHERE name_pl = 'Bernardyn'), 'female', '2022-09-12', '678901234567890', 'ZWPN/678/2022', 'Hodowla Zieliński', 'Alpine z Hodowli Zieliński', 'Misty z Hodowli Zieliński'),
-('Storm', (SELECT id FROM dictionary.breeds WHERE name_pl = 'Rottweiler'), 'male', '2020-11-30', '789012345678901', 'ZWPN/901/2020', 'Hodowla Kaczmarek', 'Titan z Hodowli Kaczmarek', 'Ruby z Hodowli Kaczmarek'),
-('Rain', (SELECT id FROM dictionary.breeds WHERE name_pl = 'Doberman'), 'female', '2023-04-18', '890123456789012', 'ZWPN/234/2023', 'Hodowla Pawlak', 'Zeus z Hodowli Pawlak', 'Athena z Hodowli Pawlak'),
-('Blizzard', (SELECT id FROM dictionary.breeds WHERE name_pl = 'Bokser'), 'male', '2021-07-22', '901234567890123', 'ZWPN/567/2021', 'Hodowla Michalska', 'Thunder z Hodowli Michalska', 'Lightning z Hodowli Michalska'),
-('Aurora', (SELECT id FROM dictionary.breeds WHERE name_pl = 'Owczarek Belgijski'), 'female', '2022-02-14', '012345678901234', 'ZWPN/890/2022', 'Hodowla Jankowski', 'Phoenix z Hodowli Jankowski', 'Ember z Hodowli Jankowski')
+('Max', (SELECT id FROM public.breeds WHERE name_pl = 'Owczarek Niemiecki' LIMIT 1), 'male', '2022-03-15', '123456789012345', 'ZWPN/123/2022', 'Hodowla Zieliński', 'Ares z Hodowli Zieliński', 'Luna z Hodowli Zieliński'),
+('Luna', (SELECT id FROM public.breeds WHERE name_pl = 'Labrador Retriever' LIMIT 1), 'female', '2021-08-20', '234567890123456', 'ZWPN/456/2021', 'Hodowla Kaczmarek', 'Rocky z Hodowli Kaczmarek', 'Bella z Hodowli Kaczmarek'),
+('Rocky', (SELECT id FROM public.breeds WHERE name_pl = 'Golden Retriever' LIMIT 1), 'male', '2020-12-10', '345678901234567', 'ZWPN/789/2020', 'Hodowla Pawlak', 'Shadow z Hodowli Pawlak', 'Sunny z Hodowli Pawlak'),
+('Bella', (SELECT id FROM public.breeds WHERE name_pl = 'Border Collie' LIMIT 1), 'female', '2023-01-25', '456789012345678', 'ZWPN/012/2023', 'Hodowla Michalska', 'Storm z Hodowli Michalska', 'Rain z Hodowli Michalska'),
+('Shadow', (SELECT id FROM public.breeds WHERE name_pl = 'Husky Syberyjski' LIMIT 1), 'male', '2021-06-05', '567890123456789', 'ZWPN/345/2021', 'Hodowla Jankowski', 'Blizzard z Hodowli Jankowski', 'Aurora z Hodowli Jankowski'),
+('Sunny', (SELECT id FROM public.breeds WHERE name_pl = 'Bernardyn' LIMIT 1), 'female', '2022-09-12', '678901234567890', 'ZWPN/678/2022', 'Hodowla Zieliński', 'Alpine z Hodowli Zieliński', 'Misty z Hodowli Zieliński'),
+('Storm', (SELECT id FROM public.breeds WHERE name_pl = 'Rottweiler' LIMIT 1), 'male', '2020-11-30', '789012345678901', 'ZWPN/901/2020', 'Hodowla Kaczmarek', 'Titan z Hodowli Kaczmarek', 'Ruby z Hodowli Kaczmarek'),
+('Rain', (SELECT id FROM public.breeds WHERE name_pl = 'Doberman' LIMIT 1), 'female', '2023-04-18', '890123456789012', 'ZWPN/234/2023', 'Hodowla Pawlak', 'Zeus z Hodowli Pawlak', 'Athena z Hodowli Pawlak'),
+('Blizzard', (SELECT id FROM public.breeds WHERE name_pl = 'Bokser' LIMIT 1), 'male', '2021-07-22', '901234567890123', 'ZWPN/567/2021', 'Hodowla Michalska', 'Thunder z Hodowli Michalska', 'Lightning z Hodowli Michalska'),
+('Aurora', (SELECT id FROM public.breeds WHERE name_pl = 'Owczarek Belgijski' LIMIT 1), 'female', '2022-02-14', '012345678901234', 'ZWPN/890/2022', 'Hodowla Jankowski', 'Phoenix z Hodowli Jankowski', 'Ember z Hodowli Jankowski')
 ON CONFLICT (microchip_number) DO NOTHING;
 
 -- =============================================================================
@@ -217,16 +217,16 @@ ON CONFLICT (microchip_number) DO NOTHING;
 -- =============================================================================
 
 INSERT INTO dog_shows.dog_owners (dog_id, owner_id, is_primary) VALUES
-((SELECT id FROM dog_shows.dogs WHERE name = 'Max'), (SELECT id FROM dog_shows.owners WHERE email = 'marek.zielinski@example.com'), true),
-((SELECT id FROM dog_shows.dogs WHERE name = 'Luna'), (SELECT id FROM dog_shows.owners WHERE email = 'katarzyna.kaczmarek@example.com'), true),
-((SELECT id FROM dog_shows.dogs WHERE name = 'Rocky'), (SELECT id FROM dog_shows.owners WHERE email = 'andrzej.pawlak@example.com'), true),
-((SELECT id FROM dog_shows.dogs WHERE name = 'Bella'), (SELECT id FROM dog_shows.owners WHERE email = 'ewa.michalska@example.com'), true),
-((SELECT id FROM dog_shows.dogs WHERE name = 'Shadow'), (SELECT id FROM dog_shows.owners WHERE email = 'robert.jankowski@example.com'), true),
-((SELECT id FROM dog_shows.dogs WHERE name = 'Sunny'), (SELECT id FROM dog_shows.owners WHERE email = 'marek.zielinski@example.com'), true),
-((SELECT id FROM dog_shows.dogs WHERE name = 'Storm'), (SELECT id FROM dog_shows.owners WHERE email = 'katarzyna.kaczmarek@example.com'), true),
-((SELECT id FROM dog_shows.dogs WHERE name = 'Rain'), (SELECT id FROM dog_shows.owners WHERE email = 'andrzej.pawlak@example.com'), true),
-((SELECT id FROM dog_shows.dogs WHERE name = 'Blizzard'), (SELECT id FROM dog_shows.owners WHERE email = 'ewa.michalska@example.com'), true),
-((SELECT id FROM dog_shows.dogs WHERE name = 'Aurora'), (SELECT id FROM dog_shows.owners WHERE email = 'robert.jankowski@example.com'), true)
+((SELECT id FROM dog_shows.dogs WHERE name = 'Max' LIMIT 1), (SELECT id FROM dog_shows.owners WHERE email = 'marek.zielinski@example.com' LIMIT 1), true),
+((SELECT id FROM dog_shows.dogs WHERE name = 'Luna' LIMIT 1), (SELECT id FROM dog_shows.owners WHERE email = 'katarzyna.kaczmarek@example.com' LIMIT 1), true),
+((SELECT id FROM dog_shows.dogs WHERE name = 'Rocky' LIMIT 1), (SELECT id FROM dog_shows.owners WHERE email = 'andrzej.pawlak@example.com' LIMIT 1), true),
+((SELECT id FROM dog_shows.dogs WHERE name = 'Bella' LIMIT 1), (SELECT id FROM dog_shows.owners WHERE email = 'ewa.michalska@example.com' LIMIT 1), true),
+((SELECT id FROM dog_shows.dogs WHERE name = 'Shadow' LIMIT 1), (SELECT id FROM dog_shows.owners WHERE email = 'robert.jankowski@example.com' LIMIT 1), true),
+((SELECT id FROM dog_shows.dogs WHERE name = 'Sunny' LIMIT 1), (SELECT id FROM dog_shows.owners WHERE email = 'marek.zielinski@example.com' LIMIT 1), true),
+((SELECT id FROM dog_shows.dogs WHERE name = 'Storm' LIMIT 1), (SELECT id FROM dog_shows.owners WHERE email = 'katarzyna.kaczmarek@example.com' LIMIT 1), true),
+((SELECT id FROM dog_shows.dogs WHERE name = 'Rain' LIMIT 1), (SELECT id FROM dog_shows.owners WHERE email = 'andrzej.pawlak@example.com' LIMIT 1), true),
+((SELECT id FROM dog_shows.dogs WHERE name = 'Blizzard' LIMIT 1), (SELECT id FROM dog_shows.owners WHERE email = 'ewa.michalska@example.com' LIMIT 1), true),
+((SELECT id FROM dog_shows.dogs WHERE name = 'Aurora' LIMIT 1), (SELECT id FROM dog_shows.owners WHERE email = 'robert.jankowski@example.com' LIMIT 1), true)
 ON CONFLICT DO NOTHING;
 
 -- =============================================================================
@@ -243,25 +243,25 @@ INSERT INTO dog_shows.show_registrations (
     registered_at
 ) VALUES
 -- Registrations for the first show (Warszawa 2024)
-((SELECT id FROM dog_shows.shows WHERE name = 'Międzynarodowa Wystawa Psów Rasowych Warszawa 2024'), (SELECT id FROM dog_shows.dogs WHERE name = 'Max'), 'open', 1, 150.00, true, '2024-01-15 10:30:00'),
-((SELECT id FROM dog_shows.shows WHERE name = 'Międzynarodowa Wystawa Psów Rasowych Warszawa 2024'), (SELECT id FROM dog_shows.dogs WHERE name = 'Luna'), 'open', 2, 150.00, true, '2024-01-16 14:20:00'),
-((SELECT id FROM dog_shows.shows WHERE name = 'Międzynarodowa Wystawa Psów Rasowych Warszawa 2024'), (SELECT id FROM dog_shows.dogs WHERE name = 'Rocky'), 'champion', 3, 150.00, false, '2024-01-17 09:15:00'),
-((SELECT id FROM dog_shows.shows WHERE name = 'Międzynarodowa Wystawa Psów Rasowych Warszawa 2024'), (SELECT id FROM dog_shows.dogs WHERE name = 'Bella'), 'junior', 4, 150.00, true, '2024-01-18 16:45:00'),
-((SELECT id FROM dog_shows.shows WHERE name = 'Międzynarodowa Wystawa Psów Rasowych Warszawa 2024'), (SELECT id FROM dog_shows.dogs WHERE name = 'Shadow'), 'open', 5, 150.00, true, '2024-01-19 11:30:00'),
-((SELECT id FROM dog_shows.shows WHERE name = 'Międzynarodowa Wystawa Psów Rasowych Warszawa 2024'), (SELECT id FROM dog_shows.dogs WHERE name = 'Sunny'), 'veteran', 6, 150.00, false, '2024-01-20 13:20:00'),
-((SELECT id FROM dog_shows.shows WHERE name = 'Międzynarodowa Wystawa Psów Rasowych Warszawa 2024'), (SELECT id FROM dog_shows.dogs WHERE name = 'Storm'), 'working', 7, 150.00, true, '2024-01-21 15:10:00'),
-((SELECT id FROM dog_shows.shows WHERE name = 'Międzynarodowa Wystawa Psów Rasowych Warszawa 2024'), (SELECT id FROM dog_shows.dogs WHERE name = 'Rain'), 'intermediate', 8, 150.00, true, '2024-01-22 08:45:00'),
-((SELECT id FROM dog_shows.shows WHERE name = 'Międzynarodowa Wystawa Psów Rasowych Warszawa 2024'), (SELECT id FROM dog_shows.dogs WHERE name = 'Blizzard'), 'open', 9, 150.00, false, '2024-01-23 12:30:00'),
-((SELECT id FROM dog_shows.shows WHERE name = 'Międzynarodowa Wystawa Psów Rasowych Warszawa 2024'), (SELECT id FROM dog_shows.dogs WHERE name = 'Aurora'), 'puppy', 10, 150.00, true, '2024-01-24 10:15:00'),
+((SELECT id FROM dog_shows.shows WHERE name = 'Międzynarodowa Wystawa Psów Rasowych Warszawa 2024' LIMIT 1), (SELECT id FROM dog_shows.dogs WHERE name = 'Max' LIMIT 1), 'open', 1, 150.00, true, '2024-01-15 10:30:00'),
+((SELECT id FROM dog_shows.shows WHERE name = 'Międzynarodowa Wystawa Psów Rasowych Warszawa 2024' LIMIT 1), (SELECT id FROM dog_shows.dogs WHERE name = 'Luna' LIMIT 1), 'open', 2, 150.00, true, '2024-01-16 14:20:00'),
+((SELECT id FROM dog_shows.shows WHERE name = 'Międzynarodowa Wystawa Psów Rasowych Warszawa 2024' LIMIT 1), (SELECT id FROM dog_shows.dogs WHERE name = 'Rocky' LIMIT 1), 'champion', 3, 150.00, false, '2024-01-17 09:15:00'),
+((SELECT id FROM dog_shows.shows WHERE name = 'Międzynarodowa Wystawa Psów Rasowych Warszawa 2024' LIMIT 1), (SELECT id FROM dog_shows.dogs WHERE name = 'Bella' LIMIT 1), 'junior', 4, 150.00, true, '2024-01-18 16:45:00'),
+((SELECT id FROM dog_shows.shows WHERE name = 'Międzynarodowa Wystawa Psów Rasowych Warszawa 2024' LIMIT 1), (SELECT id FROM dog_shows.dogs WHERE name = 'Shadow' LIMIT 1), 'open', 5, 150.00, true, '2024-01-19 11:30:00'),
+((SELECT id FROM dog_shows.shows WHERE name = 'Międzynarodowa Wystawa Psów Rasowych Warszawa 2024' LIMIT 1), (SELECT id FROM dog_shows.dogs WHERE name = 'Sunny' LIMIT 1), 'veteran', 6, 150.00, false, '2024-01-20 13:20:00'),
+((SELECT id FROM dog_shows.shows WHERE name = 'Międzynarodowa Wystawa Psów Rasowych Warszawa 2024' LIMIT 1), (SELECT id FROM dog_shows.dogs WHERE name = 'Storm' LIMIT 1), 'working', 7, 150.00, true, '2024-01-21 15:10:00'),
+((SELECT id FROM dog_shows.shows WHERE name = 'Międzynarodowa Wystawa Psów Rasowych Warszawa 2024' LIMIT 1), (SELECT id FROM dog_shows.dogs WHERE name = 'Rain' LIMIT 1), 'intermediate', 8, 150.00, true, '2024-01-22 08:45:00'),
+((SELECT id FROM dog_shows.shows WHERE name = 'Międzynarodowa Wystawa Psów Rasowych Warszawa 2024' LIMIT 1), (SELECT id FROM dog_shows.dogs WHERE name = 'Blizzard' LIMIT 1), 'open', 9, 150.00, false, '2024-01-23 12:30:00'),
+((SELECT id FROM dog_shows.shows WHERE name = 'Międzynarodowa Wystawa Psów Rasowych Warszawa 2024' LIMIT 1), (SELECT id FROM dog_shows.dogs WHERE name = 'Aurora' LIMIT 1), 'puppy', 10, 150.00, true, '2024-01-24 10:15:00'),
 
 -- Registrations for the second show (Katowice 2024) - draft status
-((SELECT id FROM dog_shows.shows WHERE name = 'Narodowa Wystawa Psów Rasowych Katowice 2024'), (SELECT id FROM dog_shows.dogs WHERE name = 'Max'), 'open', 1, 100.00, false, '2024-02-01 14:30:00'),
-((SELECT id FROM dog_shows.shows WHERE name = 'Narodowa Wystawa Psów Rasowych Katowice 2024'), (SELECT id FROM dog_shows.dogs WHERE name = 'Luna'), 'champion', 2, 100.00, false, '2024-02-02 16:20:00'),
+((SELECT id FROM dog_shows.shows WHERE name = 'Narodowa Wystawa Psów Rasowych Katowice 2024' LIMIT 1), (SELECT id FROM dog_shows.dogs WHERE name = 'Max' LIMIT 1), 'open', 1, 100.00, false, '2024-02-01 14:30:00'),
+((SELECT id FROM dog_shows.shows WHERE name = 'Narodowa Wystawa Psów Rasowych Katowice 2024' LIMIT 1), (SELECT id FROM dog_shows.dogs WHERE name = 'Luna' LIMIT 1), 'champion', 2, 100.00, false, '2024-02-02 16:20:00'),
 
 -- Registrations for the third show (Poznań 2024) - completed status
-((SELECT id FROM dog_shows.shows WHERE name = 'Wystawa Psów Rasowych Poznań 2024'), (SELECT id FROM dog_shows.dogs WHERE name = 'Rocky'), 'open', 1, 80.00, true, '2024-04-01 09:30:00'),
-((SELECT id FROM dog_shows.shows WHERE name = 'Wystawa Psów Rasowych Poznań 2024'), (SELECT id FROM dog_shows.dogs WHERE name = 'Bella'), 'junior', 2, 80.00, true, '2024-04-02 11:15:00'),
-((SELECT id FROM dog_shows.shows WHERE name = 'Wystawa Psów Rasowych Poznań 2024'), (SELECT id FROM dog_shows.dogs WHERE name = 'Shadow'), 'champion', 3, 80.00, true, '2024-04-03 13:45:00')
+((SELECT id FROM dog_shows.shows WHERE name = 'Wystawa Psów Rasowych Poznań 2024' LIMIT 1), (SELECT id FROM dog_shows.dogs WHERE name = 'Rocky' LIMIT 1), 'open', 1, 80.00, true, '2024-04-01 09:30:00'),
+((SELECT id FROM dog_shows.shows WHERE name = 'Wystawa Psów Rasowych Poznań 2024' LIMIT 1), (SELECT id FROM dog_shows.dogs WHERE name = 'Bella' LIMIT 1), 'junior', 2, 80.00, true, '2024-04-02 11:15:00'),
+((SELECT id FROM dog_shows.shows WHERE name = 'Wystawa Psów Rasowych Poznań 2024' LIMIT 1), (SELECT id FROM dog_shows.dogs WHERE name = 'Shadow' LIMIT 1), 'champion', 3, 80.00, true, '2024-04-03 13:45:00')
 ON CONFLICT DO NOTHING;
 
 -- =============================================================================
@@ -269,21 +269,21 @@ ON CONFLICT DO NOTHING;
 -- =============================================================================
 
 INSERT INTO dog_shows.show_judge_assignments (show_id, judge_id, fci_group) VALUES
-((SELECT id FROM dog_shows.shows WHERE name = 'Międzynarodowa Wystawa Psów Rasowych Warszawa 2024'), (SELECT id FROM dictionary.judges WHERE license_number = 'JUDGE-001'), 'G1'),
-((SELECT id FROM dog_shows.shows WHERE name = 'Międzynarodowa Wystawa Psów Rasowych Warszawa 2024'), (SELECT id FROM dictionary.judges WHERE license_number = 'JUDGE-002'), 'G8'),
-((SELECT id FROM dog_shows.shows WHERE name = 'Międzynarodowa Wystawa Psów Rasowych Warszawa 2024'), (SELECT id FROM dictionary.judges WHERE license_number = 'JUDGE-004'), 'G2'),
-((SELECT id FROM dog_shows.shows WHERE name = 'Narodowa Wystawa Psów Rasowych Katowice 2024'), (SELECT id FROM dictionary.judges WHERE license_number = 'JUDGE-003'), 'G1'),
-((SELECT id FROM dog_shows.shows WHERE name = 'Wystawa Psów Rasowych Poznań 2024'), (SELECT id FROM dictionary.judges WHERE license_number = 'JUDGE-005'), 'G5')
+((SELECT id FROM dog_shows.shows WHERE name = 'Międzynarodowa Wystawa Psów Rasowych Warszawa 2024' LIMIT 1), (SELECT id FROM dictionary.judges WHERE license_number = 'JUDGE-001' LIMIT 1), 'G1'),
+((SELECT id FROM dog_shows.shows WHERE name = 'Międzynarodowa Wystawa Psów Rasowych Warszawa 2024' LIMIT 1), (SELECT id FROM dictionary.judges WHERE license_number = 'JUDGE-002' LIMIT 1), 'G8'),
+((SELECT id FROM dog_shows.shows WHERE name = 'Międzynarodowa Wystawa Psów Rasowych Warszawa 2024' LIMIT 1), (SELECT id FROM dictionary.judges WHERE license_number = 'JUDGE-004' LIMIT 1), 'G2'),
+((SELECT id FROM dog_shows.shows WHERE name = 'Narodowa Wystawa Psów Rasowych Katowice 2024' LIMIT 1), (SELECT id FROM dictionary.judges WHERE license_number = 'JUDGE-003' LIMIT 1), 'G1'),
+((SELECT id FROM dog_shows.shows WHERE name = 'Wystawa Psów Rasowych Poznań 2024' LIMIT 1), (SELECT id FROM dictionary.judges WHERE license_number = 'JUDGE-005' LIMIT 1), 'G5')
 ON CONFLICT DO NOTHING;
 
 -- =============================================================================
 -- 12. INSERT SECRETARY ASSIGNMENTS
 -- =============================================================================
 
-INSERT INTO dog_shows.secretary_assignments (show_id, secretary_id) VALUES
-((SELECT id FROM dog_shows.shows WHERE name = 'Międzynarodowa Wystawa Psów Rasowych Warszawa 2024'), '00000000-0000-0000-0000-000000000002'),
-((SELECT id FROM dog_shows.shows WHERE name = 'Narodowa Wystawa Psów Rasowych Katowice 2024'), '00000000-0000-0000-0000-000000000003'),
-((SELECT id FROM dog_shows.shows WHERE name = 'Wystawa Psów Rasowych Poznań 2024'), '00000000-0000-0000-0000-000000000004')
+INSERT INTO dog_shows.secretary_assignments (show_id, secretary_id, breed_id) VALUES
+((SELECT id FROM dog_shows.shows WHERE name = 'Międzynarodowa Wystawa Psów Rasowych Warszawa 2024' LIMIT 1), '00000000-0000-0000-0000-000000000002', (SELECT id FROM public.breeds WHERE name_pl = 'Owczarek Niemiecki' LIMIT 1)),
+((SELECT id FROM dog_shows.shows WHERE name = 'Narodowa Wystawa Psów Rasowych Katowice 2024' LIMIT 1), '00000000-0000-0000-0000-000000000003', (SELECT id FROM public.breeds WHERE name_pl = 'Labrador Retriever' LIMIT 1)),
+((SELECT id FROM dog_shows.shows WHERE name = 'Wystawa Psów Rasowych Poznań 2024' LIMIT 1), '00000000-0000-0000-0000-000000000004', (SELECT id FROM public.breeds WHERE name_pl = 'Golden Retriever' LIMIT 1))
 ON CONFLICT DO NOTHING;
 
 -- =============================================================================
