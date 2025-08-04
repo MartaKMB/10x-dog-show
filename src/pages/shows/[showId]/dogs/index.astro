@@ -1,0 +1,16 @@
+---
+import Layout from "../../../../layouts/Layout.astro";
+import DogsListView from "../../../../components/shows/DogsListView.tsx";
+
+const { showId } = Astro.params;
+
+if (!showId) {
+  return Astro.redirect("/shows");
+}
+---
+
+<Layout title="Zarządzanie psami">
+  <div class="container mx-auto px-4 py-8">
+    <DogsListView client:load showId={showId} />
+  </div>
+</Layout> 

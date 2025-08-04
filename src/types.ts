@@ -690,3 +690,92 @@ export interface ModalState {
   isDeleteModalOpen: boolean;
   selectedRegistration: RegistrationResponseDto | null;
 }
+
+// =============================================================================
+// DOGS MANAGEMENT VIEW TYPES
+// =============================================================================
+
+export interface DogsListViewModel {
+  showId: string;
+  dogs: HierarchyNode[];
+  filters: DogsFilterState;
+  search: string;
+  pagination: PaginationDto;
+  isLoading: boolean;
+  error: string | null;
+  canEdit: boolean;
+  canDelete: boolean;
+  userRole: UserRole;
+}
+
+export interface HierarchyNode {
+  type: "fci_group" | "breed" | "class" | "dog";
+  id: string;
+  name: string;
+  children: HierarchyNode[];
+  isExpanded: boolean;
+  count: number;
+  data?: DogResponseDto | Breed | FCIGroup | DogClass;
+}
+
+export interface DogCardViewModel {
+  dog: DogResponseDto;
+  registration: RegistrationResponseDto;
+  descriptionStatus: DescriptionStatus;
+  canEdit: boolean;
+  canDelete: boolean;
+  canCreateDescription: boolean;
+  isExpanded: boolean;
+  isProcessing: boolean;
+}
+
+export interface DogsFilterState {
+  breedId?: string;
+  gender?: DogGender;
+  dogClass?: DogClass;
+  descriptionStatus?: DescriptionStatus;
+  search?: string;
+}
+
+export interface DescriptionStatus {
+  status: "draft" | "completed" | "finalized" | "none";
+  lastModified?: string;
+  secretaryName?: string;
+  version?: number;
+}
+
+export interface QuickAction {
+  id: string;
+  label: string;
+  icon: string;
+  action: string;
+  disabled?: boolean;
+  requiresPermission?: UserRole[];
+}
+
+// =============================================================================
+// DOGS MANAGEMENT HOOKS TYPES
+// =============================================================================
+
+export interface DogsListState {
+  showId: string;
+  dogs: HierarchyNode[];
+  filters: DogsFilterState;
+  search: string;
+  pagination: PaginationDto;
+  isLoading: boolean;
+  error: string | null;
+  canEdit: boolean;
+  canDelete: boolean;
+  userRole: UserRole;
+}
+
+export interface DogActionsState {
+  selectedDog: string | null;
+  isProcessing: boolean;
+  modalState: {
+    isAddModalOpen: boolean;
+    isEditModalOpen: boolean;
+    isDeleteModalOpen: boolean;
+  };
+}
