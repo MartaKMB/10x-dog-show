@@ -1,132 +1,112 @@
 import type { APIRoute } from "astro";
-import type { BreedResponseDto, PaginatedResponseDto } from "../../types";
+import type { ErrorResponseDto } from "../../types";
+import { BreedService } from "../../lib/services/breedService";
+import { breedQuerySchema } from "../../lib/validation/breedSchemas";
+import { supabaseClient } from "../../db/supabase.client";
+
+// Mock DEFAULT_USER dla testów (department_representative)
+const DEFAULT_USER = {
+  id: "00000000-0000-0000-0000-000000000002",
+  role: "department_representative" as const,
+};
 
 export const GET: APIRoute = async ({ request }) => {
+  const requestId = crypto.randomUUID();
+  const startTime = Date.now();
+
   try {
+    // Use DEFAULT_USER instead of real auth for now
+    const user = DEFAULT_USER;
+
+    // Parse and validate query parameters
     const url = new URL(request.url);
-    const isActive = url.searchParams.get("is_active");
-
-    // Przykładowe rasy psów
-    const mockBreeds: BreedResponseDto[] = [
-      {
-        id: "breed-1",
-        name_pl: "Owczarek Niemiecki",
-        name_en: "German Shepherd",
-        fci_group: "G1",
-        fci_number: 166,
-        is_active: true,
-        created_at: "2024-01-01T00:00:00Z",
-        updated_at: "2024-01-01T00:00:00Z",
-      },
-      {
-        id: "breed-2",
-        name_pl: "Labrador Retriever",
-        name_en: "Labrador Retriever",
-        fci_group: "G8",
-        fci_number: 122,
-        is_active: true,
-        created_at: "2024-01-01T00:00:00Z",
-        updated_at: "2024-01-01T00:00:00Z",
-      },
-      {
-        id: "breed-3",
-        name_pl: "Golden Retriever",
-        name_en: "Golden Retriever",
-        fci_group: "G8",
-        fci_number: 111,
-        is_active: true,
-        created_at: "2024-01-01T00:00:00Z",
-        updated_at: "2024-01-01T00:00:00Z",
-      },
-      {
-        id: "breed-4",
-        name_pl: "Border Collie",
-        name_en: "Border Collie",
-        fci_group: "G1",
-        fci_number: 297,
-        is_active: true,
-        created_at: "2024-01-01T00:00:00Z",
-        updated_at: "2024-01-01T00:00:00Z",
-      },
-      {
-        id: "breed-5",
-        name_pl: "Husky Syberyjski",
-        name_en: "Siberian Husky",
-        fci_group: "G5",
-        fci_number: 270,
-        is_active: true,
-        created_at: "2024-01-01T00:00:00Z",
-        updated_at: "2024-01-01T00:00:00Z",
-      },
-      {
-        id: "breed-6",
-        name_pl: "Buldog Francuski",
-        name_en: "French Bulldog",
-        fci_group: "G9",
-        fci_number: 101,
-        is_active: true,
-        created_at: "2024-01-01T00:00:00Z",
-        updated_at: "2024-01-01T00:00:00Z",
-      },
-      {
-        id: "breed-7",
-        name_pl: "Chihuahua",
-        name_en: "Chihuahua",
-        fci_group: "G9",
-        fci_number: 218,
-        is_active: true,
-        created_at: "2024-01-01T00:00:00Z",
-        updated_at: "2024-01-01T00:00:00Z",
-      },
-      {
-        id: "breed-8",
-        name_pl: "Rottweiler",
-        name_en: "Rottweiler",
-        fci_group: "G2",
-        fci_number: 147,
-        is_active: true,
-        created_at: "2024-01-01T00:00:00Z",
-        updated_at: "2024-01-01T00:00:00Z",
-      },
-    ];
-
-    // Filtruj aktywne rasy jeśli parametr is_active jest ustawiony
-    let filteredBreeds = mockBreeds;
-    if (isActive === "true") {
-      filteredBreeds = mockBreeds.filter((breed) => breed.is_active);
-    }
-
-    const response: PaginatedResponseDto<BreedResponseDto> = {
-      data: filteredBreeds,
-      pagination: {
-        page: 1,
-        limit: 50,
-        total: filteredBreeds.length,
-        pages: 1,
-      },
+    const queryParams = {
+      fci_group: url.searchParams.get("fci_group") || undefined,
+      is_active: url.searchParams.get("is_active") || undefined,
+      search: url.searchParams.get("search") || undefined,
+      page: url.searchParams.get("page") || undefined,
+      limit: url.searchParams.get("limit") || undefined,
     };
 
-    return new Response(JSON.stringify(response), {
+    // Validate query parameters using Zod schema
+    const validationResult = breedQuerySchema.safeParse(queryParams);
+    if (!validationResult.success) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const errorDetails = validationResult.error.errors.map((err: any) => ({
+        field: err.path.join("."),
+        message: err.message,
+      }));
+
+      const errorResponse: ErrorResponseDto = {
+        error: {
+          code: "VALIDATION_ERROR",
+          message: "Invalid query parameters",
+          details: errorDetails,
+        },
+        timestamp: new Date().toISOString(),
+        request_id: requestId,
+      };
+
+      return new Response(JSON.stringify(errorResponse), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    // Initialize service and fetch data
+    const breedService = new BreedService(supabaseClient);
+    const result = await breedService.getMany(validationResult.data);
+
+    // Log successful request
+    const responseTime = Date.now() - startTime;
+    // eslint-disable-next-line no-console
+    console.log(
+      `[${new Date().toISOString()}] GET /api/breeds - Success - User: ${user.id} - Response time: ${responseTime}ms - Request ID: ${requestId}`,
+    );
+
+    return new Response(JSON.stringify(result), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error("Error fetching breeds:", error);
+    const responseTime = Date.now() - startTime;
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    const errorCode = errorMessage.startsWith("NOT_FOUND:")
+      ? "NOT_FOUND"
+      : errorMessage.startsWith("VALIDATION_ERROR:")
+        ? "VALIDATION_ERROR"
+        : errorMessage.startsWith("CONFLICT:")
+          ? "CONFLICT"
+          : "INTERNAL_ERROR";
 
-    return new Response(
-      JSON.stringify({
-        error: {
-          code: "INTERNAL_ERROR",
-          message: "Internal server error",
-        },
-        timestamp: new Date().toISOString(),
-        request_id: crypto.randomUUID(),
-      }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      },
+    // Log error
+    // eslint-disable-next-line no-console
+    console.error(
+      `[${new Date().toISOString()}] GET /api/breeds - Error - User: ${DEFAULT_USER.id} - Error: ${errorMessage} - Response time: ${responseTime}ms - Request ID: ${requestId}`,
     );
+
+    const errorResponse: ErrorResponseDto = {
+      error: {
+        code: errorCode,
+        message: errorMessage.replace(/^[A-Z_]+:\s*/, ""), // Remove error code prefix
+      },
+      timestamp: new Date().toISOString(),
+      request_id: requestId,
+    };
+
+    const statusCode =
+      errorCode === "NOT_FOUND"
+        ? 404
+        : errorCode === "VALIDATION_ERROR"
+          ? 400
+          : errorCode === "CONFLICT"
+            ? 409
+            : 500;
+
+    return new Response(JSON.stringify(errorResponse), {
+      status: statusCode,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 };
