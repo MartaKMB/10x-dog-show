@@ -3,6 +3,7 @@
 ## 1. Przegląd architektury
 
 Schemat bazy danych PostgreSQL zaprojektowany dla systemu zarządzania wystawami psów zgodnie z wymaganiami PRD i notatkami z sesji planowania. Struktura wspiera:
+
 - System FCI z grupami G1-G10 i standardowymi klasami
 - Współwłasność psów (relacja M:N Dogs ↔ Owners)
 - Wersjonowanie opisów z pełnym audytem
@@ -152,7 +153,7 @@ CREATE TABLE dog_shows.shows (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     deleted_at TIMESTAMP WITH TIME ZONE NULL,
     scheduled_for_deletion BOOLEAN DEFAULT false,
-    
+
     CONSTRAINT valid_dates CHECK (registration_deadline <= show_date)
 );
 
@@ -175,7 +176,7 @@ CREATE TABLE dog_shows.owners (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     deleted_at TIMESTAMP WITH TIME ZONE NULL,
     scheduled_for_deletion BOOLEAN DEFAULT false,
-    
+
     CONSTRAINT valid_email CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
 );
 
@@ -195,7 +196,7 @@ CREATE TABLE dog_shows.dogs (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     deleted_at TIMESTAMP WITH TIME ZONE NULL,
     scheduled_for_deletion BOOLEAN DEFAULT false,
-    
+
     CONSTRAINT valid_birth_date CHECK (birth_date <= CURRENT_DATE),
     CONSTRAINT valid_microchip CHECK (microchip_number ~ '^[0-9]{15}$')
 );
@@ -207,7 +208,7 @@ CREATE TABLE dog_shows.dog_owners (
     owner_id UUID NOT NULL REFERENCES dog_shows.owners(id) ON DELETE CASCADE,
     is_primary BOOLEAN DEFAULT false,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    
+
     UNIQUE(dog_id, owner_id)
 );
 
@@ -221,7 +222,7 @@ CREATE TABLE dog_shows.show_registrations (
     registration_fee DECIMAL(10,2),
     is_paid BOOLEAN DEFAULT false,
     registered_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    
+
     UNIQUE(show_id, dog_id),
     UNIQUE(show_id, catalog_number)
 );
@@ -233,7 +234,7 @@ CREATE TABLE dog_shows.show_judge_assignments (
     judge_id UUID NOT NULL REFERENCES dictionary.judges(id) ON DELETE CASCADE,
     fci_group dog_shows.fci_group NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    
+
     UNIQUE(show_id, judge_id, fci_group)
 );
 
@@ -244,7 +245,7 @@ CREATE TABLE dog_shows.secretary_assignments (
     secretary_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
     breed_id UUID NOT NULL REFERENCES dictionary.breeds(id) ON DELETE CASCADE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    
+
     UNIQUE(show_id, secretary_id, breed_id)
 );
 
@@ -262,7 +263,7 @@ CREATE TABLE dog_shows.descriptions (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     finalized_at TIMESTAMP WITH TIME ZONE,
-    
+
     UNIQUE(show_id, dog_id, judge_id),
     CONSTRAINT content_required CHECK (content_pl IS NOT NULL OR content_en IS NOT NULL)
 );
@@ -277,7 +278,7 @@ CREATE TABLE dog_shows.description_versions (
     changed_by UUID NOT NULL REFERENCES auth.users(id),
     change_reason TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    
+
     UNIQUE(description_id, version)
 );
 
@@ -296,7 +297,7 @@ CREATE TABLE dog_shows.evaluations (
     judge_signature TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    
+
     UNIQUE(description_id),
     CONSTRAINT valid_grade_by_class CHECK (
         (dog_class IN ('baby', 'puppy') AND baby_puppy_grade IS NOT NULL AND grade IS NULL) OR
@@ -315,7 +316,7 @@ CREATE TABLE dog_shows.pdf_documents (
     generated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     sent_at TIMESTAMP WITH TIME ZONE,
     sent_to_email VARCHAR(255),
-    
+
     UNIQUE(description_id, language)
 );
 ```
@@ -422,7 +423,7 @@ DECLARE
     rec RECORD;
     counter INTEGER := 1;
 BEGIN
-    FOR rec IN 
+    FOR rec IN
         SELECT sr.id, sr.dog_class, b.fci_group, d.gender
         FROM dog_shows.show_registrations sr
         JOIN dog_shows.dogs d ON sr.dog_id = d.id
@@ -430,7 +431,7 @@ BEGIN
         WHERE sr.show_id = show_id_param
         ORDER BY b.fci_group, sr.dog_class, d.gender, sr.registered_at
     LOOP
-        UPDATE dog_shows.show_registrations 
+        UPDATE dog_shows.show_registrations
         SET catalog_number = counter
         WHERE id = rec.id;
         counter := counter + 1;
@@ -444,10 +445,10 @@ RETURNS BOOLEAN AS $$
 DECLARE
     age_months INTEGER;
 BEGIN
-    age_months := EXTRACT(MONTH FROM AGE(show_date_param, birth_date_param)) + 
+    age_months := EXTRACT(MONTH FROM AGE(show_date_param, birth_date_param)) +
                   EXTRACT(YEAR FROM AGE(show_date_param, birth_date_param)) * 12;
-    
-    RETURN CASE 
+
+    RETURN CASE
         WHEN class_param = 'baby' THEN age_months BETWEEN 4 AND 6
         WHEN class_param = 'puppy' THEN age_months BETWEEN 6 AND 9
         WHEN class_param = 'junior' THEN age_months BETWEEN 9 AND 18
@@ -472,7 +473,7 @@ BEGIN
     WHERE deleted_at IS NULL
     AND created_at < NOW() - INTERVAL '3 years'
     AND NOT EXISTS (
-        SELECT 1 FROM audit.data_retention_schedule 
+        SELECT 1 FROM audit.data_retention_schedule
         WHERE entity_type = 'show' AND entity_id = dog_shows.shows.id
     );
 END;
@@ -515,7 +516,7 @@ BEGIN
         INSERT INTO dog_shows.description_versions (
             description_id, version, content_pl, content_en, changed_by, change_reason
         ) VALUES (
-            NEW.id, NEW.version, NEW.content_pl, NEW.content_en, 
+            NEW.id, NEW.version, NEW.content_pl, NEW.content_en,
             NEW.updated_by, 'Updated description'
         );
     END IF;
@@ -616,7 +617,7 @@ CREATE POLICY hide_deleted_owners ON dog_shows.owners
 ```sql
 -- Widok aktywnych psów z danymi właścicieli
 CREATE VIEW dog_shows.active_dogs_with_owners AS
-SELECT 
+SELECT
     d.id,
     d.name,
     d.gender,
@@ -643,7 +644,7 @@ GROUP BY d.id, d.name, d.gender, d.birth_date, d.microchip_number, d.kennel_club
 
 -- Widok pełnych informacji o wystawach
 CREATE VIEW dog_shows.show_details AS
-SELECT 
+SELECT
     s.id,
     s.name,
     s.show_type,
@@ -665,7 +666,7 @@ GROUP BY s.id, s.name, s.show_type, s.status, s.show_date, s.registration_deadli
 
 -- Widok opisów z pełnymi informacjami
 CREATE VIEW dog_shows.description_details AS
-SELECT 
+SELECT
     d.id,
     d.show_id,
     s.name as show_name,
@@ -723,6 +724,7 @@ INSERT INTO auth.users (email, password_hash, first_name, last_name, role) VALUE
 ## 11. Uwagi projektowe
 
 ### Bezpieczeństwo:
+
 - Wszystkie klucze główne to UUID dla zwiększenia bezpieczeństwa
 - Implementacja RLS zapewnia izolację danych między użytkownikami
 - Soft delete z opcją oznaczania do usunięcia zgodnie z RODO
@@ -730,21 +732,24 @@ INSERT INTO auth.users (email, password_hash, first_name, last_name, role) VALUE
 - Walidacja danych na poziomie bazy danych
 
 ### Wydajność:
+
 - Indeksy zoptymalizowane pod częste zapytania
 - Kompozytowe indeksy dla złożonych filtrów
 - Partycjonowanie możliwe dla dużych tabel (descriptions, activity_log)
 - Widoki materialized dla raportów (w przyszłości)
 
 ### Skalowalność:
+
 - Schemat pozwala na łatwe dodawanie nowych funkcjonalności
 - Struktura wspiera wielojęzyczność
 - Możliwość rozszerzenia o nowe typy wystaw i klasy
 - Elastyczna struktura audytu
 
 ### Zgodność z RODO:
+
 - Mechanizm automatycznego usuwania danych po 3 latach
 - Śledzenie zgód GDPR
 - Możliwość eksportu i usuwania danych użytkowników
 - Audyt dostępu do danych osobowych
 
-Ten schemat zapewnia solidną podstawę dla aplikacji 10x Dog Show, spełniając wszystkie wymagania funkcjonalne i niefunkcjonalne określone w PRD i notatkach z sesji planowania. 
+Ten schemat zapewnia solidną podstawę dla aplikacji 10x Dog Show, spełniając wszystkie wymagania funkcjonalne i niefunkcjonalne określone w PRD i notatkach z sesji planowania.

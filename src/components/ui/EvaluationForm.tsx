@@ -99,7 +99,10 @@ export function EvaluationForm({
   disabled,
   errors,
 }: EvaluationFormProps) {
-  const handleChange = (field: keyof CreateEvaluationDto, val: any) => {
+  const handleChange = (
+    field: keyof CreateEvaluationDto,
+    val: string | number | boolean | undefined,
+  ) => {
     onChange({ ...value, [field]: val });
   };
 
@@ -108,10 +111,14 @@ export function EvaluationForm({
       {/* Ocena lub baby_puppy_grade */}
       {dogClass === "baby" || dogClass === "puppy" ? (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="baby-puppy-grade"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Ocena (baby/puppy)
           </label>
           <select
+            id="baby-puppy-grade"
             value={value.baby_puppy_grade || ""}
             onChange={(e) =>
               handleChange("baby_puppy_grade", e.target.value || undefined)
@@ -129,10 +136,14 @@ export function EvaluationForm({
         </div>
       ) : (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="grade"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Ocena
           </label>
           <select
+            id="grade"
             value={value.grade || ""}
             onChange={(e) => handleChange("grade", e.target.value || undefined)}
             className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
@@ -150,10 +161,14 @@ export function EvaluationForm({
 
       {/* Tytuł */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label
+          htmlFor="title"
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
           Tytuł
         </label>
         <select
+          id="title"
           value={value.title || ""}
           onChange={(e) => handleChange("title", e.target.value || undefined)}
           className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
@@ -170,10 +185,14 @@ export function EvaluationForm({
 
       {/* Lokata */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label
+          htmlFor="placement"
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
           Lokata
         </label>
         <select
+          id="placement"
           value={value.placement || ""}
           onChange={(e) =>
             handleChange("placement", e.target.value || undefined)
@@ -192,10 +211,14 @@ export function EvaluationForm({
 
       {/* Punkty */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label
+          htmlFor="points"
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
           Punkty
         </label>
         <input
+          id="points"
           type="number"
           value={value.points ?? ""}
           onChange={(e) =>

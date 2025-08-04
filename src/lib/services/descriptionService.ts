@@ -574,12 +574,14 @@ export class DescriptionService {
             id: show.id,
             name: show.name,
             show_date: show.show_date,
+            status: show.status as any,
             show_type: show.show_type,
           }
         : {
             id: "",
             name: "",
             show_date: "",
+            status: "draft" as const,
             show_type: "national" as const,
           },
       dog: dog

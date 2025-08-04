@@ -166,11 +166,43 @@ const DogsList: React.FC<DogsListProps> = ({
           {sortedRegistrations.map((registration) => (
             <DogCard
               key={registration.id}
-              registration={registration}
-              canEdit={canEdit}
-              canDelete={canDelete}
-              onEdit={() => onEditDog(registration)}
-              onDelete={() => onDeleteDog(registration)}
+              dog={{
+                dog: {
+                  id: registration.dog.id,
+                  name: registration.dog.name,
+                  breed: {
+                    id: "",
+                    name_pl: registration.dog.breed.name_pl,
+                    name_en: registration.dog.breed.name_en,
+                    fci_group: registration.dog.breed.fci_group,
+                  },
+                  gender: registration.dog.gender,
+                  birth_date: registration.dog.birth_date,
+                  microchip_number: "",
+                  kennel_club_number: null,
+                  kennel_name: null,
+                  father_name: null,
+                  mother_name: null,
+                  created_at: "",
+                  updated_at: "",
+                  deleted_at: null,
+                  scheduled_for_deletion: false,
+                  owners: [],
+                },
+                registration: registration,
+                descriptionStatus: { status: "none" },
+                canEdit,
+                canDelete,
+                canCreateDescription: true,
+                isExpanded: false,
+                isProcessing: false,
+              }}
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              onAction={(action, _dogId) => {
+                if (action === "edit") onEditDog(registration);
+                if (action === "delete") onDeleteDog(registration);
+              }}
+              userRole="secretary"
               showStatus={showStatus}
             />
           ))}

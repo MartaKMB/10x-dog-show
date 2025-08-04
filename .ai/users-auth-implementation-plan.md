@@ -5,6 +5,7 @@
 Kompleksowy system autentykacji i zarządzania użytkownikami oparty na Supabase Auth z dodatkowymi endpointami do zarządzania profilami użytkowników. System obejmuje pełny cykl życia użytkownika od rejestracji przez zarządzanie sesjami aż po deaktywację konta.
 
 ### Authentication Management
+
 - Rejestracja użytkowników z walidacją i aktywacją email
 - Logowanie z JWT tokenami i refresh tokenami
 - Zarządzanie sesjami użytkowników
@@ -12,6 +13,7 @@ Kompleksowy system autentykacji i zarządzania użytkownikami oparty na Supabase
 - Pobieranie informacji o aktualnym użytkowniku
 
 ### Users Management
+
 - Lista użytkowników z filtrowaniem i paginacją
 - Szczegóły użytkownika z pełnymi danymi
 - Aktualizacja profilu użytkownika
@@ -23,6 +25,7 @@ Kompleksowy system autentykacji i zarządzania użytkownikami oparty na Supabase
 ### 2.1 Authentication Endpoints
 
 #### POST /auth/register
+
 - **Metoda HTTP:** POST
 - **Struktura URL:** `/api/auth/register`
 - **Request Body:** RegisterUserDto
@@ -30,6 +33,7 @@ Kompleksowy system autentykacji i zarządzania użytkownikami oparty na Supabase
 - **Opis:** Rejestracja nowego użytkownika z walidacją email i aktywacją konta
 
 #### POST /auth/login
+
 - **Metoda HTTP:** POST
 - **Struktura URL:** `/api/auth/login`
 - **Request Body:** LoginUserDto
@@ -37,18 +41,21 @@ Kompleksowy system autentykacji i zarządzania użytkownikami oparty na Supabase
 - **Opis:** Logowanie użytkownika z generowaniem JWT tokena
 
 #### POST /auth/logout
+
 - **Metoda HTTP:** POST
 - **Struktura URL:** `/api/auth/logout`
 - **Autoryzacja:** Wszyscy uwierzytelnieni użytkownicy
 - **Opis:** Wylogowanie użytkownika i unieważnienie sesji
 
 #### GET /auth/me
+
 - **Metoda HTTP:** GET
 - **Struktura URL:** `/api/auth/me`
 - **Autoryzacja:** Wszyscy uwierzytelnieni użytkownicy
 - **Opis:** Pobranie informacji o aktualnie zalogowanym użytkowniku
 
 #### POST /auth/refresh
+
 - **Metoda HTTP:** POST
 - **Struktura URL:** `/api/auth/refresh`
 - **Request Body:** RefreshTokenDto
@@ -58,6 +65,7 @@ Kompleksowy system autentykacji i zarządzania użytkownikami oparty na Supabase
 ### 2.2 Users Management Endpoints
 
 #### GET /users
+
 - **Metoda HTTP:** GET
 - **Struktura URL:** `/api/users`
 - **Parametry query:**
@@ -69,23 +77,27 @@ Kompleksowy system autentykacji i zarządzania użytkownikami oparty na Supabase
 - **Autoryzacja:** Przedstawiciele oddziałów (rola: department_representative)
 
 #### GET /users/{id}
+
 - **Metoda HTTP:** GET
 - **Struktura URL:** `/api/users/{id}`
 - **Parametry:** `id` (UUID) - Identyfikator użytkownika
 - **Autoryzacja:** Przedstawiciele oddziałów lub własny profil
 
 #### PUT /users/{id}
+
 - **Metoda HTTP:** PUT
 - **Struktura URL:** `/api/users/{id}`
 - **Request Body:** UpdateUserDto
 - **Autoryzacja:** Przedstawiciele oddziałów lub własny profil
 
 #### DELETE /users/{id}
+
 - **Metoda HTTP:** DELETE
 - **Struktura URL:** `/api/users/{id}`
 - **Autoryzacja:** Przedstawiciele oddziałów (nie można usunąć samego siebie)
 
 #### PATCH /users/{id}/activate
+
 - **Metoda HTTP:** PATCH
 - **Struktura URL:** `/api/users/{id}/activate`
 - **Autoryzacja:** Przedstawiciele oddziałów
@@ -191,13 +203,16 @@ interface UserQueryParams {
 ### 4.1 Authentication Logic
 
 #### Rejestracja użytkownika:
+
 1. **Walidacja danych:**
+
    - Email: format RFC 5322, unikalność
    - Hasło: minimum 8 znaków, wymagane znaki specjalne
    - Imię i nazwisko: minimum 2 znaki
    - Rola: tylko department_representative lub secretary
 
 2. **Proces rejestracji:**
+
    - Hashowanie hasła z bcrypt (cost: 12)
    - Tworzenie użytkownika w auth.users
    - Generowanie tokena aktywacyjnego
@@ -210,12 +225,15 @@ interface UserQueryParams {
    - Możliwość ponownego wysłania tokena
 
 #### Logowanie użytkownika:
+
 1. **Walidacja danych:**
+
    - Sprawdzenie istnienia użytkownika
    - Weryfikacja hasła
    - Sprawdzenie statusu aktywności
 
 2. **Generowanie tokenów:**
+
    - JWT access token (ważny 1 godzinę)
    - Refresh token (ważny 7 dni)
    - Zapisywanie sesji w auth.user_sessions
@@ -226,6 +244,7 @@ interface UserQueryParams {
    - Logowanie audytu
 
 #### Wylogowanie:
+
 1. **Unieważnienie tokenów:**
    - Usunięcie sesji z auth.user_sessions
    - Dodanie tokena do blacklisty (opcjonalnie)
@@ -234,12 +253,15 @@ interface UserQueryParams {
 ### 4.2 Users Management Logic
 
 #### Lista użytkowników:
+
 1. **Filtrowanie:**
+
    - Po roli (department_representative, secretary)
    - Po statusie aktywności
    - Wyszukiwanie w imieniu, nazwisku, email
 
 2. **Paginacja:**
+
    - Domyślnie 20 elementów na stronę
    - Maksymalnie 100 elementów na stronę
    - Sortowanie po created_at (DESC)
@@ -249,12 +271,15 @@ interface UserQueryParams {
    - Sekretarze widzą tylko siebie
 
 #### Aktualizacja użytkownika:
+
 1. **Walidacja uprawnień:**
+
    - Użytkownik może edytować swój profil
    - Department_representative może edytować wszystkich
    - Nie można zmienić roli na department_representative
 
 2. **Walidacja danych:**
+
    - Imię i nazwisko: minimum 2 znaki
    - Język: tylko pl lub en
    - Status aktywności: tylko dla department_representative
@@ -265,7 +290,9 @@ interface UserQueryParams {
    - Aktualizacja updated_at
 
 #### Deaktywacja użytkownika:
+
 1. **Walidacja:**
+
    - Nie można deaktywować samego siebie
    - Nie można deaktywować ostatniego department_representative
    - Sprawdzenie czy użytkownik ma aktywne wystawy
@@ -284,44 +311,44 @@ interface UserQueryParams {
 // Błędy rejestracji
 const AUTH_ERRORS = {
   EMAIL_ALREADY_EXISTS: {
-    code: 'EMAIL_ALREADY_EXISTS',
-    message: 'Użytkownik z tym adresem email już istnieje',
-    status: 409
+    code: "EMAIL_ALREADY_EXISTS",
+    message: "Użytkownik z tym adresem email już istnieje",
+    status: 409,
   },
   INVALID_EMAIL_FORMAT: {
-    code: 'INVALID_EMAIL_FORMAT',
-    message: 'Nieprawidłowy format adresu email',
-    status: 400
+    code: "INVALID_EMAIL_FORMAT",
+    message: "Nieprawidłowy format adresu email",
+    status: 400,
   },
   WEAK_PASSWORD: {
-    code: 'WEAK_PASSWORD',
-    message: 'Hasło musi mieć minimum 8 znaków i zawierać znaki specjalne',
-    status: 400
+    code: "WEAK_PASSWORD",
+    message: "Hasło musi mieć minimum 8 znaków i zawierać znaki specjalne",
+    status: 400,
   },
   INVALID_ROLE: {
-    code: 'INVALID_ROLE',
-    message: 'Nieprawidłowa rola użytkownika',
-    status: 400
-  }
+    code: "INVALID_ROLE",
+    message: "Nieprawidłowa rola użytkownika",
+    status: 400,
+  },
 };
 
 // Błędy logowania
 const LOGIN_ERRORS = {
   INVALID_CREDENTIALS: {
-    code: 'INVALID_CREDENTIALS',
-    message: 'Nieprawidłowy email lub hasło',
-    status: 401
+    code: "INVALID_CREDENTIALS",
+    message: "Nieprawidłowy email lub hasło",
+    status: 401,
   },
   ACCOUNT_INACTIVE: {
-    code: 'ACCOUNT_INACTIVE',
-    message: 'Konto jest nieaktywne',
-    status: 403
+    code: "ACCOUNT_INACTIVE",
+    message: "Konto jest nieaktywne",
+    status: 403,
   },
   ACCOUNT_LOCKED: {
-    code: 'ACCOUNT_LOCKED',
-    message: 'Konto jest zablokowane',
-    status: 403
-  }
+    code: "ACCOUNT_LOCKED",
+    message: "Konto jest zablokowane",
+    status: 403,
+  },
 };
 ```
 
@@ -331,30 +358,30 @@ const LOGIN_ERRORS = {
 // Błędy zarządzania użytkownikami
 const USER_ERRORS = {
   USER_NOT_FOUND: {
-    code: 'USER_NOT_FOUND',
-    message: 'Użytkownik nie został znaleziony',
-    status: 404
+    code: "USER_NOT_FOUND",
+    message: "Użytkownik nie został znaleziony",
+    status: 404,
   },
   INSUFFICIENT_PERMISSIONS: {
-    code: 'INSUFFICIENT_PERMISSIONS',
-    message: 'Brak uprawnień do wykonania tej operacji',
-    status: 403
+    code: "INSUFFICIENT_PERMISSIONS",
+    message: "Brak uprawnień do wykonania tej operacji",
+    status: 403,
   },
   CANNOT_DEACTIVATE_SELF: {
-    code: 'CANNOT_DEACTIVATE_SELF',
-    message: 'Nie można deaktywować własnego konta',
-    status: 400
+    code: "CANNOT_DEACTIVATE_SELF",
+    message: "Nie można deaktywować własnego konta",
+    status: 400,
   },
   CANNOT_DEACTIVATE_LAST_ADMIN: {
-    code: 'CANNOT_DEACTIVATE_LAST_ADMIN',
-    message: 'Nie można deaktywować ostatniego przedstawiciela oddziału',
-    status: 400
+    code: "CANNOT_DEACTIVATE_LAST_ADMIN",
+    message: "Nie można deaktywować ostatniego przedstawiciela oddziału",
+    status: 400,
   },
   USER_HAS_ACTIVE_SHOWS: {
-    code: 'USER_HAS_ACTIVE_SHOWS',
-    message: 'Nie można deaktywować użytkownika z aktywnymi wystawami',
-    status: 400
-  }
+    code: "USER_HAS_ACTIVE_SHOWS",
+    message: "Nie można deaktywować użytkownika z aktywnymi wystawami",
+    status: 400,
+  },
 };
 ```
 
@@ -434,29 +461,32 @@ class UserService {
 ```typescript
 // Schemat rejestracji
 const registerUserSchema = z.object({
-  email: z.string().email('Nieprawidłowy format email'),
-  password: z.string()
-    .min(8, 'Hasło musi mieć minimum 8 znaków')
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/, 
-           'Hasło musi zawierać wielkie i małe litery, cyfry i znaki specjalne'),
-  first_name: z.string().min(2, 'Imię musi mieć minimum 2 znaki'),
-  last_name: z.string().min(2, 'Nazwisko musi mieć minimum 2 znaki'),
-  role: z.enum(['department_representative', 'secretary']),
-  language: z.enum(['pl', 'en'])
+  email: z.string().email("Nieprawidłowy format email"),
+  password: z
+    .string()
+    .min(8, "Hasło musi mieć minimum 8 znaków")
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/,
+      "Hasło musi zawierać wielkie i małe litery, cyfry i znaki specjalne",
+    ),
+  first_name: z.string().min(2, "Imię musi mieć minimum 2 znaki"),
+  last_name: z.string().min(2, "Nazwisko musi mieć minimum 2 znaki"),
+  role: z.enum(["department_representative", "secretary"]),
+  language: z.enum(["pl", "en"]),
 });
 
 // Schemat logowania
 const loginUserSchema = z.object({
-  email: z.string().email('Nieprawidłowy format email'),
-  password: z.string().min(1, 'Hasło jest wymagane')
+  email: z.string().email("Nieprawidłowy format email"),
+  password: z.string().min(1, "Hasło jest wymagane"),
 });
 
 // Schemat aktualizacji użytkownika
 const updateUserSchema = z.object({
-  first_name: z.string().min(2, 'Imię musi mieć minimum 2 znaki').optional(),
-  last_name: z.string().min(2, 'Nazwisko musi mieć minimum 2 znaki').optional(),
+  first_name: z.string().min(2, "Imię musi mieć minimum 2 znaki").optional(),
+  last_name: z.string().min(2, "Nazwisko musi mieć minimum 2 znaki").optional(),
   is_active: z.boolean().optional(),
-  language: z.enum(['pl', 'en']).optional()
+  language: z.enum(["pl", "en"]).optional(),
 });
 ```
 
@@ -466,15 +496,19 @@ const updateUserSchema = z.object({
 
 ```typescript
 // Middleware autentykacji
-export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-  const token = req.headers.authorization?.replace('Bearer ', '');
-  
+export const authMiddleware = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const token = req.headers.authorization?.replace("Bearer ", "");
+
   if (!token) {
     return res.status(401).json({
       error: {
-        code: 'MISSING_TOKEN',
-        message: 'Token autoryzacyjny jest wymagany'
-      }
+        code: "MISSING_TOKEN",
+        message: "Token autoryzacyjny jest wymagany",
+      },
     });
   }
 
@@ -485,9 +519,9 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
   } catch (error) {
     return res.status(401).json({
       error: {
-        code: 'INVALID_TOKEN',
-        message: 'Nieprawidłowy lub wygasły token'
-      }
+        code: "INVALID_TOKEN",
+        message: "Nieprawidłowy lub wygasły token",
+      },
     });
   }
 };
@@ -498,18 +532,18 @@ export const roleMiddleware = (allowedRoles: UserRole[]) => {
     if (!req.user) {
       return res.status(401).json({
         error: {
-          code: 'UNAUTHORIZED',
-          message: 'Użytkownik nie jest uwierzytelniony'
-        }
+          code: "UNAUTHORIZED",
+          message: "Użytkownik nie jest uwierzytelniony",
+        },
       });
     }
 
     if (!allowedRoles.includes(req.user.role)) {
       return res.status(403).json({
         error: {
-          code: 'INSUFFICIENT_PERMISSIONS',
-          message: 'Brak uprawnień do wykonania tej operacji'
-        }
+          code: "INSUFFICIENT_PERMISSIONS",
+          message: "Brak uprawnień do wykonania tej operacji",
+        },
       });
     }
 
@@ -529,20 +563,20 @@ const rateLimitConfig = {
   register: {
     windowMs: 60 * 60 * 1000, // 1 godzina
     max: 5,
-    message: 'Zbyt wiele prób rejestracji. Spróbuj ponownie za godzinę.'
+    message: "Zbyt wiele prób rejestracji. Spróbuj ponownie za godzinę.",
   },
   // Logowanie: 10 prób na godzinę na IP
   login: {
     windowMs: 60 * 60 * 1000, // 1 godzina
     max: 10,
-    message: 'Zbyt wiele prób logowania. Spróbuj ponownie za godzinę.'
+    message: "Zbyt wiele prób logowania. Spróbuj ponownie za godzinę.",
   },
   // Ogólne API: 1000 requestów na godzinę na użytkownika
   api: {
     windowMs: 60 * 60 * 1000, // 1 godzina
     max: 1000,
-    message: 'Zbyt wiele żądań. Spróbuj ponownie za godzinę.'
-  }
+    message: "Zbyt wiele żądań. Spróbuj ponownie za godzinę.",
+  },
 };
 ```
 
@@ -551,12 +585,13 @@ const rateLimitConfig = {
 ```typescript
 // Konfiguracja nagłówków bezpieczeństwa
 const securityHeaders = {
-  'X-Content-Type-Options': 'nosniff',
-  'X-Frame-Options': 'DENY',
-  'X-XSS-Protection': '1; mode=block',
-  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
-  'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'",
-  'Referrer-Policy': 'strict-origin-when-cross-origin'
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "DENY",
+  "X-XSS-Protection": "1; mode=block",
+  "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+  "Content-Security-Policy":
+    "default-src 'self'; script-src 'self' 'unsafe-inline'",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
 };
 ```
 
@@ -565,39 +600,39 @@ const securityHeaders = {
 ### 10.1 Unit Tests
 
 ```typescript
-describe('AuthService', () => {
-  describe('registerUser', () => {
-    it('should register a new user successfully', async () => {
+describe("AuthService", () => {
+  describe("registerUser", () => {
+    it("should register a new user successfully", async () => {
       // Test rejestracji
     });
 
-    it('should throw error for duplicate email', async () => {
+    it("should throw error for duplicate email", async () => {
       // Test duplikatu email
     });
 
-    it('should validate password strength', async () => {
+    it("should validate password strength", async () => {
       // Test siły hasła
     });
   });
 
-  describe('loginUser', () => {
-    it('should login user with valid credentials', async () => {
+  describe("loginUser", () => {
+    it("should login user with valid credentials", async () => {
       // Test logowania
     });
 
-    it('should throw error for invalid credentials', async () => {
+    it("should throw error for invalid credentials", async () => {
       // Test nieprawidłowych danych
     });
   });
 });
 
-describe('UserService', () => {
-  describe('getUsers', () => {
-    it('should return paginated users list', async () => {
+describe("UserService", () => {
+  describe("getUsers", () => {
+    it("should return paginated users list", async () => {
       // Test listy użytkowników
     });
 
-    it('should filter users by role', async () => {
+    it("should filter users by role", async () => {
       // Test filtrowania
     });
   });
@@ -607,15 +642,15 @@ describe('UserService', () => {
 ### 10.2 Integration Tests
 
 ```typescript
-describe('Auth API', () => {
-  describe('POST /api/auth/register', () => {
-    it('should register new user', async () => {
+describe("Auth API", () => {
+  describe("POST /api/auth/register", () => {
+    it("should register new user", async () => {
       // Test endpointu rejestracji
     });
   });
 
-  describe('POST /api/auth/login', () => {
-    it('should login user and return tokens', async () => {
+  describe("POST /api/auth/login", () => {
+    it("should login user and return tokens", async () => {
       // Test endpointu logowania
     });
   });
@@ -637,17 +672,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RegisterUserDto'
+              $ref: "#/components/schemas/RegisterUserDto"
       responses:
-        '201':
+        "201":
           description: Użytkownik został zarejestrowany
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthResponseDto'
-        '400':
+                $ref: "#/components/schemas/AuthResponseDto"
+        "400":
           description: Błąd walidacji danych
-        '409':
+        "409":
           description: Email już istnieje
 
   /api/auth/login:
@@ -659,15 +694,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LoginUserDto'
+              $ref: "#/components/schemas/LoginUserDto"
       responses:
-        '200':
+        "200":
           description: Logowanie udane
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthResponseDto'
-        '401':
+                $ref: "#/components/schemas/AuthResponseDto"
+        "401":
           description: Nieprawidłowe dane logowania
 ```
 
@@ -720,47 +755,45 @@ CREATE INDEX IF NOT EXISTS idx_sessions_user_expires ON auth.user_sessions(user_
 ```typescript
 // Logowanie akcji autentykacji
 const logAuthAction = async (action: string, userId: string, metadata: any) => {
-  await supabase
-    .from('audit.activity_log')
-    .insert({
-      user_id: userId,
-      action: action,
-      entity_type: 'user',
-      entity_id: userId,
-      metadata: metadata,
-      ip_address: req.ip,
-      user_agent: req.headers['user-agent']
-    });
+  await supabase.from("audit.activity_log").insert({
+    user_id: userId,
+    action: action,
+    entity_type: "user",
+    entity_id: userId,
+    metadata: metadata,
+    ip_address: req.ip,
+    user_agent: req.headers["user-agent"],
+  });
 };
 
 // Przykłady logowania
-await logAuthAction('login', userId, { success: true });
-await logAuthAction('register', userId, { role: userRole });
-await logAuthAction('logout', userId, { session_id: sessionId });
+await logAuthAction("login", userId, { success: true });
+await logAuthAction("register", userId, { role: userRole });
+await logAuthAction("logout", userId, { session_id: sessionId });
 ```
 
 ### 13.2 Error Tracking
 
 ```typescript
 // Konfiguracja Sentry dla śledzenia błędów
-import * as Sentry from '@sentry/node';
+import * as Sentry from "@sentry/node";
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
   environment: process.env.NODE_ENV,
   integrations: [
     new Sentry.Integrations.Http({ tracing: true }),
-    new Sentry.Integrations.Express({ app })
+    new Sentry.Integrations.Express({ app }),
   ],
   tracesSampleRate: 1.0,
 });
 
 // Przechwytywanie błędów autentykacji
 app.use((error: any, req: Request, res: Response, next: NextFunction) => {
-  if (error.code?.startsWith('AUTH_') || error.code?.startsWith('USER_')) {
+  if (error.code?.startsWith("AUTH_") || error.code?.startsWith("USER_")) {
     Sentry.captureException(error, {
-      tags: { component: 'auth' },
-      user: { id: req.user?.id }
+      tags: { component: "auth" },
+      user: { id: req.user?.id },
     });
   }
   next(error);
@@ -772,6 +805,7 @@ app.use((error: any, req: Request, res: Response, next: NextFunction) => {
 Ten plan implementacji zapewnia:
 
 ### ✅ **Funkcjonalności Authentication:**
+
 - Rejestracja użytkowników z walidacją email
 - Logowanie z JWT tokenami
 - Zarządzanie sesjami i refresh tokenami
@@ -779,6 +813,7 @@ Ten plan implementacji zapewnia:
 - Pobieranie informacji o aktualnym użytkowniku
 
 ### ✅ **Funkcjonalności Users Management:**
+
 - Lista użytkowników z filtrowaniem i paginacją
 - Szczegóły użytkownika z pełnymi danymi
 - Aktualizacja profilu użytkownika
@@ -786,6 +821,7 @@ Ten plan implementacji zapewnia:
 - Zarządzanie rolami i uprawnieniami
 
 ### ✅ **Bezpieczeństwo:**
+
 - Row Level Security (RLS) w Supabase
 - Rate limiting dla endpointów
 - Walidacja danych wejściowych
@@ -793,9 +829,10 @@ Ten plan implementacji zapewnia:
 - Bezpieczne nagłówki HTTP
 
 ### ✅ **Skalowalność:**
+
 - Architektura oparta na Supabase Auth
 - Automatyczne zarządzanie sesjami
 - Możliwość rozszerzenia o OAuth
 - Monitoring i error tracking
 
-**Następne kroki:** Implementacja endpointów zgodnie z tym planem, testy jednostkowe i integracyjne, dokumentacja API. 
+**Następne kroki:** Implementacja endpointów zgodnie z tym planem, testy jednostkowe i integracyjne, dokumentacja API.

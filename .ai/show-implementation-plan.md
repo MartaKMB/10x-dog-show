@@ -5,12 +5,14 @@
 Kompleksowy system zarządzania wystawami psów i rejestracji psów na wystawy. System obejmuje pełny cykl życia wystawy od tworzenia przez zarządzanie rejestracjami aż po zakończenie wystawy.
 
 ### Show Management
+
 - Tworzenie, edycja, przeglądanie i usuwanie wystaw
 - Zarządzanie statusem wystawy (draft, open_for_registration, etc.)
 - Konfiguracja parametrów wystawy (daty, lokalizacja, opłaty)
 - Statystyki i raporty wystaw
 
 ### Show Registration Management
+
 - Rejestracja psów na wystawy
 - Zarządzanie listą uczestników
 - Filtrowanie i wyszukiwanie rejestracji
@@ -21,6 +23,7 @@ Kompleksowy system zarządzania wystawami psów i rejestracji psów na wystawy. 
 ### 2.1 Show Management Endpoints
 
 #### GET /shows
+
 - **Metoda HTTP:** GET
 - **Struktura URL:** `/api/shows`
 - **Parametry query:**
@@ -34,30 +37,35 @@ Kompleksowy system zarządzania wystawami psów i rejestracji psów na wystawy. 
 - **Autoryzacja:** Wszyscy uwierzytelnieni użytkownicy
 
 #### GET /shows/{id}
+
 - **Metoda HTTP:** GET
 - **Struktura URL:** `/api/shows/{id}`
 - **Parametry:** `id` (UUID) - Identyfikator wystawy
 - **Autoryzacja:** Wszyscy uwierzytelnieni użytkownicy
 
 #### POST /shows
+
 - **Metoda HTTP:** POST
 - **Struktura URL:** `/api/shows`
 - **Request Body:** CreateShowDto
 - **Autoryzacja:** Przedstawiciele oddziałów (rola: department_representative)
 
 #### PUT /shows/{id}
+
 - **Metoda HTTP:** PUT
 - **Struktura URL:** `/api/shows/{id}`
 - **Request Body:** UpdateShowDto
 - **Autoryzacja:** Przedstawiciele oddziałów (tylko przed rozpoczęciem wystawy)
 
 #### PATCH /shows/{id}/status
+
 - **Metoda HTTP:** PATCH
 - **Struktura URL:** `/api/shows/{id}/status`
 - **Request Body:** UpdateShowStatusDto
 - **Autoryzacja:** Przedstawiciele oddziałów
 
 #### DELETE /shows/{id}
+
 - **Metoda HTTP:** DELETE
 - **Struktura URL:** `/api/shows/{id}`
 - **Autoryzacja:** Przedstawiciele oddziałów (tylko przed rozpoczęciem wystawy)
@@ -65,6 +73,7 @@ Kompleksowy system zarządzania wystawami psów i rejestracji psów na wystawy. 
 ### 2.2 Show Registration Management Endpoints
 
 #### GET /shows/{showId}/registrations
+
 - **Metoda HTTP:** GET
 - **Struktura URL:** `/api/shows/{showId}/registrations`
 - **Parametry query:**
@@ -78,35 +87,41 @@ Kompleksowy system zarządzania wystawami psów i rejestracji psów na wystawy. 
 - **Autoryzacja:** Wszyscy uwierzytelnieni użytkownicy
 
 #### POST /shows/{showId}/registrations
+
 - **Metoda HTTP:** POST
 - **Struktura URL:** `/api/shows/{showId}/registrations`
 - **Request Body:** CreateRegistrationDto
 - **Autoryzacja:** Przedstawiciele oddziałów i sekretarze
 
 #### GET /shows/{showId}/registrations/{registrationId}
+
 - **Metoda HTTP:** GET
 - **Struktura URL:** `/api/shows/{showId}/registrations/{registrationId}`
 - **Parametry:** `showId` (UUID), `registrationId` (UUID)
 - **Autoryzacja:** Wszyscy uwierzytelnieni użytkownicy
 
 #### PUT /shows/{showId}/registrations/{registrationId}
+
 - **Metoda HTTP:** PUT
 - **Struktura URL:** `/api/shows/{showId}/registrations/{registrationId}`
 - **Request Body:** UpdateRegistrationDto
 - **Autoryzacja:** Przedstawiciele oddziałów (tylko przed rozpoczęciem wystawy)
 
 #### DELETE /shows/{showId}/registrations/{registrationId}
+
 - **Metoda HTTP:** DELETE
 - **Struktura URL:** `/api/shows/{showId}/registrations/{registrationId}`
 - **Autoryzacja:** Przedstawiciele oddziałów (tylko przed rozpoczęciem wystawy)
 
 #### PATCH /shows/{showId}/registrations/{registrationId}/payment
+
 - **Metoda HTTP:** PATCH
 - **Struktura URL:** `/api/shows/{showId}/registrations/{registrationId}/payment`
 - **Request Body:** UpdatePaymentStatusDto
 - **Autoryzacja:** Przedstawiciele oddziałów
 
 #### GET /shows/{showId}/registrations/stats
+
 - **Metoda HTTP:** GET
 - **Struktura URL:** `/api/shows/{showId}/registrations/stats`
 - **Autoryzacja:** Wszyscy uwierzytelnieni użytkownicy
@@ -337,6 +352,7 @@ BreedSummaryDto {
 ## 4. Szczegóły odpowiedzi
 
 ### 4.1 Kody statusu HTTP
+
 - **200 OK:** Pomyślne operacje odczytu i aktualizacji
 - **201 Created:** Pomyślne utworzenie nowego zasobu
 - **400 Bad Request:** Błędy walidacji danych wejściowych
@@ -350,6 +366,7 @@ BreedSummaryDto {
 ### 4.2 Przykłady odpowiedzi
 
 #### GET /shows (200 OK)
+
 ```json
 {
   "shows": [
@@ -373,7 +390,7 @@ BreedSummaryDto {
       },
       "max_participants": 200,
       "registered_dogs": 45,
-      "entry_fee": 50.00,
+      "entry_fee": 50.0,
       "language": "pl",
       "created_at": "2024-01-15T10:30:00Z"
     }
@@ -388,6 +405,7 @@ BreedSummaryDto {
 ```
 
 #### GET /shows/{showId}/registrations (200 OK)
+
 ```json
 {
   "registrations": [
@@ -406,7 +424,7 @@ BreedSummaryDto {
       },
       "dog_class": "open",
       "catalog_number": 45,
-      "registration_fee": 50.00,
+      "registration_fee": 50.0,
       "is_paid": true,
       "payment_date": "2024-01-15T10:30:00Z",
       "registered_at": "2024-01-15T10:30:00Z"
@@ -422,6 +440,7 @@ BreedSummaryDto {
 ```
 
 #### GET /shows/{showId}/registrations/stats (200 OK)
+
 ```json
 {
   "total": 45,
@@ -445,9 +464,9 @@ BreedSummaryDto {
     "G10": 10
   },
   "revenue": {
-    "total": 2250.00,
-    "paid": 1900.00,
-    "outstanding": 350.00
+    "total": 2250.0,
+    "paid": 1900.0,
+    "outstanding": 350.0
   }
 }
 ```
@@ -457,6 +476,7 @@ BreedSummaryDto {
 ### 5.1 Show Management Flow
 
 #### POST /shows:
+
 1. **Walidacja danych wejściowych** - sprawdzenie wymaganych pól
 2. **Walidacja biznesowa** - daty, lokalizacja, uprawnienia
 3. **Sprawdzenie duplikatu** - czy wystawa o tej nazwie już istnieje
@@ -465,6 +485,7 @@ BreedSummaryDto {
 6. **Odpowiedź** - zwrócenie utworzonej wystawy
 
 #### PUT /shows/{id}:
+
 1. **Sprawdzenie istnienia** - czy wystawa istnieje
 2. **Walidacja stanu** - czy można edytować (nie rozpoczęta)
 3. **Walidacja uprawnień** - czy użytkownik jest organizatorem
@@ -472,6 +493,7 @@ BreedSummaryDto {
 5. **Odpowiedź** - zwrócenie zaktualizowanej wystawy
 
 #### PATCH /shows/{id}/status:
+
 1. **Sprawdzenie istnienia** - czy wystawa istnieje
 2. **Walidacja przejścia** - czy przejście statusu jest dozwolone
 3. **Aktualizacja statusu** - zmiana statusu wystawy
@@ -481,6 +503,7 @@ BreedSummaryDto {
 ### 5.2 Show Registration Management Flow
 
 #### POST /shows/{showId}/registrations:
+
 1. **Sprawdzenie wystawy** - czy wystawa istnieje i przyjmuje rejestracje
 2. **Walidacja psa** - czy pies istnieje i spełnia wymagania
 3. **Sprawdzenie limitu** - czy nie przekroczono max_participants
@@ -490,6 +513,7 @@ BreedSummaryDto {
 7. **Odpowiedź** - zwrócenie utworzonej rejestracji
 
 #### PUT /shows/{showId}/registrations/{registrationId}:
+
 1. **Sprawdzenie rejestracji** - czy rejestracja istnieje
 2. **Walidacja stanu** - czy można edytować (wystawa nie rozpoczęta)
 3. **Walidacja danych** - nowe wartości rejestracji
@@ -497,12 +521,14 @@ BreedSummaryDto {
 5. **Odpowiedź** - zwrócenie zaktualizowanej rejestracji
 
 #### PATCH /shows/{showId}/registrations/{registrationId}/payment:
+
 1. **Sprawdzenie rejestracji** - czy rejestracja istnieje
 2. **Aktualizacja płatności** - zmiana statusu płatności
 3. **Logowanie** - zapisanie informacji o płatności
 4. **Odpowiedź** - potwierdzenie aktualizacji płatności
 
 #### GET /shows/{showId}/registrations/stats:
+
 1. **Sprawdzenie wystawy** - czy wystawa istnieje
 2. **Agregacja danych** - obliczenie statystyk z rejestracji
 3. **Odpowiedź** - zwrócenie statystyk
@@ -510,23 +536,27 @@ BreedSummaryDto {
 ## 6. Względy bezpieczeństwa
 
 ### 6.1 Autoryzacja i uwierzytelnianie
+
 - **JWT Token Validation:** Sprawdzanie tokenu w headerze
 - **Role-based Access Control:** Przedstawiciele oddziałów dla zarządzania, wszyscy dla odczytu
 - **Row Level Security (RLS):** Polityki na poziomie bazy danych
 
 ### 6.2 Walidacja danych wejściowych
+
 - **Zod Schemas:** Walidacja wszystkich DTOs
 - **Date Validation:** Sprawdzenie relacji dat (registration_deadline <= show_date)
 - **Business Rule Validation:** Reguły rejestracji i limitów
 - **SQL Injection Prevention:** Parametryzowane zapytania
 
 ### 6.3 Walidacja biznesowa
+
 - **Show Status:** Edycja tylko przed rozpoczęciem wystawy
 - **Registration Limits:** Nie przekraczać max_participants
 - **Dog Class Validation:** Zgodność klasy z wiekiem psa
 - **Payment Tracking:** Śledzenie statusu płatności
 
 ### 6.4 Rate Limiting
+
 - **Authenticated requests:** 1000 requests/hour per user
 - **Registration creation:** 100 registrations/hour per user
 - **Show creation:** 10 shows/hour per user
@@ -534,6 +564,7 @@ BreedSummaryDto {
 ## 7. Obsługa błędów
 
 ### 7.1 Typy błędów i kody
+
 - **VALIDATION_ERROR (400):** Błędy walidacji danych wejściowych
 - **AUTHENTICATION_ERROR (401):** Nieprawidłowy lub wygasły token
 - **AUTHORIZATION_ERROR (403):** Brak uprawnień do operacji
@@ -543,6 +574,7 @@ BreedSummaryDto {
 - **INTERNAL_ERROR (500):** Błędy serwera
 
 ### 7.2 Przykłady błędów
+
 ```json
 // Limit uczestników przekroczony
 {
@@ -581,17 +613,20 @@ BreedSummaryDto {
 ## 8. Rozważania dotyczące wydajności
 
 ### 8.1 Optymalizacja zapytań
+
 - **Indexing:** Indeksy na (organizer_id, status), (show_date), (registration_deadline)
 - **JOIN Optimization:** Efektywne JOINy z tabelami venues, users, dogs, owners
 - **Pagination:** Cursor-based pagination dla dużych zbiorów
 - **Query Caching:** Cache dla często używanych danych
 
 ### 8.2 Strategie buforowania
+
 - **Redis Cache:** Cache dla wystaw i rejestracji
 - **Stats Caching:** Cache statystyk rejestracji
 - **Response Caching:** Cache odpowiedzi dla operacji odczytu
 
 ### 8.3 Monitoring wydajności
+
 - **Query Performance:** Monitorowanie czasu wykonywania zapytań
 - **Registration Rate:** Śledzenie tempa rejestracji
 - **Payment Processing:** Monitorowanie płatności
@@ -600,12 +635,15 @@ BreedSummaryDto {
 ## 9. Etapy wdrożenia
 
 ### 9.1 Faza 1: Podstawowa infrastruktura
+
 1. **Setup Validation Schemas**
+
    - Utworzenie Zod schemas dla wszystkich DTOs
    - Implementacja walidacji biznesowej
    - Testy jednostkowe dla schemas
 
 2. **Error Handling Infrastructure**
+
    - Implementacja centralnego error handler
    - Utworzenie typów ErrorResponseDto
    - Setup logging system
@@ -616,7 +654,9 @@ BreedSummaryDto {
    - Setup TypeScript types
 
 ### 9.2 Faza 2: Show Management
+
 1. **ShowService**
+
    - Implementacja CRUD operacji dla wystaw
    - Zarządzanie statusem wystaw
    - Walidacja uprawnień organizatorów
@@ -631,7 +671,9 @@ BreedSummaryDto {
    - DELETE /shows/{id}
 
 ### 9.3 Faza 3: Show Registration Management
+
 1. **RegistrationService**
+
    - Implementacja CRUD operacji dla rejestracji
    - Walidacja limitów uczestników
    - Zarządzanie płatnościami
@@ -647,12 +689,15 @@ BreedSummaryDto {
    - GET /shows/{showId}/registrations/stats
 
 ### 9.4 Faza 4: Security & Testing
+
 1. **Authentication & Authorization**
+
    - JWT token validation
    - Row Level Security policies
    - Role-based access control
 
 2. **Input Validation & Sanitization**
+
    - Comprehensive input validation
    - SQL injection prevention
    - XSS protection
@@ -664,12 +709,15 @@ BreedSummaryDto {
    - Performance tests
 
 ### 9.5 Faza 5: Performance & Monitoring
+
 1. **Performance Optimization**
+
    - Database indexing
    - Query optimization
    - Caching implementation
 
 2. **Monitoring & Logging**
+
    - Error tracking
    - Performance monitoring
    - Audit logging
@@ -680,7 +728,9 @@ BreedSummaryDto {
    - Deployment guides
 
 ### 9.6 Faza 6: Deployment & Maintenance
+
 1. **Production Deployment**
+
    - Environment configuration
    - Database migrations
    - Monitoring setup
@@ -693,6 +743,7 @@ BreedSummaryDto {
 ## 10. Pliki do utworzenia/modyfikacji
 
 ### 10.1 Nowe pliki:
+
 - `src/lib/validation/showSchemas.ts` (rozszerzenie)
 - `src/lib/validation/registrationSchemas.ts`
 - `src/lib/services/showService.ts` (rozszerzenie)
@@ -704,17 +755,20 @@ BreedSummaryDto {
 - `src/pages/api/shows/[id]/registrations/stats.ts`
 
 ### 10.2 Modyfikowane pliki:
+
 - `src/types.ts` (dodanie brakujących typów)
 - `src/lib/services/errorHandler.ts` (rozszerzenie o nowe błędy)
 - `src/lib/services/permissionService.ts` (dodanie uprawnień dla rejestracji)
 
 ### 10.3 Pliki konfiguracyjne:
+
 - `supabase/migrations/` (nowe migracje dla indeksów)
 - `package.json` (dodanie zależności testowych)
 
 ## 11. Kryteria akceptacji
 
 ### 11.1 Funkcjonalne:
+
 - ✅ Endpointy akceptują prawidłowe dane i tworzą/aktualizują wystawy
 - ✅ System zarządzania statusem wystaw działa poprawnie
 - ✅ Rejestracje psów są walidowane zgodnie z regułami biznesowymi
@@ -724,15 +778,17 @@ BreedSummaryDto {
 - ✅ Logowanie audytu dla każdej akcji
 
 ### 11.2 Niefunkcjonalne:
+
 - ✅ Czas odpowiedzi < 500ms dla 95% żądań
 - ✅ Obsługa 1000 żądań na godzinę na użytkownika
 - ✅ 99.9% dostępność endpointów
 - ✅ Pełne pokrycie testami (>90%)
 
 ### 11.3 Bezpieczeństwo:
+
 - ✅ Tylko przedstawiciele oddziałów mogą zarządzać wystawami
 - ✅ Wszystkie dane wejściowe są walidowane i sanityzowane
 - ✅ RLS policies chronią dane użytkowników
 - ✅ Brak ekspozycji wrażliwych informacji w błędach
 
-Ten plan zapewnia kompleksową implementację systemu zarządzania wystawami i rejestracjami psów z uwzględnieniem wszystkich aspektów bezpieczeństwa, wydajności i niezawodności wymaganych w aplikacji zarządzania wystawami psów. 
+Ten plan zapewnia kompleksową implementację systemu zarządzania wystawami i rejestracjami psów z uwzględnieniem wszystkich aspektów bezpieczeństwa, wydajności i niezawodności wymaganych w aplikacji zarządzania wystawami psów.

@@ -1,15 +1,18 @@
 # Plan implementacji widoku Description Editor
 
 ## 1. Przegląd
+
 Widok Description Editor służy do tworzenia i edycji opisów psów podczas konkretnej wystawy przez sekretarza ringu. Każdy pies może mieć różne opisy i oceny na różnych wystawach.
 Umożliwia wprowadzanie opisu w dwóch językach (PL/EN), ocenianie psa (ocena, tytuł, lokata, punkty), przeglądanie historii wersji oraz finalizację opisu.
 Obsługuje ręczne zapisywanie, walidację uprawnień i ograniczenia czasowe.
 
 ## 2. Routing widoku
+
 - `/descriptions/{id}/edit` – edycja istniejącego opisu dla konkretnej wystawy
 - `/shows/{showId}/dogs/{dogId}/description/new` – tworzenie nowego opisu dla psa na konkretnej wystawie
 
 ## 3. Struktura komponentów
+
 - `DescriptionEditor`
   - `DescriptionHeader`
     - `DogInfo`
@@ -31,6 +34,7 @@ Obsługuje ręczne zapisywanie, walidację uprawnień i ograniczenia czasowe.
 ## 4. Szczegóły komponentów
 
 ### DescriptionEditor
+
 - **Opis**: Główny kontener widoku, zarządza stanem formularza, walidacją, integracją z API.
 - **Elementy**: Header, edytor tekstu, formularz oceny, historia zmian, przyciski akcji.
 - **Interakcje**: onSave, onFinalize, onCancel, onFieldChange.
@@ -39,6 +43,7 @@ Obsługuje ręczne zapisywanie, walidację uprawnień i ograniczenia czasowe.
 - **Props**: `descriptionId?`, `dogId`, `showId`, `initialData?`
 
 ### RichTextEditor
+
 - **Opis**: Edytor rich text z obsługą PL/EN, wsparcie dla dostępności.
 - **Elementy**: zakładki językowe, toolbar, pole edycji.
 - **Interakcje**: onChange, onBlur, onFocus.
@@ -47,6 +52,7 @@ Obsługuje ręczne zapisywanie, walidację uprawnień i ograniczenia czasowe.
 - **Props**: `value`, `onChange`, `disabled`
 
 ### EvaluationForm
+
 - **Opis**: Formularz oceny psa (ocena, tytuł, lokata, punkty) dla konkretnej wystawy.
 - **Elementy**: selecty, inputy, walidacja zależna od klasy psa.
 - **Interakcje**: onGradeChange, onTitleChange, onPlacementChange, onPointsChange.
@@ -55,6 +61,7 @@ Obsługuje ręczne zapisywanie, walidację uprawnień i ograniczenia czasowe.
 - **Props**: `value`, `onChange`, `dogClass`, `disabled`
 
 ### ChangeHistory
+
 - **Opis**: Wyświetla historię wersji opisu z minimalnymi informacjami o zmianach.
 - **Elementy**: lista wersji, prosty diff viewer.
 - **Interakcje**: onVersionSelect.
@@ -63,6 +70,7 @@ Obsługuje ręczne zapisywanie, walidację uprawnień i ograniczenia czasowe.
 - **Props**: `versions`, `onSelect`
 
 ### SimpleDiffViewer
+
 - **Opis**: Minimalny diff viewer pokazujący kto, kiedy i jakie pole edytował.
 - **Elementy**: lista zmian z informacjami o autorze, czasie i edytowanym polu.
 - **Interakcje**: brak.
@@ -71,6 +79,7 @@ Obsługuje ręczne zapisywanie, walidację uprawnień i ograniczenia czasowe.
 - **Props**: `changes`
 
 ### ActionButtons
+
 - **Opis**: Zbiór przycisków akcji (Zapisz, Finalizuj, Anuluj).
 - **Elementy**: buttony, potwierdzenia.
 - **Interakcje**: onClick dla każdej akcji.

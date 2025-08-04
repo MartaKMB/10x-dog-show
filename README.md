@@ -33,6 +33,7 @@ A modern web application for digitizing and streamlining dog show documentation 
 ## Tech Stack
 
 ### Frontend
+
 - **[Astro 5.5.5](https://astro.build/)** - Modern web framework for fast, content-focused websites with server-side rendering
 - **[React 19.0.0](https://react.dev/)** - UI library for building interactive components
 - **[TypeScript 5](https://www.typescriptlang.org/)** - Type-safe JavaScript for better development experience
@@ -40,16 +41,19 @@ A modern web application for digitizing and streamlining dog show documentation 
 - **[Shadcn/ui](https://ui.shadcn.com/)** - Accessible and customizable React components
 
 ### Backend & Services
+
 - **[Supabase](https://supabase.com/)** - Backend-as-a-Service with PostgreSQL database, authentication, and real-time subscriptions
 - **[Resend](https://resend.com/)** - High-deliverability email service for automated communications
 - **[React-PDF](https://react-pdf.org/)** - Client-side PDF generation for dog descriptions
 
 ### DevOps & Infrastructure
+
 - **[GitHub Actions](https://github.com/features/actions)** - CI/CD automation and deployment
 - **[Docker](https://www.docker.com/)** - Containerization for consistent development and deployment
 - **[DigitalOcean](https://www.digitalocean.com/)** - Cloud hosting platform
 
 ### Development Tools
+
 - **[ESLint](https://eslint.org/)** - Code linting and quality assurance
 - **[Prettier](https://prettier.io/)** - Code formatting for consistency
 - **[Husky](https://typicode.github.io/husky/)** - Git hooks for pre-commit checks
@@ -65,18 +69,21 @@ A modern web application for digitizing and streamlining dog show documentation 
 ### Installation
 
 1. **Clone the repository:**
+
    ```bash
    git clone https://github.com/przeprogramowani/10x-dog-show.git
    cd 10x-dog-show
    ```
 
 2. **Install dependencies:**
+
    ```bash
    npm install
    ```
 
 3. **Set up environment variables:**
    Create a `.env` file in the project root with your Supabase and Resend credentials:
+
    ```env
    SUPABASE_URL=your_supabase_url
    SUPABASE_ANON_KEY=your_supabase_anon_key
@@ -84,6 +91,7 @@ A modern web application for digitizing and streamlining dog show documentation 
    ```
 
 4. **Start the development server:**
+
    ```bash
    npm run dev
    ```
@@ -93,18 +101,19 @@ A modern web application for digitizing and streamlining dog show documentation 
 
 ## Available Scripts
 
-| Script | Description |
-|--------|-------------|
-| `npm run dev` | Start the development server with hot reload |
-| `npm run build` | Build the application for production |
-| `npm run preview` | Preview the production build locally |
-| `npm run lint` | Run ESLint to check code quality |
-| `npm run lint:fix` | Automatically fix ESLint issues |
-| `npm run format` | Format code using Prettier |
+| Script             | Description                                  |
+| ------------------ | -------------------------------------------- |
+| `npm run dev`      | Start the development server with hot reload |
+| `npm run build`    | Build the application for production         |
+| `npm run preview`  | Preview the production build locally         |
+| `npm run lint`     | Run ESLint to check code quality             |
+| `npm run lint:fix` | Automatically fix ESLint issues              |
+| `npm run format`   | Format code using Prettier                   |
 
 ## Project Scope
 
 ### MVP Features (Current Phase)
+
 - ✅ **User Authentication**: Registration, login, and role-based access control
 - ✅ **Show Management**: Create, edit, and delete dog shows with templates
 - ✅ **Dog Registration**: Add, edit, and manage dog and owner information
@@ -115,6 +124,7 @@ A modern web application for digitizing and streamlining dog show documentation 
 - ✅ **GDPR Compliance**: Consent management and data retention policies
 
 ### Future Enhancements
+
 - 🔄 **Voice-to-Text Integration**: Speech recognition for hands-free documentation
 - 🔄 **Mobile Application**: Native mobile app for on-the-go access
 - 🔄 **Offline Mode**: Local data storage for unreliable internet connections
@@ -129,11 +139,13 @@ A modern web application for digitizing and streamlining dog show documentation 
 **Status**: Active Development
 
 ### Development Timeline
+
 - **Phase 1**: Core MVP functionality (In Progress)
 - **Phase 2**: Advanced features and optimization
 - **Phase 3**: Scaling and performance improvements
 
 ### Success Metrics
+
 - **10% faster** documentation creation by ring secretaries
 - **2 pages saved** per dog per show (paper reduction)
 - **100% elimination** of readability errors

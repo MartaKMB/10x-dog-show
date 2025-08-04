@@ -14,7 +14,7 @@ curl -X POST http://localhost:4321/api/descriptions \
   -H "Content-Type: application/json" \
   -d '{
     "show_id": "550e8400-e29b-41d4-a716-446655440001",
-    "dog_id": "550e8400-e29b-41d4-a716-446655440002", 
+    "dog_id": "550e8400-e29b-41d4-a716-446655440002",
     "judge_id": "550e8400-e29b-41d4-a716-446655440003",
     "content_pl": "Bardzo dobry przedstawiciel rasy. Doskonała budowa, poprawny ruch.",
     "content_en": "Very good representative of the breed. Excellent structure, correct movement."
@@ -22,6 +22,7 @@ curl -X POST http://localhost:4321/api/descriptions \
 ```
 
 **Oczekiwana odpowiedź (201 Created):**
+
 ```json
 {
   "id": "uuid-generated",
@@ -79,6 +80,7 @@ curl -X POST http://localhost:4321/api/descriptions \
 ```
 
 **Oczekiwana odpowiedź (400 Bad Request):**
+
 ```json
 {
   "error": {
@@ -109,6 +111,7 @@ curl -X POST http://localhost:4321/api/descriptions \
 ```
 
 **Oczekiwana odpowiedź (400 Bad Request):**
+
 ```json
 {
   "error": {
@@ -140,6 +143,7 @@ curl -X POST http://localhost:4321/api/descriptions \
 ```
 
 **Oczekiwana odpowiedź (404 Not Found):**
+
 ```json
 {
   "error": {
@@ -166,6 +170,7 @@ curl -X POST http://localhost:4321/api/descriptions \
 ```
 
 **Oczekiwana odpowiedź (409 Conflict):**
+
 ```json
 {
   "error": {
@@ -197,7 +202,7 @@ curl -X POST http://localhost:4321/api/descriptions \
   -H "Content-Type: application/json" \
   -d '{
     "show_id": "550e8400-e29b-41d4-a716-446655440001",
-    "dog_id": "550e8400-e29b-41d4-a716-446655440002", 
+    "dog_id": "550e8400-e29b-41d4-a716-446655440002",
     "judge_id": "550e8400-e29b-41d4-a716-446655440003",
     "content_pl": "Tylko polska treść"
   }'
@@ -216,4 +221,4 @@ Aby przetestować więcej scenariuszy, można dodać do MOCK_DATA:
 
 - Wystawę ze statusem "completed" do testowania business rule error
 - Psa innej rasy do testowania autoryzacji
-- Dodatkowych sędziów i sekretarzy 
+- Dodatkowych sędziów i sekretarzy

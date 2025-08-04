@@ -25,6 +25,7 @@ curl -X POST http://localhost:3000/api/shows \
 ```
 
 **Oczekiwana odpowiedź (201 Created):**
+
 ```json
 {
   "id": "uuid-generated",
@@ -45,7 +46,7 @@ curl -X POST http://localhost:3000/api/shows \
   },
   "max_participants": 200,
   "registered_dogs": 0,
-  "entry_fee": 50.00,
+  "entry_fee": 50.0,
   "description": "Annual national dog show featuring all FCI groups",
   "language": "pl",
   "created_at": "2024-01-15T10:30:00Z",
@@ -69,6 +70,7 @@ curl -X POST http://localhost:3000/api/shows \
 ```
 
 **Oczekiwana odpowiedź (400 Bad Request):**
+
 ```json
 {
   "error": {
@@ -102,6 +104,7 @@ curl -X POST http://localhost:3000/api/shows \
 ```
 
 **Oczekiwana odpowiedź (400 Bad Request):**
+
 ```json
 {
   "error": {
@@ -135,6 +138,7 @@ curl -X POST http://localhost:3000/api/shows \
 ```
 
 **Oczekiwana odpowiedź (422 Unprocessable Entity):**
+
 ```json
 {
   "error": {
@@ -162,6 +166,7 @@ curl -X POST http://localhost:3000/api/shows \
 ```
 
 **Oczekiwana odpowiedź (404 Not Found):**
+
 ```json
 {
   "error": {
@@ -202,6 +207,7 @@ curl -X GET "http://localhost:3000/api/shows?from_date=2024-01-01T00:00:00.000Z&
 ```
 
 **Oczekiwana odpowiedź (200 OK):**
+
 ```json
 {
   "data": [
@@ -224,7 +230,7 @@ curl -X GET "http://localhost:3000/api/shows?from_date=2024-01-01T00:00:00.000Z&
       },
       "max_participants": 200,
       "registered_dogs": 0,
-      "entry_fee": 50.00,
+      "entry_fee": 50.0,
       "description": "Annual national dog show featuring all FCI groups",
       "language": "pl",
       "created_at": "2024-01-15T10:30:00Z",
@@ -260,4 +266,4 @@ Aby przetestować więcej scenariuszy, można dodać do MOCK_DATA:
 - Wszystkie nowe wystawy automatycznie otrzymują status `draft`
 - Organizator jest automatycznie ustawiany na bieżącego użytkownika (department_representative)
 - Walidacja dat sprawdza, czy data wystawy jest w przyszłości
-- Walidacja relacji dat sprawdza, czy deadline rejestracji <= data wystawy 
+- Walidacja relacji dat sprawdza, czy deadline rejestracji <= data wystawy

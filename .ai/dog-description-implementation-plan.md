@@ -5,12 +5,14 @@
 Kompleksowy system zarządzania opisami psów i ich ocenami podczas wystaw. System obejmuje pełny cykl życia opisu od tworzenia przez edycję, ocenianie, finalizację aż po generowanie PDF i wysyłanie emaili.
 
 ### Descriptions Management
+
 - Tworzenie, edycja, przeglądanie i usuwanie opisów psów
 - Wersjonowanie opisów z pełną historią zmian
 - Finalizacja opisów (blokada edycji)
 - Walidacja uprawnień sekretarzy do ras
 
-### Evaluation Management  
+### Evaluation Management
+
 - Tworzenie i aktualizacja ocen psów
 - System ocen dostosowany do klas psów (baby/puppy vs inne klasy)
 - Przydzielanie tytułów (CWC, CACIB) i lokat
@@ -21,6 +23,7 @@ Kompleksowy system zarządzania opisami psów i ich ocenami podczas wystaw. Syst
 ### 2.1 Descriptions Management Endpoints
 
 #### GET /descriptions
+
 - **Metoda HTTP:** GET
 - **Struktura URL:** `/api/descriptions`
 - **Parametry query:**
@@ -34,34 +37,40 @@ Kompleksowy system zarządzania opisami psów i ich ocenami podczas wystaw. Syst
 - **Autoryzacja:** Wszyscy uwierzytelnieni użytkownicy
 
 #### GET /descriptions/{id}
+
 - **Metoda HTTP:** GET
 - **Struktura URL:** `/api/descriptions/{id}`
 - **Parametry:** `id` (UUID) - Identyfikator opisu
 - **Autoryzacja:** Wszyscy uwierzytelnieni użytkownicy
 
 #### POST /descriptions
+
 - **Metoda HTTP:** POST
 - **Struktura URL:** `/api/descriptions`
 - **Request Body:** CreateDescriptionDto
 - **Autoryzacja:** Sekretarze (rola: secretary)
 
 #### PUT /descriptions/{id}
+
 - **Metoda HTTP:** PUT
 - **Struktura URL:** `/api/descriptions/{id}`
 - **Request Body:** UpdateDescriptionDto
 - **Autoryzacja:** Sekretarze (tylko przed finalizacją)
 
 #### PATCH /descriptions/{id}/finalize
+
 - **Metoda HTTP:** PATCH
 - **Struktura URL:** `/api/descriptions/{id}/finalize`
 - **Autoryzacja:** Sekretarze (tylko przed zakończeniem wystawy)
 
 #### GET /descriptions/{id}/versions
+
 - **Metoda HTTP:** GET
 - **Struktura URL:** `/api/descriptions/{id}/versions`
 - **Autoryzacja:** Wszyscy uwierzytelnieni użytkownicy
 
 #### DELETE /descriptions/{id}
+
 - **Metoda HTTP:** DELETE
 - **Struktura URL:** `/api/descriptions/{id}`
 - **Autoryzacja:** Sekretarze (tylko przed finalizacją)
@@ -69,12 +78,14 @@ Kompleksowy system zarządzania opisami psów i ich ocenami podczas wystaw. Syst
 ### 2.2 Evaluation Management Endpoints
 
 #### POST /descriptions/{descriptionId}/evaluations
+
 - **Metoda HTTP:** POST
 - **Struktura URL:** `/api/descriptions/{descriptionId}/evaluations`
 - **Request Body:** CreateEvaluationDto
 - **Autoryzacja:** Sekretarze
 
 #### PUT /descriptions/{descriptionId}/evaluations
+
 - **Metoda HTTP:** PUT
 - **Struktura URL:** `/api/descriptions/{descriptionId}/evaluations`
 - **Request Body:** UpdateEvaluationDto
@@ -83,12 +94,14 @@ Kompleksowy system zarządzania opisami psów i ich ocenami podczas wystaw. Syst
 ### 2.3 PDF and Email Management Endpoints
 
 #### GET /descriptions/{id}/pdf
+
 - **Metoda HTTP:** GET
 - **Struktura URL:** `/api/descriptions/{id}/pdf`
 - **Parametry query:** `language` (optional): Język PDF (pl/en)
 - **Autoryzacja:** Wszyscy uwierzytelnieni użytkownicy
 
 #### POST /descriptions/{id}/send-email
+
 - **Metoda HTTP:** POST
 - **Struktura URL:** `/api/descriptions/{id}/send-email`
 - **Request Body:** SendEmailDto
@@ -266,6 +279,7 @@ UserSummaryDto {
 ## 4. Szczegóły odpowiedzi
 
 ### 4.1 Kody statusu HTTP
+
 - **200 OK:** Pomyślne operacje odczytu i aktualizacji
 - **201 Created:** Pomyślne utworzenie nowego zasobu
 - **400 Bad Request:** Błędy walidacji danych wejściowych
@@ -279,6 +293,7 @@ UserSummaryDto {
 ### 4.2 Przykłady odpowiedzi
 
 #### GET /descriptions (200 OK)
+
 ```json
 {
   "descriptions": [
@@ -329,6 +344,7 @@ UserSummaryDto {
 ```
 
 #### POST /descriptions/{descriptionId}/evaluations (201 Created)
+
 ```json
 {
   "id": "uuid",
@@ -345,6 +361,7 @@ UserSummaryDto {
 ```
 
 #### GET /descriptions/{id}/pdf (200 OK)
+
 ```json
 {
   "pdf_url": "https://storage.supabase.co/bucket/pdfs/description-uuid.pdf",
@@ -358,6 +375,7 @@ UserSummaryDto {
 ### 5.1 Descriptions Management Flow
 
 #### POST /descriptions:
+
 1. **Walidacja danych wejściowych** - sprawdzenie wymaganych pól
 2. **Walidacja biznesowa** - status wystawy, uprawnienia sekretarza
 3. **Sprawdzenie duplikatu** - czy opis już istnieje
@@ -366,6 +384,7 @@ UserSummaryDto {
 6. **Odpowiedź** - zwrócenie utworzonego opisu
 
 #### PUT /descriptions/{id}:
+
 1. **Sprawdzenie istnienia** - czy opis istnieje
 2. **Walidacja stanu** - czy można edytować (nie sfinalizowany)
 3. **Walidacja uprawnień** - czy sekretarz ma dostęp
@@ -374,6 +393,7 @@ UserSummaryDto {
 6. **Odpowiedź** - zwrócenie zaktualizowanego opisu
 
 #### PATCH /descriptions/{id}/finalize:
+
 1. **Sprawdzenie istnienia** - czy opis istnieje
 2. **Walidacja stanu** - czy można sfinalizować
 3. **Walidacja kompletności** - czy opis jest kompletny
@@ -384,6 +404,7 @@ UserSummaryDto {
 ### 5.2 Evaluation Management Flow
 
 #### POST /descriptions/{descriptionId}/evaluations:
+
 1. **Sprawdzenie opisu** - czy opis istnieje i nie jest sfinalizowany
 2. **Walidacja oceny** - zgodność z klasą psa
 3. **Walidacja reguł biznesowych** - tytuły, lokaty, punkty
@@ -391,6 +412,7 @@ UserSummaryDto {
 5. **Odpowiedź** - zwrócenie oceny
 
 #### PUT /descriptions/{descriptionId}/evaluations:
+
 1. **Sprawdzenie oceny** - czy ocena istnieje
 2. **Walidacja stanu** - czy można edytować
 3. **Walidacja danych** - nowe wartości oceny
@@ -400,12 +422,14 @@ UserSummaryDto {
 ### 5.3 PDF and Email Flow
 
 #### GET /descriptions/{id}/pdf:
+
 1. **Sprawdzenie opisu** - czy opis istnieje
 2. **Generowanie PDF** - utworzenie dokumentu
 3. **Upload do storage** - zapisanie pliku
 4. **Odpowiedź** - zwrócenie URL do PDF
 
 #### POST /descriptions/{id}/send-email:
+
 1. **Sprawdzenie opisu** - czy opis istnieje
 2. **Generowanie PDF** - jeśli nie istnieje
 3. **Wysyłanie email** - przez Resend API
@@ -415,23 +439,27 @@ UserSummaryDto {
 ## 6. Względy bezpieczeństwa
 
 ### 6.1 Autoryzacja i uwierzytelnianie
+
 - **JWT Token Validation:** Sprawdzanie tokenu w headerze
 - **Role-based Access Control:** Sekretarze dla edycji, wszyscy dla odczytu
 - **Row Level Security (RLS):** Polityki na poziomie bazy danych
 
 ### 6.2 Walidacja danych wejściowych
+
 - **Zod Schemas:** Walidacja wszystkich DTOs
 - **Content Validation:** Sanityzacja treści opisów
 - **Business Rule Validation:** Reguły ocen i tytułów
 - **SQL Injection Prevention:** Parametryzowane zapytania
 
 ### 6.3 Walidacja biznesowa
+
 - **Show Status:** Edycja tylko przed zakończeniem wystawy
 - **Finalization:** Brak edycji po finalizacji
 - **Secretary Permissions:** Dostęp tylko do przypisanych ras
 - **Evaluation Rules:** Zgodność ocen z klasami psów
 
 ### 6.4 Rate Limiting
+
 - **Authenticated requests:** 1000 requests/hour per user
 - **PDF generation:** 50 requests/hour per user
 - **Email sending:** 100 emails/hour per user
@@ -439,6 +467,7 @@ UserSummaryDto {
 ## 7. Obsługa błędów
 
 ### 7.1 Typy błędów i kody
+
 - **VALIDATION_ERROR (400):** Błędy walidacji danych wejściowych
 - **AUTHENTICATION_ERROR (401):** Nieprawidłowy lub wygasły token
 - **AUTHORIZATION_ERROR (403):** Brak uprawnień do operacji
@@ -448,6 +477,7 @@ UserSummaryDto {
 - **INTERNAL_ERROR (500):** Błędy serwera
 
 ### 7.2 Przykłady błędów
+
 ```json
 // Opis już istnieje
 {
@@ -486,17 +516,20 @@ UserSummaryDto {
 ## 8. Rozważania dotyczące wydajności
 
 ### 8.1 Optymalizacja zapytań
+
 - **Indexing:** Indeksy na (show_id, dog_id, judge_id), (secretary_id, show_id)
 - **JOIN Optimization:** Efektywne JOINy z tabelami shows, dogs, judges
 - **Pagination:** Cursor-based pagination dla dużych zbiorów
 - **Query Caching:** Cache dla często używanych danych
 
 ### 8.2 Strategie buforowania
+
 - **Redis Cache:** Cache dla opisów i ocen
 - **PDF Caching:** Cache wygenerowanych PDF
 - **Response Caching:** Cache odpowiedzi dla operacji odczytu
 
 ### 8.3 Monitoring wydajności
+
 - **Query Performance:** Monitorowanie czasu wykonywania zapytań
 - **PDF Generation Time:** Śledzenie czasu generowania PDF
 - **Email Delivery:** Monitorowanie dostarczania emaili
@@ -505,12 +538,15 @@ UserSummaryDto {
 ## 9. Etapy wdrożenia
 
 ### 9.1 Faza 1: Podstawowa infrastruktura
+
 1. **Setup Validation Schemas**
+
    - Utworzenie Zod schemas dla wszystkich DTOs
    - Implementacja walidacji biznesowej
    - Testy jednostkowe dla schemas
 
 2. **Error Handling Infrastructure**
+
    - Implementacja centralnego error handler
    - Utworzenie typów ErrorResponseDto
    - Setup logging system
@@ -521,7 +557,9 @@ UserSummaryDto {
    - Setup TypeScript types
 
 ### 9.2 Faza 2: Descriptions Management
+
 1. **DescriptionService**
+
    - Implementacja CRUD operacji dla opisów
    - Wersjonowanie opisów
    - Walidacja uprawnień sekretarzy
@@ -537,7 +575,9 @@ UserSummaryDto {
    - DELETE /descriptions/{id}
 
 ### 9.3 Faza 3: Evaluation Management
+
 1. **EvaluationService**
+
    - Implementacja CRUD operacji dla ocen
    - Walidacja reguł biznesowych ocen
    - System ocen dla różnych klas psów
@@ -547,12 +587,15 @@ UserSummaryDto {
    - PUT /descriptions/{descriptionId}/evaluations
 
 ### 9.4 Faza 4: PDF and Email Management
+
 1. **PDFService**
+
    - Generowanie PDF z opisami
    - Upload do Supabase Storage
    - Cache wygenerowanych PDF
 
 2. **EmailService**
+
    - Integracja z Resend API
    - Wysyłanie opisów mailem
    - Logowanie wysłanych emaili
@@ -562,12 +605,15 @@ UserSummaryDto {
    - POST /descriptions/{id}/send-email
 
 ### 9.5 Faza 5: Security & Testing
+
 1. **Authentication & Authorization**
+
    - JWT token validation
    - Row Level Security policies
    - Role-based access control
 
 2. **Input Validation & Sanitization**
+
    - Comprehensive input validation
    - SQL injection prevention
    - XSS protection
@@ -579,12 +625,15 @@ UserSummaryDto {
    - Performance tests
 
 ### 9.6 Faza 6: Performance & Monitoring
+
 1. **Performance Optimization**
+
    - Database indexing
    - Query optimization
    - Caching implementation
 
 2. **Monitoring & Logging**
+
    - Error tracking
    - Performance monitoring
    - Audit logging
@@ -595,7 +644,9 @@ UserSummaryDto {
    - Deployment guides
 
 ### 9.7 Faza 7: Deployment & Maintenance
+
 1. **Production Deployment**
+
    - Environment configuration
    - Database migrations
    - Monitoring setup
@@ -608,6 +659,7 @@ UserSummaryDto {
 ## 10. Pliki do utworzenia/modyfikacji
 
 ### 10.1 Nowe pliki:
+
 - `src/lib/validation/descriptionSchemas.ts` (rozszerzenie)
 - `src/lib/validation/evaluationSchemas.ts`
 - `src/lib/services/descriptionService.ts` (rozszerzenie)
@@ -623,17 +675,20 @@ UserSummaryDto {
 - `src/pages/api/descriptions/[id]/send-email.ts`
 
 ### 10.2 Modyfikowane pliki:
+
 - `src/types.ts` (dodanie brakujących typów)
 - `src/lib/services/errorHandler.ts` (rozszerzenie o nowe błędy)
 - `src/lib/services/permissionService.ts` (dodanie uprawnień dla opisów)
 
 ### 10.3 Pliki konfiguracyjne:
+
 - `supabase/migrations/` (nowe migracje dla indeksów)
 - `package.json` (dodanie zależności dla PDF i email)
 
 ## 11. Kryteria akceptacji
 
 ### 11.1 Funkcjonalne:
+
 - ✅ Endpointy akceptują prawidłowe dane i tworzą/aktualizują opisy
 - ✅ System wersjonowania działa poprawnie
 - ✅ Finalizacja opisów blokuje edycję
@@ -644,15 +699,17 @@ UserSummaryDto {
 - ✅ Logowanie audytu dla każdej akcji
 
 ### 11.2 Niefunkcjonalne:
+
 - ✅ Czas odpowiedzi < 500ms dla 95% żądań
 - ✅ Obsługa 1000 żądań na godzinę na użytkownika
 - ✅ 99.9% dostępność endpointów
 - ✅ Pełne pokrycie testami (>90%)
 
 ### 11.3 Bezpieczeństwo:
+
 - ✅ Tylko sekretarze mogą tworzyć/edytować opisy
 - ✅ Wszystkie dane wejściowe są walidowane i sanityzowane
 - ✅ RLS policies chronią dane użytkowników
 - ✅ Brak ekspozycji wrażliwych informacji w błędach
 
-Ten plan zapewnia kompleksową implementację systemu zarządzania opisami i ocenami psów z uwzględnieniem wszystkich aspektów bezpieczeństwa, wydajności i niezawodności wymaganych w aplikacji zarządzania wystawami psów. 
+Ten plan zapewnia kompleksową implementację systemu zarządzania opisami i ocenami psów z uwzględnieniem wszystkich aspektów bezpieczeństwa, wydajności i niezawodności wymaganych w aplikacji zarządzania wystawami psów.

@@ -5,6 +5,7 @@
 System 10x Dog Show wykorzystuje **unified interface approach** z jednym wspólnym layoutem dla wszystkich ról użytkowników. Architektura opiera się na hierarchicznej strukturze nawigacji z conditional rendering komponentów w zależności od uprawnień użytkownika i stanu biznesowego obiektów.
 
 ### Kluczowe zasady architektury:
+
 - **Role-based UI**: Dynamiczne dostosowanie interfejsu do uprawnień (Department Representative vs Secretary)
 - **Progressive Enhancement**: Astro SSR z selektywną hydratacją React komponentów
 - **Time-aware Interface**: Ograniczenia edycji na podstawie statusu wystawy i czasu
@@ -13,6 +14,7 @@ System 10x Dog Show wykorzystuje **unified interface approach** z jednym wspóln
 - **Accessibility**: Zgodność z minimalnymi standardami WCAG 2.1 AA
 
 ### Stack technologiczny:
+
 - **Framework**: Astro z React komponentami
 - **Styling**: Tailwind CSS z shadcn/ui komponentami
 - **State Management**: React Context + Supabase built-in state
@@ -24,6 +26,7 @@ System 10x Dog Show wykorzystuje **unified interface approach** z jednym wspóln
 ### 2.1 Widoki autentykacji
 
 #### Login Page
+
 - **Ścieżka**: `/login`
 - **Cel**: Uwierzytelnianie użytkowników w systemie
 - **API**: `POST /auth/login`
@@ -37,6 +40,7 @@ System 10x Dog Show wykorzystuje **unified interface approach** z jednym wspóln
 - **Bezpieczeństwo**: Rate limiting, CSRF protection, secure session handling
 
 #### Register Page
+
 - **Ścieżka**: `/register`
 - **Cel**: Rejestracja nowych użytkowników
 - **API**: `POST /auth/register`
@@ -52,6 +56,7 @@ System 10x Dog Show wykorzystuje **unified interface approach** z jednym wspóln
 ### 2.2 Widoki główne
 
 #### Dashboard
+
 - **Ścieżka**: `/dashboard`
 - **Cel**: Główny przegląd dostępnych wystaw i quick actions
 - **API**: `GET /shows`, `GET /auth/me`
@@ -65,6 +70,7 @@ System 10x Dog Show wykorzystuje **unified interface approach** z jednym wspóln
 - **Bezpieczeństwo**: Role-based data filtering, privacy toggle respect
 
 #### User Profile
+
 - **Ścieżka**: `/profile`
 - **Cel**: Zarządzanie danymi użytkownika i preferencjami
 - **API**: `GET /auth/me`, `PUT /users/{id}`
@@ -81,6 +87,7 @@ System 10x Dog Show wykorzystuje **unified interface approach** z jednym wspóln
 ### 2.3 Widoki zarządzania wystawami
 
 #### Shows List
+
 - **Ścieżka**: `/shows`
 - **Cel**: Przegląd wszystkich wystaw z zaawansowanym filtrowaniem
 - **API**: `GET /shows` z query parameters
@@ -95,6 +102,7 @@ System 10x Dog Show wykorzystuje **unified interface approach** z jednym wspóln
 - **Bezpieczeństwo**: Role-based filtering, data privacy respect
 
 #### Show Details
+
 - **Ścieżka**: `/shows/{id}`
 - **Cel**: Szczegółowy widok wystawy z zarządzaniem psami i statusem
 - **API**: `GET /shows/{id}`, `GET /shows/{showId}/registrations`
@@ -109,6 +117,7 @@ System 10x Dog Show wykorzystuje **unified interface approach** z jednym wspóln
 - **Bezpieczeństwo**: Time-based edit restrictions, role-based actions
 
 #### Show Creator
+
 - **Ścieżka**: `/shows/new`
 - **Cel**: Multi-step wizard tworzenia nowej wystawy
 - **API**: `POST /shows`, `GET /venues`, `GET /judges`
@@ -126,6 +135,7 @@ System 10x Dog Show wykorzystuje **unified interface approach** z jednym wspóln
 ### 2.4 Widoki zarządzania psami
 
 #### Dogs List (w kontekście wystawy)
+
 - **Ścieżka**: `/shows/{showId}/dogs`
 - **Cel**: Hierarchiczna lista psów pogrupowana według grup FCI, ras i klas
 - **API**: `GET /shows/{showId}/registrations`, `GET /breeds`
@@ -140,6 +150,7 @@ System 10x Dog Show wykorzystuje **unified interface approach** z jednym wspóln
 - **Bezpieczeństwo**: Secretary role filtering, time-based restrictions
 
 #### Dog Details
+
 - **Ścieżka**: `/dogs/{id}`
 - **Cel**: Szczegółowe informacje o psie z historią opisów
 - **API**: `GET /dogs/{id}`, `GET /descriptions?dog_id={id}`
@@ -154,6 +165,7 @@ System 10x Dog Show wykorzystuje **unified interface approach** z jednym wspóln
 - **Bezpieczeństwo**: Data privacy masking, edit time restrictions
 
 #### Dog Registration
+
 - **Ścieżka**: `/shows/{showId}/register-dog`
 - **Cel**: Rejestracja psa na wystawę z walidacją klas
 - **API**: `POST /shows/{showId}/registrations`, `GET /dogs`, `GET /owners`
@@ -170,6 +182,7 @@ System 10x Dog Show wykorzystuje **unified interface approach** z jednym wspóln
 ### 2.5 Widoki opisów i ocen
 
 #### Description Editor
+
 - **Ścieżka**: `/descriptions/{id}/edit` lub `/dogs/{dogId}/description/new`
 - **Cel**: Tworzenie i edycja opisów psów z systemem ocen
 - **API**: `POST /descriptions`, `PUT /descriptions/{id}`, `POST /descriptions/{id}/evaluations`
@@ -185,6 +198,7 @@ System 10x Dog Show wykorzystuje **unified interface approach** z jednym wspóln
 - **Bezpieczeństwo**: Version control, time-based edit locks, secretary breed restrictions
 
 #### Description History
+
 - **Ścieżka**: `/descriptions/{id}/history`
 - **Cel**: Szczegółowa historia wszystkich zmian w opisie
 - **API**: `GET /descriptions/{id}/versions`
@@ -201,6 +215,7 @@ System 10x Dog Show wykorzystuje **unified interface approach** z jednym wspóln
 ### 2.6 Widoki administratorskie (Department Representative)
 
 #### User Management
+
 - **Ścieżka**: `/admin/users`
 - **Cel**: Zarządzanie sekretarzami i przypisaniami do ras
 - **API**: `GET /users`, `POST /users`, `PUT /users/{id}`
@@ -215,6 +230,7 @@ System 10x Dog Show wykorzystuje **unified interface approach** z jednym wspóln
 - **Bezpieczeństwo**: Department representative only, audit logging
 
 #### GDPR Management
+
 - **Ścieżka**: `/admin/gdpr`
 - **Cel**: Zarządzanie polityką prywatności i żądaniami RODO
 - **API**: `GET /gdpr/*`, `POST /gdpr/export`, `POST /gdpr/delete`
@@ -229,6 +245,7 @@ System 10x Dog Show wykorzystuje **unified interface approach** z jednym wspóln
 - **Bezpieczeństwo**: Restricted access, audit trail, secure data handling
 
 #### Owner Management
+
 - **Ścieżka**: `/owners`
 - **Cel**: Zarządzanie bazą właścicieli psów
 - **API**: `GET /owners`, `POST /owners`, `PUT /owners/{id}`
@@ -245,6 +262,7 @@ System 10x Dog Show wykorzystuje **unified interface approach** z jednym wspóln
 ### 2.7 Widoki słownikowe
 
 #### Breeds Dictionary
+
 - **Ścieżka**: `/dictionaries/breeds`
 - **Cel**: Zarządzanie słownikiem ras psów FCI
 - **API**: `GET /breeds`
@@ -263,13 +281,15 @@ System 10x Dog Show wykorzystuje **unified interface approach** z jednym wspóln
 ### 3.1 Department Representative Journey
 
 **Główny przepływ zarządzania wystawą:**
+
 ```
-Login → Dashboard → Show Creator (wizard) → Show Details → 
-Dog Registration → User Assignment → Progress Monitoring → 
+Login → Dashboard → Show Creator (wizard) → Show Details →
+Dog Registration → User Assignment → Progress Monitoring →
 Description Review → PDF Generation → Data Export
 ```
 
 **Szczegółowe kroki:**
+
 1. **Planowanie wystawy**: Dashboard → Shows List → Show Creator
 2. **Konfiguracja**: Venue selection → Judge assignment → Registration settings
 3. **Zarządzanie rejestracjami**: Dog Registration → Owner management → GDPR consent
@@ -281,12 +301,14 @@ Description Review → PDF Generation → Data Export
 ### 3.2 Secretary Journey
 
 **Główny przepływ tworzenia opisów:**
+
 ```
-Login → Dashboard → Show Selection → Dogs List (filtered) → 
+Login → Dashboard → Show Selection → Dogs List (filtered) →
 Dog Details → Description Editor → Evaluation Form → Finalization
 ```
 
 **Szczegółowe kroki:**
+
 1. **Dostęp do przypisanych wystaw**: Dashboard → Show filtering by assignments
 2. **Nawigacja po rasach**: Show Details → Dogs List → Breed filtering
 3. **Tworzenie opisów**: Dog Details → Description Editor → Rich text editing
@@ -297,6 +319,7 @@ Dog Details → Description Editor → Evaluation Form → Finalization
 ### 3.3 Shared Interaction Patterns
 
 **Common workflows:**
+
 - **Privacy management**: Global privacy toggle → Data masking across all views
 - **Profile management**: User menu → Profile settings → Password change
 - **Offline handling**: Connection loss → Offline indicator → Draft preservation
@@ -307,6 +330,7 @@ Dog Details → Description Editor → Evaluation Form → Finalization
 ### 4.1 Główna struktura nawigacji
 
 **Header Navigation (persistent):**
+
 ```
 ┌─ Logo/Home ─┬─ Main Navigation ─┬─ Global Controls ─┬─ User Menu ─┐
 │             │                   │                   │             │
@@ -319,6 +343,7 @@ Dog Details → Description Editor → Evaluation Form → Finalization
 ```
 
 **Sidebar Navigation (contextual):**
+
 - **Show context**: Show details, Dogs, Registrations, Settings
 - **Dog context**: Dog details, Descriptions, History
 - **Admin context**: Users, GDPR, Owners, Dictionaries
@@ -326,11 +351,13 @@ Dog Details → Description Editor → Evaluation Form → Finalization
 ### 4.2 Breadcrumb Navigation
 
 **Hierarchical navigation pattern:**
+
 ```
 Dashboard > Shows > Warsaw Show 2024 > Dogs > German Shepherd > Bella > Description
 ```
 
 **Context-aware breadcrumbs:**
+
 - **Role-based**: Different paths for different roles
 - **State-aware**: Show editing restrictions based on show status
 - **Permission-aware**: Hidden paths for unauthorized actions
@@ -338,12 +365,14 @@ Dashboard > Shows > Warsaw Show 2024 > Dogs > German Shepherd > Bella > Descript
 ### 4.3 Mobile/Tablet Adaptations
 
 **Tablet Navigation (768px - 1024px):**
+
 - Collapsible sidebar navigation
 - Bottom action bar for key functions
 - Swipe gestures between related items
 - Touch-optimized form controls
 
 **Responsive breakpoints:**
+
 - **Mobile**: < 768px (basic support)
 - **Tablet**: 768px - 1024px (optimized)
 - **Desktop**: > 1024px (primary target)
@@ -353,24 +382,30 @@ Dashboard > Shows > Warsaw Show 2024 > Dogs > German Shepherd > Bella > Descript
 ### 5.1 Layout Components
 
 #### Layout.astro
+
 **Cel**: Unified layout dla wszystkich stron z conditional rendering
 **Funkcjonalność**:
+
 - Role-based navigation rendering
 - Theme persistence i initialization
 - Global state providers (user, privacy, theme)
 - Responsive layout adaptation
 
 #### PermissionGate
+
 **Cel**: Conditional rendering na podstawie uprawnień użytkownika
 **Props**: `role`, `permission`, `fallback`
 **Funkcjonalność**:
+
 - Role-based access control
 - Business rule validation (time restrictions)
 - Graceful fallback rendering
 
 #### Navbar
+
 **Cel**: Global navigation z kontrolami systemowymi
 **Funkcjonalność**:
+
 - Role-based menu items
 - GlobalPrivacyToggle integration
 - Theme switching
@@ -380,25 +415,31 @@ Dashboard > Shows > Warsaw Show 2024 > Dogs > German Shepherd > Bella > Descript
 ### 5.2 Form Components
 
 #### FormWithConfirmation
+
 **Cel**: Wrapper dla formularzy z protection przed utratą danych
 **Funkcjonalność**:
+
 - Unsaved changes detection
 - Browser beforeunload event handling
 - Confirmation dialogs
 - Auto-save integration
 
 #### FormWizard
+
 **Cel**: Multi-step form handling z progress tracking
 **Props**: `steps`, `onStepChange`, `onComplete`
 **Funkcjonalność**:
+
 - Step validation i navigation
 - Progress indication
 - Draft saving between steps
 - Step-specific validation rules
 
 #### DescriptionEditor
+
 **Cel**: Rich text editor dla opisów psów z version control
 **Funkcjonalność**:
+
 - Multi-language support (PL/EN)
 - Auto-save z visual indicators
 - Version history integration
@@ -408,9 +449,11 @@ Dashboard > Shows > Warsaw Show 2024 > Dogs > German Shepherd > Bella > Descript
 ### 5.3 Data Display Components
 
 #### DataTable
+
 **Cel**: Consistent table component z advanced functionality
 **Props**: `data`, `columns`, `filters`, `pagination`
 **Funkcjonalność**:
+
 - Built-in sorting i filtering
 - Responsive design
 - Keyboard navigation
@@ -418,17 +461,21 @@ Dashboard > Shows > Warsaw Show 2024 > Dogs > German Shepherd > Bella > Descript
 - Role-based column visibility
 
 #### HierarchicalList
+
 **Cel**: Nested data display dla grup/ras/klas
 **Funkcjonalność**:
+
 - Collapsible sections
 - Search within hierarchy
 - Keyboard navigation
 - Custom rendering per level
 
 #### ChangeHistory
+
 **Cel**: Expandable version history display
 **Props**: `versions`, `showDiff`, `maxItems`
 **Funkcjonalność**:
+
 - Chronological timeline
 - Diff visualization
 - User attribution
@@ -437,25 +484,31 @@ Dashboard > Shows > Warsaw Show 2024 > Dogs > German Shepherd > Bella > Descript
 ### 5.4 Specialized Components
 
 #### GlobalPrivacyToggle
+
 **Cel**: Navbar component dla hiding personal data
 **Funkcjonalność**:
+
 - Global state management (Context + localStorage)
 - Real-time data masking across all components
 - Visual indicator when privacy mode active
 - Accessibility announcements
 
 #### ShowStatusIndicator
+
 **Cel**: Visual show status z business rule awareness
 **Props**: `show`, `detailed`
 **Funkcjonalność**:
+
 - Status badge rendering
 - Edit restriction messaging
 - Countdown timers dla deadlines
 - Contextual actions availability
 
 #### EvaluationForm
+
 **Cel**: Structured form dla dog evaluations
 **Funkcjonalność**:
+
 - Grade validation per dog class
 - Title eligibility checking
 - Placement conflict detection
@@ -465,26 +518,32 @@ Dashboard > Shows > Warsaw Show 2024 > Dogs > German Shepherd > Bella > Descript
 ### 5.5 Security & Privacy Components
 
 #### PrivacyMask
+
 **Cel**: Data masking component responsive to privacy toggle
 **Props**: `data`, `maskType`, `fallback`
 **Funkcjonalność**:
+
 - Context-aware masking (GlobalPrivacyToggle)
 - Different masking strategies (full, partial, placeholder)
 - Screen reader appropriate alternatives
 
 #### TimeRestriction
+
 **Cel**: Component enforcement time-based business rules
 **Props**: `show`, `restrictionType`, `children`
 **Funkcjonalność**:
+
 - Show status validation
 - Time-based edit locks
 - User feedback dla restrictions
 - Alternative action suggestions
 
 #### RoleGuard
+
 **Cel**: Higher-order component dla role-based access control
 **Props**: `allowedRoles`, `fallback`
 **Funkcjonalność**:
+
 - JWT token validation
 - Role hierarchy checking
 - Graceful access denial
@@ -493,34 +552,41 @@ Dashboard > Shows > Warsaw Show 2024 > Dogs > German Shepherd > Bella > Descript
 ### 5.6 UX Enhancement Components
 
 #### OfflineDetector
+
 **Cel**: Network status monitoring i user feedback
 **Funkcjonalność**:
+
 - Connection status detection
 - Toast notifications dla status changes
 - Draft preservation during offline periods
 - Sync indicators when reconnected
 
 #### AutoSave
+
 **Cel**: Automatic form data preservation
 **Props**: `interval`, `onSave`, `indicator`
 **Funkcjonalność**:
+
 - Configurable save intervals
 - Visual save status indicators
 - Conflict resolution dla concurrent edits
 - Local storage fallback
 
 #### LoadingSpinner
+
 **Cel**: Skeleton UI dla loading states
 **Props**: `type`, `size`, `message`
 **Funkcjonalność**:
+
 - Multiple skeleton patterns (table, card, form)
 - Accessibility announcements
 - Progressive loading indicators
 - Error state handling
 
 Każdy component jest zaprojektowany z myślą o:
+
 - **Accessibility**: WCAG 2.1 AA compliance
 - **Performance**: Lazy loading i code splitting
 - **Maintainability**: Clear props interface i documentation
 - **Testing**: Unit test coverage i visual regression tests
-- **Internationalization**: Polish/English support preparation 
+- **Internationalization**: Polish/English support preparation

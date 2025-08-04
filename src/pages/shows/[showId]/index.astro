@@ -1,12 +1,11 @@
 ---
-// eslint-disable-next-line prettier/prettier
-import Layout from '../../../layouts/Layout.astro';
-import ShowDetailsView from '../../../components/shows/ShowDetailsView.tsx';
+import Layout from "../../../layouts/Layout.astro";
+import ShowDetailsView from "../../../components/shows/ShowDetailsView.tsx";
 
 const { showId } = Astro.params;
 
 if (!showId) {
-  return Astro.redirect('/shows');
+  return Astro.redirect("/shows");
 }
 ---
 

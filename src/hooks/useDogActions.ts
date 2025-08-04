@@ -56,14 +56,13 @@ const useDogActions = () => {
     }));
   }, []);
 
-  const editDog = useCallback(async (dogId: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const editDog = useCallback(async (_dogId: string) => {
     setState((prev) => ({ ...prev, isProcessing: true }));
 
     try {
       // Navigate to edit page or open edit modal
       // This will be implemented based on the specific requirements
-      // eslint-disable-next-line no-console
-      console.log("Editing dog:", dogId);
 
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -106,14 +105,13 @@ const useDogActions = () => {
     [closeModals],
   );
 
-  const createDescription = useCallback(async (dogId: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const createDescription = useCallback(async (_dogId: string) => {
     setState((prev) => ({ ...prev, isProcessing: true }));
 
     try {
       // Navigate to description creation page
       // This will be implemented based on the specific requirements
-      // eslint-disable-next-line no-console
-      console.log("Creating description for dog:", dogId);
 
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));

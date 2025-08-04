@@ -1,14 +1,17 @@
 # Plan implementacji widoku zarządzania psami
 
 ## 1. Przegląd
+
 Widok zarządzania psami to hierarchiczna lista psów pogrupowana według grup FCI, ras i klas w kontekście konkretnej wystawy. Umożliwia sekretarzom i przedstawicielom oddziałów przeglądanie, edycję i zarządzanie psami uczestniczącymi w wystawie z uwzględnieniem statusów opisów i ograniczeń czasowych.
 
 ## 2. Routing widoku
+
 - **Ścieżka**: `/shows/{showId}/dogs`
 - **Parametry**: `showId` (UUID) - identyfikator wystawy
 - **Layout**: Layout.astro z nawigacją i breadcrumbs
 
 ## 3. Struktura komponentów
+
 ```
 DogsListView (główny kontener)
 ├── FilterPanel (filtry i wyszukiwanie)
@@ -34,6 +37,7 @@ DogsListView (główny kontener)
 ## 4. Szczegóły komponentów
 
 ### DogsListView
+
 - **Opis**: Główny kontener widoku zarządzania psami, koordynuje stan i komunikację między komponentami
 - **Główne elementy**: FilterPanel, HierarchicalList, Pagination, modals
 - **Obsługiwane interakcje**: inicjalizacja danych, obsługa błędów, nawigacja
@@ -42,6 +46,7 @@ DogsListView (główny kontener)
 - **Propsy**: showId: string, userRole: UserRole
 
 ### FilterPanel
+
 - **Opis**: Panel z filtrami i wyszukiwaniem dla listy psów
 - **Główne elementy**: BreedFilter, GenderFilter, ClassFilter, StatusFilter, SearchBar, ClearFiltersButton
 - **Obsługiwane interakcje**: zmiana filtrów, wyszukiwanie, czyszczenie filtrów
@@ -50,6 +55,7 @@ DogsListView (główny kontener)
 - **Propsy**: filters: FilterState, onFiltersChange: (filters: FilterState) => void, breeds: BreedResponseDto[]
 
 ### HierarchicalList
+
 - **Opis**: Renderuje hierarchiczną strukturę: Grupa FCI → Rasa → Klasa → Pies
 - **Główne elementy**: FciGroupNode, BreedGroupNode, ClassGroupNode, DogCard
 - **Obsługiwane interakcje**: expand/collapse węzłów, wybór elementu, nawigacja klawiaturą
@@ -58,6 +64,7 @@ DogsListView (główny kontener)
 - **Propsy**: nodes: HierarchyNode[], onNodeToggle: (nodeId: string) => void, selectedNodeId?: string
 
 ### DogCard
+
 - **Opis**: Karta wyświetlająca podstawowe informacje o psie i status opisu
 - **Główne elementy**: dog info, StatusBadge, QuickActionMenu, owner info (z privacy toggle)
 - **Obsługiwane interakcje**: view details, edit dog, delete dog, create description
@@ -66,6 +73,7 @@ DogsListView (główny kontener)
 - **Propsy**: dog: DogCardViewModel, onAction: (action: string, dogId: string) => void
 
 ### StatusBadge
+
 - **Opis**: Wizualny wskaźnik statusu opisu psa z kolorami i ikonami
 - **Główne elementy**: badge z kolorem, ikona, tekst statusu
 - **Obsługiwane interakcje**: click (pokazuje szczegóły statusu)
@@ -74,6 +82,7 @@ DogsListView (główny kontener)
 - **Propsy**: status: DescriptionStatus, onClick?: () => void
 
 ### QuickActionMenu
+
 - **Opis**: Menu z szybkimi akcjami dla psa (view, edit, delete, create description)
 - **Główne elementy**: dropdown menu z akcjami, ikony, tooltips
 - **Obsługiwane interakcje**: wybór akcji, hover effects
@@ -84,6 +93,7 @@ DogsListView (główny kontener)
 ## 5. Typy
 
 ### DogsListViewModel
+
 ```typescript
 interface DogsListViewModel {
   showId: string;
@@ -100,9 +110,10 @@ interface DogsListViewModel {
 ```
 
 ### HierarchyNode
+
 ```typescript
 interface HierarchyNode {
-  type: 'fci_group' | 'breed' | 'class' | 'dog';
+  type: "fci_group" | "breed" | "class" | "dog";
   id: string;
   name: string;
   children: HierarchyNode[];
@@ -113,6 +124,7 @@ interface HierarchyNode {
 ```
 
 ### DogCardViewModel
+
 ```typescript
 interface DogCardViewModel {
   dog: DogResponseDto;
@@ -126,6 +138,7 @@ interface DogCardViewModel {
 ```
 
 ### FilterState
+
 ```typescript
 interface FilterState {
   breedId?: string;
@@ -137,9 +150,10 @@ interface FilterState {
 ```
 
 ### DescriptionStatus
+
 ```typescript
 interface DescriptionStatus {
-  status: 'draft' | 'completed' | 'finalized' | 'none';
+  status: "draft" | "completed" | "finalized" | "none";
   lastModified?: string;
   secretaryName?: string;
   version?: number;
@@ -147,6 +161,7 @@ interface DescriptionStatus {
 ```
 
 ### QuickAction
+
 ```typescript
 interface QuickAction {
   id: string;
@@ -161,19 +176,20 @@ interface QuickAction {
 ## 6. Zarządzanie stanem
 
 ### useDogsList Hook
+
 ```typescript
 const useDogsList = (showId: string) => {
   const [state, setState] = useState<DogsListViewModel>({
     showId,
     dogs: [],
     filters: {},
-    search: '',
+    search: "",
     pagination: { page: 1, limit: 20, total: 0, pages: 0 },
     isLoading: false,
     error: null,
     canEdit: false,
     canDelete: false,
-    userRole: 'secretary'
+    userRole: "secretary",
   });
 
   const fetchDogs = useCallback(async () => {
@@ -192,12 +208,13 @@ const useDogsList = (showId: string) => {
     state,
     fetchDogs,
     updateFilters,
-    searchDogs
+    searchDogs,
   };
 };
 ```
 
 ### useDogActions Hook
+
 ```typescript
 const useDogActions = () => {
   const [selectedDog, setSelectedDog] = useState<string | null>(null);
@@ -220,7 +237,7 @@ const useDogActions = () => {
     isProcessing,
     editDog,
     deleteDog,
-    createDescription
+    createDescription,
   };
 };
 ```
@@ -228,19 +245,24 @@ const useDogActions = () => {
 ## 7. Integracja API
 
 ### Główne endpointy:
+
 1. **GET /shows/{showId}/registrations** - pobranie rejestracji psów
+
    - Typ odpowiedzi: `RegistrationResponseDto[]`
    - Użycie: inicjalne ładowanie listy psów
 
 2. **GET /dogs** - pobranie psów z filtrami
+
    - Typ odpowiedzi: `PaginatedResponseDto<DogResponseDto>`
    - Użycie: wyszukiwanie i filtrowanie psów
 
 3. **GET /breeds** - pobranie ras dla filtrów
+
    - Typ odpowiedzi: `BreedResponseDto[]`
    - Użycie: lista ras w filtrach
 
 4. **DELETE /dogs/{id}** - usunięcie psa
+
    - Typ odpowiedzi: `{ message: string }`
    - Użycie: usuwanie psa z wystawy
 
@@ -249,17 +271,22 @@ const useDogActions = () => {
    - Użycie: sprawdzenie statusu opisu
 
 ### Implementacja wywołań:
+
 ```typescript
 // W useDogsList
 const fetchDogs = async () => {
-  setState(prev => ({ ...prev, isLoading: true }));
+  setState((prev) => ({ ...prev, isLoading: true }));
   try {
     const response = await fetch(`/api/shows/${showId}/registrations`);
     const data = await response.json();
     // Transformacja danych do hierarchii
-    setState(prev => ({ ...prev, dogs: transformToHierarchy(data), isLoading: false }));
+    setState((prev) => ({
+      ...prev,
+      dogs: transformToHierarchy(data),
+      isLoading: false,
+    }));
   } catch (error) {
-    setState(prev => ({ ...prev, error: error.message, isLoading: false }));
+    setState((prev) => ({ ...prev, error: error.message, isLoading: false }));
   }
 };
 ```
@@ -267,6 +294,7 @@ const fetchDogs = async () => {
 ## 8. Interakcje użytkownika
 
 ### Filtrowanie:
+
 - **Wybór rasy**: aktualizuje filtr `breedId`, odświeża listę
 - **Wybór płci**: aktualizuje filtr `gender`, odświeża listę
 - **Wybór klasy**: aktualizuje filtr `dogClass`, odświeża listę
@@ -274,17 +302,20 @@ const fetchDogs = async () => {
 - **Czyszczenie filtrów**: resetuje wszystkie filtry, odświeża listę
 
 ### Wyszukiwanie:
+
 - **Wprowadzenie tekstu**: debounced search z minimalną długością 2 znaki
 - **Clear search**: usuwa filtr wyszukiwania, odświeża listę
 - **Enter key**: natychmiastowe wyszukiwanie
 
 ### Hierarchia:
+
 - **Kliknięcie grupy FCI**: rozwija/zwija grupę, aktualizuje `isExpanded`
 - **Kliknięcie rasy**: rozwija/zwija rasę, aktualizuje `isExpanded`
 - **Kliknięcie klasy**: rozwija/zwija klasę, aktualizuje `isExpanded`
 - **Keyboard navigation**: strzałki, Enter, Escape
 
 ### Akcje na psach:
+
 - **View Details**: otwiera modal z szczegółami psa
 - **Edit Dog**: otwiera modal edycji (jeśli dozwolone)
 - **Delete Dog**: otwiera modal potwierdzenia (jeśli dozwolone)
@@ -293,22 +324,26 @@ const fetchDogs = async () => {
 ## 9. Warunki i walidacja
 
 ### Uprawnienia użytkownika:
+
 - **Sekretarz**: tylko przypisane rasy, ograniczone akcje
 - **Przedstawiciel**: wszystkie psy, pełne uprawnienia
 - **Sprawdzenie**: w komponencie `DogsListView` na podstawie `userRole`
 
 ### Ograniczenia czasowe:
+
 - **Edycja**: tylko przed rozpoczęciem wystawy (`show.status !== 'in_progress'`)
 - **Usuwanie**: tylko przed rozpoczęciem wystawy
 - **Sprawdzenie**: w komponencie `QuickActionMenu` na podstawie `show.status`
 
 ### Walidacja filtrów:
+
 - **breed_id**: musi istnieć w systemie (sprawdzenie w `FilterPanel`)
 - **gender**: enum `DogGender` (walidacja w `GenderFilter`)
 - **dogClass**: enum `DogClass` (walidacja w `ClassFilter`)
 - **descriptionStatus**: enum statusów (walidacja w `StatusFilter`)
 
 ### Walidacja wyszukiwania:
+
 - **Minimalna długość**: 2 znaki (sprawdzenie w `SearchBar`)
 - **Maksymalna długość**: 100 znaków
 - **Debounce**: 300ms opóźnienie
@@ -316,21 +351,25 @@ const fetchDogs = async () => {
 ## 10. Obsługa błędów
 
 ### Błędy sieciowe:
+
 - **Wyświetlenie**: komunikat błędu w `DogsListView`
 - **Akcja**: przycisk "Retry" do ponownego pobrania danych
 - **Fallback**: pusty stan z komunikatem
 
 ### Błędy uprawnień:
+
 - **Wyświetlenie**: ukrycie akcji wymagających uprawnień
 - **Akcja**: komunikat o braku dostępu w `QuickActionMenu`
 - **Fallback**: tylko akcje "View Details"
 
 ### Błędy walidacji:
+
 - **Wyświetlenie**: błędy pod polami w `FilterPanel`
 - **Akcja**: blokada wysłania formularza
 - **Fallback**: reset do poprzedniej wartości
 
 ### Pusty wynik:
+
 - **Wyświetlenie**: komunikat "No results found" w `HierarchicalList`
 - **Akcja**: sugestia zmiany filtrów
 - **Fallback**: wyświetlenie wszystkich psów
@@ -338,46 +377,55 @@ const fetchDogs = async () => {
 ## 11. Kroki implementacji
 
 1. **Setup podstawowej struktury**
+
    - Utworzenie pliku `pages/shows/[showId]/dogs/index.astro`
    - Implementacja podstawowego layoutu z nawigacją
    - Setup TypeScript types dla widoku
 
 2. **Implementacja głównych komponentów**
+
    - `DogsListView` - główny kontener
    - `FilterPanel` - panel filtrów
    - `SearchBar` - wyszukiwanie
 
 3. **Implementacja hierarchicznej listy**
+
    - `HierarchicalList` - struktura drzewa
    - `FciGroupNode`, `BreedGroupNode`, `ClassGroupNode`
    - Logika expand/collapse
 
 4. **Implementacja kart psów**
+
    - `DogCard` - karta pojedynczego psa
    - `StatusBadge` - wskaźnik statusu
    - `QuickActionMenu` - menu akcji
 
 5. **Implementacja custom hooks**
+
    - `useDogsList` - zarządzanie stanem listy
    - `useDogActions` - akcje na psach
    - `useHierarchy` - zarządzanie hierarchią
 
 6. **Integracja z API**
+
    - Implementacja wywołań do endpointów
    - Obsługa odpowiedzi i błędów
    - Transformacja danych do hierarchii
 
 7. **Implementacja filtrów i wyszukiwania**
+
    - Logika filtrowania
    - Debounced search
    - Synchronizacja z API
 
 8. **Implementacja modali**
+
    - `AddDogModal` - dodawanie psa
    - `EditDogModal` - edycja psa
    - `DeleteDogConfirmation` - potwierdzenie usunięcia
 
 9. **Implementacja walidacji i uprawnień**
+
    - Sprawdzanie uprawnień użytkownika
    - Walidacja ograniczeń czasowych
    - Obsługa błędów walidacji
@@ -386,4 +434,4 @@ const fetchDogs = async () => {
     - Testy jednostkowe komponentów
     - Testy integracyjne
     - Optymalizacja wydajności
-    - Testy accessibility 
+    - Testy accessibility

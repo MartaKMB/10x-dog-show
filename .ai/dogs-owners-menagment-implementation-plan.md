@@ -2,10 +2,12 @@
 
 ## 1. Przegląd punktów końcowych
 
-### Dogs Management  
+### Dogs Management
+
 Zestaw endpointów do zarządzania psami w systemie wystaw. Obsługuje tworzenie, edycję i usuwanie psów z walidacją ras, numerów mikrochipów i relacji z właścicielami.
 
 ### Owners Management
+
 Zestaw endpointów do zarządzania właścicielami psów z uwzględnieniem zgodności RODO. Obsługuje operacje CRUD z automatycznym śledzeniem zgód na przetwarzanie danych.
 
 ## 2. Szczegóły żądań
@@ -13,6 +15,7 @@ Zestaw endpointów do zarządzania właścicielami psów z uwzględnieniem zgodn
 ### Dogs Management Endpoints
 
 #### GET /dogs
+
 - **Metoda HTTP:** GET
 - **Struktura URL:** `/api/dogs`
 - **Parametry:**
@@ -21,6 +24,7 @@ Zestaw endpointów do zarządzania właścicielami psów z uwzględnieniem zgodn
 - **Autoryzacja:** Wszyscy uwierzytelnieni użytkownicy
 
 #### GET /dogs/{id}
+
 - **Metoda HTTP:** GET
 - **Struktura URL:** `/api/dogs/{id}`
 - **Parametry:**
@@ -29,6 +33,7 @@ Zestaw endpointów do zarządzania właścicielami psów z uwzględnieniem zgodn
 - **Autoryzacja:** Wszyscy uwierzytelnieni użytkownicy
 
 #### POST /dogs
+
 - **Metoda HTTP:** POST
 - **Struktura URL:** `/api/dogs`
 - **Parametry:**
@@ -38,6 +43,7 @@ Zestaw endpointów do zarządzania właścicielami psów z uwzględnieniem zgodn
 - **Autoryzacja:** Wszyscy uwierzytelnieni użytkownicy
 
 #### PUT /dogs/{id}
+
 - **Metoda HTTP:** PUT
 - **Struktura URL:** `/api/dogs/{id}`
 - **Parametry:**
@@ -47,6 +53,7 @@ Zestaw endpointów do zarządzania właścicielami psów z uwzględnieniem zgodn
 - **Autoryzacja:** Wszyscy uwierzytelnieni użytkownicy
 
 #### DELETE /dogs/{id}
+
 - **Metoda HTTP:** DELETE
 - **Struktura URL:** `/api/dogs/{id}`
 - **Parametry:**
@@ -57,6 +64,7 @@ Zestaw endpointów do zarządzania właścicielami psów z uwzględnieniem zgodn
 ### Owners Management Endpoints
 
 #### GET /owners
+
 - **Metoda HTTP:** GET
 - **Struktura URL:** `/api/owners`
 - **Parametry:**
@@ -65,6 +73,7 @@ Zestaw endpointów do zarządzania właścicielami psów z uwzględnieniem zgodn
 - **Autoryzacja:** Wszyscy uwierzytelnieni użytkownicy
 
 #### GET /owners/{id}
+
 - **Metoda HTTP:** GET
 - **Struktura URL:** `/api/owners/{id}`
 - **Parametry:**
@@ -73,6 +82,7 @@ Zestaw endpointów do zarządzania właścicielami psów z uwzględnieniem zgodn
 - **Autoryzacja:** Wszyscy uwierzytelnieni użytkownicy
 
 #### POST /owners
+
 - **Metoda HTTP:** POST
 - **Struktura URL:** `/api/owners`
 - **Parametry:**
@@ -82,6 +92,7 @@ Zestaw endpointów do zarządzania właścicielami psów z uwzględnieniem zgodn
 - **Autoryzacja:** Wszyscy uwierzytelnieni użytkownicy
 
 #### PUT /owners/{id}
+
 - **Metoda HTTP:** PUT
 - **Struktura URL:** `/api/owners/{id}`
 - **Parametry:**
@@ -91,6 +102,7 @@ Zestaw endpointów do zarządzania właścicielami psów z uwzględnieniem zgodn
 - **Autoryzacja:** Wszyscy uwierzytelnieni użytkownicy
 
 #### DELETE /owners/{id}
+
 - **Metoda HTTP:** DELETE
 - **Struktura URL:** `/api/owners/{id}`
 - **Parametry:**
@@ -103,6 +115,7 @@ Zestaw endpointów do zarządzania właścicielami psów z uwzględnieniem zgodn
 ### DTOs i Command Modele
 
 #### Dogs Management
+
 ```typescript
 // Query Parameters
 DogQueryParams {
@@ -151,6 +164,7 @@ PaginatedResponseDto<DogResponseDto>;
 ```
 
 #### Owners Management
+
 ```typescript
 // Query Parameters
 OwnerQueryParams {
@@ -190,6 +204,7 @@ PaginatedResponseDto<OwnerResponseDto>;
 ```
 
 #### Wspólne typy
+
 ```typescript
 // Error Handling
 ErrorResponseDto {
@@ -219,6 +234,7 @@ PaginationDto {
 ## 4. Szczegóły odpowiedzi
 
 ### Kody statusu HTTP
+
 - **200 OK:** Pomyślne operacje odczytu i aktualizacji
 - **201 Created:** Pomyślne utworzenie nowego zasobu
 - **400 Bad Request:** Błędy walidacji danych wejściowych
@@ -229,6 +245,7 @@ PaginationDto {
 - **500 Internal Server Error:** Błędy serwera
 
 ### Struktura odpowiedzi błędów
+
 ```json
 {
   "error": {
@@ -249,7 +266,9 @@ PaginationDto {
 ## 5. Przepływ danych
 
 ### Dogs Management Flow
+
 1. **POST /dogs:**
+
    - Walidacja danych wejściowych
    - Sprawdzenie unikalności numeru mikrochipu
    - Sprawdzenie istnienia rasy
@@ -258,6 +277,7 @@ PaginationDto {
    - Zwrócenie utworzonego `DogResponseDto`
 
 2. **GET /dogs:**
+
    - Walidacja parametrów zapytania
    - Zastosowanie filtrów RLS
    - JOIN z `dictionary.breeds` i `dog_shows.owners`
@@ -265,11 +285,13 @@ PaginationDto {
    - Zwrócenie `PaginatedResponseDto<DogResponseDto>`
 
 3. **GET /dogs/{id}:**
+
    - Sprawdzenie istnienia psa
    - Pobranie szczegółowych danych z relacjami
    - Zwrócenie `DogDetailResponseDto`
 
 4. **PUT /dogs/{id}:**
+
    - Sprawdzenie istnienia psa
    - Walidacja danych wejściowych
    - Aktualizacja w `dog_shows.dogs`
@@ -281,7 +303,9 @@ PaginationDto {
    - Zwrócenie komunikatu o sukcesie
 
 ### Owners Management Flow
+
 1. **POST /owners:**
+
    - Walidacja danych wejściowych (email format, wymagane pola)
    - Sprawdzenie unikalności email
    - Jeśli `gdpr_consent: true`, ustawienie `gdpr_consent_date`
@@ -289,17 +313,20 @@ PaginationDto {
    - Zwrócenie utworzonego `OwnerResponseDto`
 
 2. **GET /owners:**
+
    - Walidacja parametrów zapytania
    - Zastosowanie filtrów RLS
    - Paginacja wyników
    - Zwrócenie `PaginatedResponseDto<OwnerResponseDto>`
 
 3. **GET /owners/{id}:**
+
    - Sprawdzenie istnienia właściciela
    - Pobranie szczegółowych danych
    - Zwrócenie `OwnerResponseDto`
 
 4. **PUT /owners/{id}:**
+
    - Sprawdzenie istnienia właściciela
    - Walidacja danych wejściowych
    - Aktualizacja w `dog_shows.owners`
@@ -314,11 +341,13 @@ PaginationDto {
 ## 6. Względy bezpieczeństwa
 
 ### Autoryzacja i uwierzytelnianie
+
 - **JWT Token Validation:** Sprawdzanie tokenu w headerze `Authorization: Bearer <token>`
 - **Role-based Access Control:** Wszyscy uwierzytelnieni użytkownicy mogą zarządzać psami i właścicielami
 - **Row Level Security (RLS):** Polityki na poziomie bazy danych
 
 ### Walidacja danych wejściowych
+
 - **Zod Schemas:** Walidacja wszystkich DTOs
 - **Email Validation:** RFC 5322 compliant
 - **Microchip Validation:** Dokładnie 15 cyfr
@@ -326,18 +355,21 @@ PaginationDto {
 - **SQL Injection Prevention:** Parametryzowane zapytania
 
 ### Zgodność RODO
+
 - **GDPR Consent Tracking:** Automatyczne śledzenie zgód z timestampami
 - **Soft Delete:** Dane nie są fizycznie usuwane
 - **Data Retention:** Automatyczne planowanie usuwania po 3 latach
 - **Audit Logging:** Logowanie wszystkich operacji CRUD
 
 ### Rate Limiting
+
 - **Authenticated requests:** 1000 requests/hour per user
 - **Unauthenticated requests:** 100 requests/hour per IP
 
 ## 7. Obsługa błędów
 
 ### Typy błędów i kody
+
 - **VALIDATION_ERROR (400):** Błędy walidacji danych wejściowych
 - **AUTHENTICATION_ERROR (401):** Nieprawidłowy lub wygasły token
 - **AUTHORIZATION_ERROR (403):** Brak uprawnień do operacji
@@ -347,6 +379,7 @@ PaginationDto {
 - **INTERNAL_ERROR (500):** Błędy serwera
 
 ### Strategie obsługi błędów
+
 1. **Centralized Error Handler:** Wspólny handler dla wszystkich endpointów
 2. **Structured Error Responses:** Spójny format odpowiedzi błędów
 3. **Request ID Tracking:** Unikalny ID dla każdego żądania
@@ -354,6 +387,7 @@ PaginationDto {
 5. **Graceful Degradation:** Łagodne obsługiwanie błędów bazodanowych
 
 ### Przykłady błędów
+
 ```json
 // Walidacja mikrochipu
 {
@@ -395,17 +429,20 @@ PaginationDto {
 ## 8. Rozważania dotyczące wydajności
 
 ### Optymalizacja zapytań
+
 - **Indexing:** Indeksy na często używanych kolumnach (email, microchip_number, breed_id, owner_id)
 - **JOIN Optimization:** Efektywne JOINy z tabelami breeds i owners
 - **Pagination:** Implementacja cursor-based pagination dla dużych zbiorów danych
 - **Query Caching:** Cache dla słowników (breeds)
 
 ### Strategie buforowania
+
 - **Redis Cache:** Cache dla często używanych danych
 - **Database Connection Pooling:** Optymalizacja połączeń z bazą
 - **Response Caching:** Cache odpowiedzi dla operacji odczytu
 
 ### Monitoring wydajności
+
 - **Query Performance:** Monitorowanie czasu wykonywania zapytań
 - **Response Time Tracking:** Śledzenie czasu odpowiedzi endpointów
 - **Resource Usage:** Monitorowanie wykorzystania CPU i pamięci
@@ -414,12 +451,15 @@ PaginationDto {
 ## 9. Etapy wdrożenia
 
 ### Faza 1: Podstawowa infrastruktura
+
 1. **Setup Validation Schemas**
+
    - Utworzenie Zod schemas dla CreateDogDto, UpdateDogDto, CreateOwnerDto, UpdateOwnerDto
    - Implementacja walidacji email, mikrochipów, dat urodzenia
    - Testy jednostkowe dla schemas
 
 2. **Error Handling Infrastructure**
+
    - Implementacja centralnego error handler
    - Utworzenie typów ErrorResponseDto
    - Setup logging system
@@ -430,7 +470,9 @@ PaginationDto {
    - Setup TypeScript types
 
 ### Faza 2: Service Layer Implementation
+
 1. **DogService**
+
    - Implementacja CRUD operacji dla psów
    - Breed validation i relationships
    - Microchip uniqueness validation
@@ -442,7 +484,9 @@ PaginationDto {
    - Email validation i uniqueness
 
 ### Faza 3: API Endpoints Implementation
+
 1. **Dogs Endpoints**
+
    - GET /dogs (z paginacją i filtrami)
    - GET /dogs/{id}
    - POST /dogs
@@ -457,11 +501,14 @@ PaginationDto {
    - DELETE /owners/{id}
 
 ### Faza 4: Security & Testing
+
 1. **Authentication & Authorization**
+
    - JWT token validation
    - Row Level Security policies
 
 2. **Input Validation & Sanitization**
+
    - Comprehensive input validation
    - SQL injection prevention
    - XSS protection
@@ -473,12 +520,15 @@ PaginationDto {
    - Performance tests
 
 ### Faza 5: Performance & Monitoring
+
 1. **Performance Optimization**
+
    - Database indexing
    - Query optimization
    - Caching implementation
 
 2. **Monitoring & Logging**
+
    - Error tracking
    - Performance monitoring
    - Audit logging
@@ -489,7 +539,9 @@ PaginationDto {
    - Deployment guides
 
 ### Faza 6: Deployment & Maintenance
+
 1. **Production Deployment**
+
    - Environment configuration
    - Database migrations
    - Monitoring setup
@@ -497,4 +549,4 @@ PaginationDto {
 2. **Maintenance & Updates**
    - Regular security updates
    - Performance monitoring
-   - Bug fixes and improvements 
+   - Bug fixes and improvements

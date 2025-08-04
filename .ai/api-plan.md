@@ -4,25 +4,27 @@
 
 The API is organized around the following main resources, each corresponding to key database entities:
 
-| Resource | Database Table | Description |
-|----------|---------------|-------------|
-| **Users** | `auth.users` | System users with roles (department_representative, secretary) |
-| **Shows** | `dog_shows.shows` | Dog show events with schedules and configurations |
-| **Dogs** | `dog_shows.dogs` | Individual dogs with breed and identification data |
-| **Owners** | `dog_shows.owners` | Dog owners with contact information and GDPR consent |
-| **Descriptions** | `dog_shows.descriptions` | Judge evaluations and descriptions of dogs |
-| **Evaluations** | `dog_shows.evaluations` | Grades, titles, and placements for dogs |
-| **Registrations** | `dog_shows.show_registrations` | Dog registrations for specific shows |
-| **Breeds** | `dictionary.breeds` | FCI breed classifications and groups |
-| **Judges** | `dictionary.judges` | Certified judges with specializations |
-| **Venues** | `dictionary.venues` | Show locations and facilities |
+| Resource          | Database Table                 | Description                                                    |
+| ----------------- | ------------------------------ | -------------------------------------------------------------- |
+| **Users**         | `auth.users`                   | System users with roles (department_representative, secretary) |
+| **Shows**         | `dog_shows.shows`              | Dog show events with schedules and configurations              |
+| **Dogs**          | `dog_shows.dogs`               | Individual dogs with breed and identification data             |
+| **Owners**        | `dog_shows.owners`             | Dog owners with contact information and GDPR consent           |
+| **Descriptions**  | `dog_shows.descriptions`       | Judge evaluations and descriptions of dogs                     |
+| **Evaluations**   | `dog_shows.evaluations`        | Grades, titles, and placements for dogs                        |
+| **Registrations** | `dog_shows.show_registrations` | Dog registrations for specific shows                           |
+| **Breeds**        | `dictionary.breeds`            | FCI breed classifications and groups                           |
+| **Judges**        | `dictionary.judges`            | Certified judges with specializations                          |
+| **Venues**        | `dictionary.venues`            | Show locations and facilities                                  |
 
 ## 2. Endpoints
 
 ### 2.1 Authentication & Authorization
 
 #### POST /auth/register
+
 Create a new user account
+
 - **Request Body:**
   ```json
   {
@@ -54,7 +56,9 @@ Create a new user account
   - `409 Conflict`: Email already exists
 
 #### POST /auth/login
+
 Authenticate user and create session
+
 - **Request Body:**
   ```json
   {
@@ -82,7 +86,9 @@ Authenticate user and create session
   - `403 Forbidden`: Account not activated or suspended
 
 #### POST /auth/logout
+
 End user session
+
 - **Response (200 OK):**
   ```json
   {
@@ -91,7 +97,9 @@ End user session
   ```
 
 #### GET /auth/me
+
 Get current user information
+
 - **Response (200 OK):**
   ```json
   {
@@ -109,7 +117,9 @@ Get current user information
 ### 2.2 Users Management
 
 #### GET /users
+
 List users (department_representative only)
+
 - **Query Parameters:**
   - `role` (optional): Filter by role
   - `is_active` (optional): Filter by active status
@@ -139,7 +149,9 @@ List users (department_representative only)
   ```
 
 #### GET /users/{id}
+
 Get specific user details
+
 - **Response (200 OK):**
   ```json
   {
@@ -156,7 +168,9 @@ Get specific user details
   ```
 
 #### PUT /users/{id}
+
 Update user information
+
 - **Request Body:**
   ```json
   {
@@ -181,7 +195,9 @@ Update user information
   ```
 
 #### DELETE /users/{id}
+
 Deactivate user (soft delete)
+
 - **Response (200 OK):**
   ```json
   {
@@ -192,7 +208,9 @@ Deactivate user (soft delete)
 ### 2.3 Shows Management
 
 #### GET /shows
+
 List dog shows
+
 - **Query Parameters:**
   - `status` (optional): Filter by show status
   - `show_type` (optional): Filter by show type (national/international)
@@ -223,7 +241,7 @@ List dog shows
         },
         "max_participants": 200,
         "registered_dogs": 45,
-        "entry_fee": 50.00,
+        "entry_fee": 50.0,
         "language": "pl",
         "created_at": "2024-01-15T10:30:00Z"
       }
@@ -238,7 +256,9 @@ List dog shows
   ```
 
 #### GET /shows/{id}
+
 Get specific show details
+
 - **Response (200 OK):**
   ```json
   {
@@ -264,7 +284,7 @@ Get specific show details
     },
     "max_participants": 200,
     "registered_dogs": 45,
-    "entry_fee": 50.00,
+    "entry_fee": 50.0,
     "description": "Annual national dog show featuring all FCI groups",
     "language": "pl",
     "created_at": "2024-01-15T10:30:00Z",
@@ -273,7 +293,9 @@ Get specific show details
   ```
 
 #### POST /shows
+
 Create new show (department_representative only)
+
 - **Request Body:**
   ```json
   {
@@ -283,7 +305,7 @@ Create new show (department_representative only)
     "registration_deadline": "2024-03-01",
     "venue_id": "uuid",
     "max_participants": 200,
-    "entry_fee": 50.00,
+    "entry_fee": 50.0,
     "description": "Annual national dog show featuring all FCI groups",
     "language": "pl"
   }
@@ -300,7 +322,7 @@ Create new show (department_representative only)
     "venue_id": "uuid",
     "organizer_id": "uuid",
     "max_participants": 200,
-    "entry_fee": 50.00,
+    "entry_fee": 50.0,
     "description": "Annual national dog show featuring all FCI groups",
     "language": "pl",
     "created_at": "2024-01-15T10:30:00Z"
@@ -308,7 +330,9 @@ Create new show (department_representative only)
   ```
 
 #### PUT /shows/{id}
+
 Update show (only before show starts)
+
 - **Request Body:**
   ```json
   {
@@ -316,7 +340,7 @@ Update show (only before show starts)
     "show_date": "2024-03-16",
     "registration_deadline": "2024-03-02",
     "max_participants": 250,
-    "entry_fee": 55.00,
+    "entry_fee": 55.0,
     "description": "Updated description"
   }
   ```
@@ -330,14 +354,16 @@ Update show (only before show starts)
     "show_date": "2024-03-16",
     "registration_deadline": "2024-03-02",
     "max_participants": 250,
-    "entry_fee": 55.00,
+    "entry_fee": 55.0,
     "description": "Updated description",
     "updated_at": "2024-01-15T11:30:00Z"
   }
   ```
 
 #### PATCH /shows/{id}/status
+
 Update show status
+
 - **Request Body:**
   ```json
   {
@@ -354,7 +380,9 @@ Update show status
   ```
 
 #### DELETE /shows/{id}
+
 Delete show (only before show starts)
+
 - **Response (200 OK):**
   ```json
   {
@@ -365,7 +393,9 @@ Delete show (only before show starts)
 ### 2.4 Dogs Management
 
 #### GET /dogs
+
 List dogs
+
 - **Query Parameters:**
   - `breed_id` (optional): Filter by breed
   - `gender` (optional): Filter by gender
@@ -413,7 +443,9 @@ List dogs
   ```
 
 #### GET /dogs/{id}
+
 Get specific dog details
+
 - **Response (200 OK):**
   ```json
   {
@@ -449,7 +481,9 @@ Get specific dog details
   ```
 
 #### POST /dogs
+
 Create new dog
+
 - **Request Body:**
   ```json
   {
@@ -488,7 +522,9 @@ Create new dog
   ```
 
 #### PUT /dogs/{id}
+
 Update dog information
+
 - **Request Body:**
   ```json
   {
@@ -515,7 +551,9 @@ Update dog information
   ```
 
 #### DELETE /dogs/{id}
+
 Delete dog (soft delete)
+
 - **Response (200 OK):**
   ```json
   {
@@ -526,7 +564,9 @@ Delete dog (soft delete)
 ### 2.5 Owners Management
 
 #### GET /owners
+
 List owners
+
 - **Query Parameters:**
   - `email` (optional): Search by email
   - `city` (optional): Filter by city
@@ -563,7 +603,9 @@ List owners
   ```
 
 #### GET /owners/{id}
+
 Get specific owner details
+
 - **Response (200 OK):**
   ```json
   {
@@ -586,7 +628,9 @@ Get specific owner details
   ```
 
 #### POST /owners
+
 Create new owner
+
 - **Request Body:**
   ```json
   {
@@ -624,7 +668,9 @@ Create new owner
   ```
 
 #### PUT /owners/{id}
+
 Update owner information
+
 - **Request Body:**
   ```json
   {
@@ -655,7 +701,9 @@ Update owner information
   ```
 
 #### DELETE /owners/{id}
+
 Delete owner (soft delete)
+
 - **Response (200 OK):**
   ```json
   {
@@ -666,7 +714,9 @@ Delete owner (soft delete)
 ### 2.6 Show Registrations
 
 #### GET /shows/{showId}/registrations
+
 List registrations for a show
+
 - **Query Parameters:**
   - `dog_class` (optional): Filter by dog class
   - `is_paid` (optional): Filter by payment status
@@ -690,7 +740,7 @@ List registrations for a show
         },
         "dog_class": "open",
         "catalog_number": 45,
-        "registration_fee": 50.00,
+        "registration_fee": 50.0,
         "is_paid": true,
         "registered_at": "2024-01-15T10:30:00Z"
       }
@@ -705,13 +755,15 @@ List registrations for a show
   ```
 
 #### POST /shows/{showId}/registrations
+
 Register dog for show
+
 - **Request Body:**
   ```json
   {
     "dog_id": "uuid",
     "dog_class": "open",
-    "registration_fee": 50.00
+    "registration_fee": 50.0
   }
   ```
 - **Response (201 Created):**
@@ -722,14 +774,16 @@ Register dog for show
     "dog_id": "uuid",
     "dog_class": "open",
     "catalog_number": null,
-    "registration_fee": 50.00,
+    "registration_fee": 50.0,
     "is_paid": false,
     "registered_at": "2024-01-15T10:30:00Z"
   }
   ```
 
 #### PUT /shows/{showId}/registrations/{registrationId}
+
 Update registration
+
 - **Request Body:**
   ```json
   {
@@ -745,14 +799,16 @@ Update registration
     "dog_id": "uuid",
     "dog_class": "champion",
     "catalog_number": 45,
-    "registration_fee": 50.00,
+    "registration_fee": 50.0,
     "is_paid": true,
     "registered_at": "2024-01-15T10:30:00Z"
   }
   ```
 
 #### DELETE /shows/{showId}/registrations/{registrationId}
+
 Cancel registration
+
 - **Response (200 OK):**
   ```json
   {
@@ -763,7 +819,9 @@ Cancel registration
 ### 2.7 Descriptions Management
 
 #### GET /descriptions
+
 List descriptions
+
 - **Query Parameters:**
   - `show_id` (optional): Filter by show
   - `judge_id` (optional): Filter by judge
@@ -823,7 +881,9 @@ List descriptions
   ```
 
 #### GET /descriptions/{id}
+
 Get specific description
+
 - **Response (200 OK):**
   ```json
   {
@@ -879,7 +939,9 @@ Get specific description
   ```
 
 #### POST /descriptions
+
 Create new description
+
 - **Request Body:**
   ```json
   {
@@ -907,7 +969,9 @@ Create new description
   ```
 
 #### PUT /descriptions/{id}
+
 Update description (only before show completion)
+
 - **Request Body:**
   ```json
   {
@@ -932,7 +996,9 @@ Update description (only before show completion)
   ```
 
 #### PATCH /descriptions/{id}/finalize
+
 Finalize description (no further edits allowed)
+
 - **Response (200 OK):**
   ```json
   {
@@ -943,7 +1009,9 @@ Finalize description (no further edits allowed)
   ```
 
 #### GET /descriptions/{id}/versions
+
 Get description version history
+
 - **Response (200 OK):**
   ```json
   {
@@ -977,7 +1045,9 @@ Get description version history
   ```
 
 #### DELETE /descriptions/{id}
+
 Delete description
+
 - **Response (200 OK):**
   ```json
   {
@@ -988,7 +1058,9 @@ Delete description
 ### 2.8 Evaluations Management
 
 #### POST /descriptions/{descriptionId}/evaluations
+
 Create or update evaluation for description
+
 - **Request Body:**
   ```json
   {
@@ -1018,7 +1090,9 @@ Create or update evaluation for description
   ```
 
 #### PUT /descriptions/{descriptionId}/evaluations
+
 Update evaluation
+
 - **Request Body:**
   ```json
   {
@@ -1048,7 +1122,9 @@ Update evaluation
 ### 2.9 PDF and Email Management
 
 #### GET /descriptions/{id}/pdf
+
 Generate PDF for description
+
 - **Query Parameters:**
   - `language` (optional): Language for PDF (pl/en), defaults to description language
 - **Response (200 OK):**
@@ -1061,7 +1137,9 @@ Generate PDF for description
   ```
 
 #### POST /descriptions/{id}/send-email
+
 Send description PDF via email
+
 - **Request Body:**
   ```json
   {
@@ -1081,7 +1159,9 @@ Send description PDF via email
 ### 2.10 Dictionary Resources
 
 #### GET /breeds
+
 List dog breeds
+
 - **Query Parameters:**
   - `fci_group` (optional): Filter by FCI group
   - `is_active` (optional): Filter by active status
@@ -1111,7 +1191,9 @@ List dog breeds
   ```
 
 #### GET /judges
+
 List judges
+
 - **Query Parameters:**
   - `fci_group` (optional): Filter by specialization
   - `is_active` (optional): Filter by active status
@@ -1141,7 +1223,9 @@ List judges
   ```
 
 #### GET /venues
+
 List venues
+
 - **Query Parameters:**
   - `city` (optional): Filter by city
   - `country` (optional): Filter by country
@@ -1174,7 +1258,9 @@ List venues
 ### 2.11 GDPR Compliance
 
 #### POST /gdpr/consent
+
 Grant GDPR consent for owner
+
 - **Request Body:**
   ```json
   {
@@ -1192,7 +1278,9 @@ Grant GDPR consent for owner
   ```
 
 #### POST /gdpr/withdraw
+
 Withdraw GDPR consent
+
 - **Request Body:**
   ```json
   {
@@ -1209,7 +1297,9 @@ Withdraw GDPR consent
   ```
 
 #### POST /gdpr/export
+
 Request data export
+
 - **Request Body:**
   ```json
   {
@@ -1226,7 +1316,9 @@ Request data export
   ```
 
 #### POST /gdpr/delete
+
 Request data deletion
+
 - **Request Body:**
   ```json
   {
@@ -1245,6 +1337,7 @@ Request data deletion
 ## 3. Authentication and Authorization
 
 ### 3.1 Authentication Method
+
 The API uses **JWT (JSON Web Token)** based authentication provided by Supabase Auth:
 
 - **Token Type**: Bearer tokens
@@ -1256,12 +1349,14 @@ The API uses **JWT (JSON Web Token)** based authentication provided by Supabase 
 ### 3.2 Authorization Roles
 
 #### Department Representative
+
 - **Full access** to all endpoints
 - Can manage users, shows, dogs, owners, and descriptions
 - Can view all data across all shows they organize
 - Can export data and manage GDPR requests
 
 #### Secretary
+
 - **Limited access** based on assignments
 - Can only access shows and breeds they are assigned to
 - Can create and edit descriptions for assigned breeds
@@ -1290,16 +1385,19 @@ The API implements **Row Level Security** policies at the database level:
 ### 4.1 Input Validation
 
 #### Email Validation
+
 - **Format**: RFC 5322 compliant email addresses
 - **Uniqueness**: Emails must be unique across users and owners
 - **Required**: Email is required for all owners (for PDF delivery)
 
 #### Date Validation
+
 - **Show dates**: Must be in the future when creating shows
 - **Registration deadlines**: Must be before show date
 - **Dog birth dates**: Must be in the past and realistic (not more than 20 years ago)
 
 #### Dog Class Validation
+
 - **Age-based validation**: Dog class must match age on show date
   - Baby: 4-6 months
   - Puppy: 6-9 months
@@ -1311,6 +1409,7 @@ The API implements **Row Level Security** policies at the database level:
   - Veteran: 8+ years
 
 #### Microchip Validation
+
 - **Format**: Exactly 15 digits
 - **Uniqueness**: Must be unique across all dogs
 - **Required**: Microchip number is required for all dogs
@@ -1318,29 +1417,34 @@ The API implements **Row Level Security** policies at the database level:
 ### 4.2 Business Logic Rules
 
 #### Show Management
+
 - **Edit restrictions**: Shows can only be edited before they start
 - **Status transitions**: Shows must follow valid status progression
 - **Capacity limits**: Registration cannot exceed max_participants
 
 #### Description Management
+
 - **Edit restrictions**: Descriptions cannot be edited after show completion
 - **Versioning**: Every description change creates a new version
 - **Finalization**: Once finalized, descriptions cannot be edited
 - **Language requirements**: At least one language (Polish or English) is required
 
 #### Evaluation Rules
+
 - **Grade validation**: Baby/Puppy classes use different grading system
 - **Title eligibility**: CWC only for national shows, CACIB only for international shows
 - **Placement limits**: Only 4 placements per class
 - **Best in Group/Show**: Only one dog can be best in group/show per group/show
 
 #### GDPR Compliance
+
 - **Consent tracking**: All consent changes are logged with timestamps
 - **Data retention**: Data is automatically scheduled for deletion after 3 years
 - **Export format**: Data exports are provided in JSON format
 - **Deletion timeline**: Data deletion requests are processed within 30 days
 
 #### Secretary Assignments
+
 - **Breed restrictions**: Secretaries can only work on breeds they are assigned to
 - **Show limitations**: Secretaries can only access shows they are assigned to
 - **Description access**: Secretaries can only create/edit descriptions for their assigned breeds
@@ -1348,6 +1452,7 @@ The API implements **Row Level Security** policies at the database level:
 ### 4.3 Error Handling
 
 #### Standard Error Response Format
+
 ```json
 {
   "error": {
@@ -1370,6 +1475,7 @@ The API implements **Row Level Security** policies at the database level:
 ```
 
 #### Common Error Codes
+
 - `VALIDATION_ERROR`: Input validation failed
 - `AUTHENTICATION_ERROR`: Authentication failed
 - `AUTHORIZATION_ERROR`: Insufficient permissions
@@ -1382,6 +1488,7 @@ The API implements **Row Level Security** policies at the database level:
 ### 4.4 Audit Logging
 
 Critical actions are automatically logged:
+
 - User authentication (login/logout)
 - Show creation/modification/deletion
 - Description creation/modification/finalization
@@ -1390,8 +1497,9 @@ Critical actions are automatically logged:
 - GDPR consent changes and data requests
 
 Each audit entry includes:
+
 - User ID and action type
 - Entity type and ID
 - Old and new values (for updates)
 - IP address and user agent
-- Timestamp and metadata 
+- Timestamp and metadata

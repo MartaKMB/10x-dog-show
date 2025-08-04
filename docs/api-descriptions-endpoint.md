@@ -18,7 +18,7 @@ Endpoint `POST /descriptions` umożliwia sekretarzom ringów tworzenie nowych op
 ```typescript
 {
   show_id: string;     // UUID wystawy
-  dog_id: string;      // UUID psa  
+  dog_id: string;      // UUID psa
   judge_id: string;    // UUID sędziego
   content_pl?: string; // Treść opisu w języku polskim (opcjonalnie)
   content_en?: string; // Treść opisu w języku angielskim (opcjonalnie)
@@ -46,15 +46,15 @@ Endpoint `POST /descriptions` umożliwia sekretarzom ringów tworzenie nowych op
 
 ## Response Codes
 
-| Code | Status | Opis |
-|------|--------|------|
-| 201 | Created | Opis został pomyślnie utworzony |
-| 400 | Bad Request | Błąd walidacji danych wejściowych |
-| 403 | Forbidden | Brak uprawnień sekretarza do rasy |
-| 404 | Not Found | Wystawa/Pies/Sędzia nie istnieje |
-| 409 | Conflict | Opis już istnieje dla tej kombinacji |
-| 422 | Unprocessable Entity | Wystawa zakończona |
-| 500 | Internal Server Error | Błąd serwera |
+| Code | Status                | Opis                                 |
+| ---- | --------------------- | ------------------------------------ |
+| 201  | Created               | Opis został pomyślnie utworzony      |
+| 400  | Bad Request           | Błąd walidacji danych wejściowych    |
+| 403  | Forbidden             | Brak uprawnień sekretarza do rasy    |
+| 404  | Not Found             | Wystawa/Pies/Sędzia nie istnieje     |
+| 409  | Conflict              | Opis już istnieje dla tej kombinacji |
+| 422  | Unprocessable Entity  | Wystawa zakończona                   |
+| 500  | Internal Server Error | Błąd serwera                         |
 
 ## Response Body
 
@@ -64,7 +64,7 @@ Endpoint `POST /descriptions` umożliwia sekretarzom ringów tworzenie nowych op
 {
   "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
   "show": {
-    "id": "550e8400-e29b-41d4-a716-446655440001", 
+    "id": "550e8400-e29b-41d4-a716-446655440001",
     "name": "National Dog Show Warsaw 2024",
     "show_date": "2024-03-15",
     "show_type": "national"
@@ -74,7 +74,7 @@ Endpoint `POST /descriptions` umożliwia sekretarzom ringów tworzenie nowych op
     "name": "Bella",
     "breed": {
       "id": "550e8400-e29b-41d4-a716-446655440101",
-      "name_pl": "Labrador retriever", 
+      "name_pl": "Labrador retriever",
       "name_en": "Labrador Retriever",
       "fci_group": "G8"
     },
@@ -85,7 +85,7 @@ Endpoint `POST /descriptions` umożliwia sekretarzom ringów tworzenie nowych op
   "judge": {
     "id": "550e8400-e29b-41d4-a716-446655440003",
     "first_name": "Jan",
-    "last_name": "Kowalski", 
+    "last_name": "Kowalski",
     "license_number": "PL001"
   },
   "secretary": {
@@ -98,7 +98,7 @@ Endpoint `POST /descriptions` umożliwia sekretarzom ringów tworzenie nowych op
   "version": 1,
   "is_final": false,
   "created_at": "2024-01-15T10:30:00.000Z",
-  "updated_at": "2024-01-15T10:30:00.000Z", 
+  "updated_at": "2024-01-15T10:30:00.000Z",
   "finalized_at": null
 }
 ```
@@ -142,18 +142,22 @@ Endpoint `POST /descriptions` umożliwia sekretarzom ringów tworzenie nowych op
 Endpoint wykonuje następujące sprawdzenia:
 
 1. **Weryfikacja wystawy**:
+
    - Wystawa musi istnieć
    - Status wystawy nie może być "completed" lub "cancelled"
 
 2. **Weryfikacja psa**:
+
    - Pies musi istnieć w systemie
    - Pies musi być zarejestrowany na wystawę
 
 3. **Weryfikacja sędziego**:
+
    - Sędzia musi istnieć w systemie
    - Sędzia musi być przypisany do wystawy
 
 4. **Weryfikacja uprawnień sekretarza**:
+
    - Sekretarz musi mieć uprawnienia do rasy psa
    - Sekretarz musi być przypisany do wystawy
 
@@ -190,7 +194,7 @@ Aktualnie endpoint używa mock danych dla testowania:
 
 // Pies
 {
-  id: "550e8400-e29b-41d4-a716-446655440002", 
+  id: "550e8400-e29b-41d4-a716-446655440002",
   breed_id: "550e8400-e29b-41d4-a716-446655440101",
   name: "Bella",
   gender: "female",
@@ -202,7 +206,7 @@ Aktualnie endpoint używa mock danych dla testowania:
 {
   id: "550e8400-e29b-41d4-a716-446655440003",
   first_name: "Jan",
-  last_name: "Kowalski", 
+  last_name: "Kowalski",
   license_number: "PL001"
 }
 
@@ -241,10 +245,10 @@ interface CreateDescriptionRequest {
 }
 
 async function createDescription(data: CreateDescriptionRequest) {
-  const response = await fetch('/api/descriptions', {
-    method: 'POST',
+  const response = await fetch("/api/descriptions", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(data),
   });
@@ -261,27 +265,29 @@ async function createDescription(data: CreateDescriptionRequest) {
 try {
   const description = await createDescription({
     show_id: "550e8400-e29b-41d4-a716-446655440001",
-    dog_id: "550e8400-e29b-41d4-a716-446655440002", 
+    dog_id: "550e8400-e29b-41d4-a716-446655440002",
     judge_id: "550e8400-e29b-41d4-a716-446655440003",
     content_pl: "Bardzo dobry przedstawiciel rasy.",
-    content_en: "Very good representative of the breed."
+    content_en: "Very good representative of the breed.",
   });
-  
-  console.log('Opis utworzony:', description.id);
+
+  console.log("Opis utworzony:", description.id);
 } catch (error) {
-  console.error('Błąd:', error.message);
+  console.error("Błąd:", error.message);
 }
 ```
 
 ## Ograniczenia Mock Implementacji
 
 **Obecne ograniczenia:**
+
 - Używa DEFAULT_USER zamiast rzeczywistej autoryzacji
 - Mock data nie persystuje między restartami serwera
 - Brak rzeczywistej integracji z bazą danych Supabase
 - Uproszczone sprawdzenie uprawnień
 
 **Planowane ulepszenia:**
+
 - Integracja z Supabase Auth
 - Rzeczywiste zapytania do bazy danych
 - Row Level Security (RLS) policies
@@ -299,18 +305,18 @@ async function handleCreateDescription(data: CreateDescriptionRequest) {
     // Sukces
     return result;
   } catch (error) {
-    if (error.message.includes('VALIDATION_ERROR')) {
+    if (error.message.includes("VALIDATION_ERROR")) {
       // Pokaż błędy walidacji użytkownikowi
       showValidationErrors(error.details);
-    } else if (error.message.includes('AUTHORIZATION_ERROR')) {
+    } else if (error.message.includes("AUTHORIZATION_ERROR")) {
       // Przekieruj do logowania lub pokaż komunikat o braku uprawnień
       redirectToLogin();
-    } else if (error.message.includes('CONFLICT')) {
+    } else if (error.message.includes("CONFLICT")) {
       // Pokaż komunikat o duplikacie
-      showMessage('Opis już istnieje dla tego psa i sędziego');
+      showMessage("Opis już istnieje dla tego psa i sędziego");
     } else {
       // Ogólny błąd
-      showMessage('Wystąpił nieoczekiwany błąd. Spróbuj ponownie.');
+      showMessage("Wystąpił nieoczekiwany błąd. Spróbuj ponownie.");
     }
   }
 }
@@ -322,16 +328,17 @@ Szczegółowe instrukcje testowania znajdują się w `test-descriptions-requests
 
 - ✅ Pomyślne utworzenie opisu
 - ❌ Błędy walidacji
-- ❌ Błędy autoryzacji  
+- ❌ Błędy autoryzacji
 - ❌ Błędy business logic
 - ❌ Błędy conflict
 
 ## Roadmap
 
 **Następne kroki:**
+
 1. Integracja z rzeczywistą bazą danych
 2. Implementacja autoryzacji JWT
 3. Dodanie rate limiting
 4. Rozszerzenie audit logging
 5. Implementacja wersjonowania opisów
-6. Dodanie endpoint'ów PUT/PATCH dla edycji opisów 
+6. Dodanie endpoint'ów PUT/PATCH dla edycji opisów

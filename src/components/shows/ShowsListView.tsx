@@ -53,7 +53,7 @@ const ShowsListView: React.FC<ShowsListViewProps> = () => {
   // Load shows on component mount
   useEffect(() => {
     loadShows(viewModel.filters, viewModel.pagination);
-  }, [loadShows]); // Include loadShows in dependencies since it's now stable
+  }, [loadShows, viewModel.filters, viewModel.pagination]); // Include all dependencies
 
   useEffect(() => {
     setViewModel((prev) => ({

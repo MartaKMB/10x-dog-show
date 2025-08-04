@@ -1,31 +1,26 @@
 ---
 // Pobieranie parametrów z URL
-// eslint-disable-next-line prettier/prettier
+
 const { showId, dogId } = Astro.params;
 
 if (!showId || !dogId) {
-  return Astro.redirect('/404');
+  return Astro.redirect("/404");
 }
 
-import { DescriptionEditor } from '@/components/DescriptionEditor';
+import { DescriptionEditor } from "@/components/DescriptionEditor";
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nowy opis psa</title>
-  <link rel="icon" type="image/png" href="/favicon.png">
-</head>
-<body>
-  <div class="container mx-auto px-4 py-8">
-    <DescriptionEditor 
-      client:load
-      showId={showId} 
-      dogId={dogId} 
-      mode="create"
-    />
-  </div>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nowy opis psa</title>
+    <link rel="icon" type="image/png" href="/favicon.png" />
+  </head>
+  <body>
+    <div class="container mx-auto px-4 py-8">
+      <DescriptionEditor client:load showId={showId} dogId={dogId} mode="create" />
+    </div>
+  </body>
 </html>

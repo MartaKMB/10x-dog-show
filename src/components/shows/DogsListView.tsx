@@ -62,10 +62,9 @@ const DogsListView: React.FC<DogsListViewProps> = ({
     toggleNode(nodeId);
   };
 
-  const handleHierarchySearch = (query: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleHierarchySearch = (_query: string) => {
     // Implementacja wyszukiwania w hierarchii
-    // eslint-disable-next-line no-console
-    console.log("Searching hierarchy for:", query);
   };
 
   const handleDogAction = (action: string, dogId: string) => {
@@ -75,13 +74,9 @@ const DogsListView: React.FC<DogsListViewProps> = ({
         break;
       case "edit":
         // TODO: Implement edit modal
-        // eslint-disable-next-line no-console
-        console.log("Edit dog:", dogId);
         break;
       case "delete":
         // TODO: Implement delete modal
-        // eslint-disable-next-line no-console
-        console.log("Delete dog:", dogId);
         break;
       case "create_description":
         createDescription(dogId);
@@ -167,13 +162,6 @@ const DogsListView: React.FC<DogsListViewProps> = ({
               visibleNodes={getVisibleNodes().length}
             />
 
-            {/* Debug: Log hierarchy nodes */}
-            {/* eslint-disable-next-line no-console */}
-            {console.log(
-              "Rendering HierarchicalList with nodes:",
-              hierarchyNodes,
-            )}
-
             <HierarchicalList
               nodes={hierarchyNodes}
               onNodeToggle={handleNodeToggle}
@@ -190,10 +178,9 @@ const DogsListView: React.FC<DogsListViewProps> = ({
                   currentPage={state.pagination.page}
                   totalPages={state.pagination.pages}
                   totalItems={state.pagination.total}
-                  onPageChange={(page: number) => {
+                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                  onPageChange={(_page: number) => {
                     // TODO: Implementacja zmiany strony
-                    // eslint-disable-next-line no-console
-                    console.log("Page change to:", page);
                   }}
                 />
               </div>
@@ -208,10 +195,9 @@ const DogsListView: React.FC<DogsListViewProps> = ({
         onClose={closeModals}
         showId={showId}
         isProcessing={isProcessing}
-        onAddDog={async (data) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        onAddDog={async (_data) => {
           // TODO: Implement add dog logic
-          // eslint-disable-next-line no-console
-          console.log("Add dog with data:", data);
           return Promise.resolve();
         }}
         onSuccess={() => {
@@ -235,7 +221,7 @@ const DogsListView: React.FC<DogsListViewProps> = ({
 
       <DeleteDogConfirmation
         isOpen={modalState.isDeleteModalOpen}
-        onClose={closeModals}
+        onClose={closeModals}       
         dogId={selectedDog}
         onConfirm={() => selectedDog && handleDeleteDog(selectedDog)}
         isProcessing={isProcessing}

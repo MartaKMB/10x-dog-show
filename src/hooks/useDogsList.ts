@@ -164,28 +164,15 @@ const useDogsList = (
         pages: 1,
       };
 
-      // eslint-disable-next-line no-console
-      console.log("Fetched registrations:", registrations);
-      // eslint-disable-next-line no-console
-      console.log("Pagination:", pagination);
-
       // Transform to hierarchy
       const hierarchy = transformToHierarchy(registrations);
 
-      // eslint-disable-next-line no-console
-      console.log("Transformed hierarchy:", hierarchy);
-
-      setState((prev) => {
-        const newState = {
-          ...prev,
-          dogs: hierarchy,
-          pagination,
-          isLoading: false,
-        };
-        // eslint-disable-next-line no-console
-        console.log("Setting new state:", newState);
-        return newState;
-      });
+      setState((prev) => ({
+        ...prev,
+        dogs: hierarchy,
+        pagination,
+        isLoading: false,
+      }));
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error("Failed to fetch dogs:", error);

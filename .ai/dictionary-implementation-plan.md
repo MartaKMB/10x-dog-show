@@ -5,18 +5,21 @@
 System słowników referencyjnych dla aplikacji 10x Dog Show, obejmujący zarządzanie rasami psów, sędziami i obiektami wystaw. Słowniki zapewniają dane referencyjne dla głównych funkcjonalności systemu i są używane w formularzach, filtrowaniu i raportowaniu.
 
 ### Breeds Management
+
 - Lista ras psów z klasyfikacją FCI (grupy G1-G10)
 - Filtrowanie po grupach FCI i statusie aktywności
 - Wyszukiwanie w nazwach ras (polski/angielski)
 - Dane referencyjne dla rejestracji psów
 
 ### Judges Management
+
 - Lista sędziów z licencjami FCI
 - Specjalizacje sędziów w grupach FCI
 - Filtrowanie po specjalizacjach i statusie aktywności
 - Dane referencyjne dla przypisań do wystaw
 
 ### Venues Management
+
 - Lista obiektów wystawowych
 - Filtrowanie po lokalizacji i statusie aktywności
 - Dane referencyjne dla tworzenia wystaw
@@ -26,6 +29,7 @@ System słowników referencyjnych dla aplikacji 10x Dog Show, obejmujący zarzą
 ### 2.1 Breeds Management Endpoints
 
 #### GET /breeds
+
 - **Metoda HTTP:** GET
 - **Struktura URL:** `/api/breeds`
 - **Parametry query:**
@@ -38,6 +42,7 @@ System słowników referencyjnych dla aplikacji 10x Dog Show, obejmujący zarzą
 - **Opis:** Lista ras psów z filtrowaniem i paginacją
 
 #### GET /breeds/{id}
+
 - **Metoda HTTP:** GET
 - **Struktura URL:** `/api/breeds/{id}`
 - **Parametry:** `id` (UUID) - Identyfikator rasy
@@ -45,6 +50,7 @@ System słowników referencyjnych dla aplikacji 10x Dog Show, obejmujący zarzą
 - **Opis:** Szczegóły konkretnej rasy
 
 #### GET /breeds/groups/{fciGroup}
+
 - **Metoda HTTP:** GET
 - **Struktura URL:** `/api/breeds/groups/{fciGroup}`
 - **Parametry:** `fciGroup` (G1-G10) - Grupa FCI
@@ -54,6 +60,7 @@ System słowników referencyjnych dla aplikacji 10x Dog Show, obejmujący zarzą
 ### 2.2 Judges Management Endpoints
 
 #### GET /judges
+
 - **Metoda HTTP:** GET
 - **Struktura URL:** `/api/judges`
 - **Parametry query:**
@@ -66,6 +73,7 @@ System słowników referencyjnych dla aplikacji 10x Dog Show, obejmujący zarzą
 - **Opis:** Lista sędziów z filtrowaniem i paginacją
 
 #### GET /judges/{id}
+
 - **Metoda HTTP:** GET
 - **Struktura URL:** `/api/judges/{id}`
 - **Parametry:** `id` (UUID) - Identyfikator sędziego
@@ -73,6 +81,7 @@ System słowników referencyjnych dla aplikacji 10x Dog Show, obejmujący zarzą
 - **Opis:** Szczegóły konkretnego sędziego z specjalizacjami
 
 #### GET /judges/specializations/{fciGroup}
+
 - **Metoda HTTP:** GET
 - **Struktura URL:** `/api/judges/specializations/{fciGroup}`
 - **Parametry:** `fciGroup` (G1-G10) - Grupa FCI
@@ -82,6 +91,7 @@ System słowników referencyjnych dla aplikacji 10x Dog Show, obejmujący zarzą
 ### 2.3 Venues Management Endpoints
 
 #### GET /venues
+
 - **Metoda HTTP:** GET
 - **Struktura URL:** `/api/venues`
 - **Parametry query:**
@@ -95,6 +105,7 @@ System słowników referencyjnych dla aplikacji 10x Dog Show, obejmujący zarzą
 - **Opis:** Lista obiektów wystawowych z filtrowaniem i paginacją
 
 #### GET /venues/{id}
+
 - **Metoda HTTP:** GET
 - **Struktura URL:** `/api/venues/{id}`
 - **Parametry:** `id` (UUID) - Identyfikator obiektu
@@ -102,6 +113,7 @@ System słowników referencyjnych dla aplikacji 10x Dog Show, obejmujący zarzą
 - **Opis:** Szczegóły konkretnego obiektu
 
 #### GET /venues/cities
+
 - **Metoda HTTP:** GET
 - **Struktura URL:** `/api/venues/cities`
 - **Autoryzacja:** Wszyscy uwierzytelnieni użytkownicy
@@ -257,12 +269,15 @@ interface VenueQueryParams {
 ### 4.1 Breeds Management Logic
 
 #### Lista ras:
+
 1. **Filtrowanie:**
+
    - Po grupie FCI (G1-G10)
    - Po statusie aktywności
    - Wyszukiwanie w nazwach polskich i angielskich
 
 2. **Paginacja:**
+
    - Domyślnie 50 elementów na stronę
    - Maksymalnie 200 elementów na stronę
    - Sortowanie po fci_group, fci_number, name_pl
@@ -273,6 +288,7 @@ interface VenueQueryParams {
    - Partial matching (LIKE %search%)
 
 #### Rasy w grupie FCI:
+
 1. **Agregacja:**
    - Grupowanie po fci_group
    - Liczenie ras w grupie
@@ -281,12 +297,15 @@ interface VenueQueryParams {
 ### 4.2 Judges Management Logic
 
 #### Lista sędziów:
+
 1. **Filtrowanie:**
+
    - Po specjalizacji (grupa FCI)
    - Po statusie aktywności
    - Wyszukiwanie w imieniu, nazwisku, licencji
 
 2. **Paginacja:**
+
    - Domyślnie 20 elementów na stronę
    - Maksymalnie 100 elementów na stronę
    - Sortowanie po last_name, first_name
@@ -297,6 +316,7 @@ interface VenueQueryParams {
    - Agregacja specjalizacji w array
 
 #### Sędziowie w specjalizacji:
+
 1. **Filtrowanie:**
    - Tylko sędziowie z aktywną specjalizacją
    - Sortowanie po last_name, first_name
@@ -304,12 +324,15 @@ interface VenueQueryParams {
 ### 4.3 Venues Management Logic
 
 #### Lista obiektów:
+
 1. **Filtrowanie:**
+
    - Po mieście i kraju
    - Po statusie aktywności
    - Wyszukiwanie w nazwie i adresie
 
 2. **Paginacja:**
+
    - Domyślnie 20 elementów na stronę
    - Maksymalnie 100 elementów na stronę
    - Sortowanie po city, name
@@ -320,6 +343,7 @@ interface VenueQueryParams {
    - Liczba nadchodzących wystaw
 
 #### Lista miast:
+
 1. **Agregacja:**
    - Grupowanie po city, country
    - Liczenie obiektów w mieście
@@ -340,7 +364,9 @@ class DictionaryService {
     // Implementacja szczegółów rasy
   }
 
-  async getBreedsByGroup(fciGroup: FCIGroup): Promise<BreedsByGroupResponseDto> {
+  async getBreedsByGroup(
+    fciGroup: FCIGroup,
+  ): Promise<BreedsByGroupResponseDto> {
     // Implementacja ras w grupie FCI
   }
 
@@ -353,7 +379,9 @@ class DictionaryService {
     // Implementacja szczegółów sędziego
   }
 
-  async getJudgesBySpecialization(fciGroup: FCIGroup): Promise<JudgesBySpecializationResponseDto> {
+  async getJudgesBySpecialization(
+    fciGroup: FCIGroup,
+  ): Promise<JudgesBySpecializationResponseDto> {
     // Implementacja sędziów w specjalizacji
   }
 
@@ -378,21 +406,21 @@ class DictionaryService {
 
 ```sql
 -- Lista ras z filtrowaniem
-SELECT 
+SELECT
   id, name_pl, name_en, fci_group, fci_number, is_active,
   created_at, updated_at
 FROM dictionary.breeds
 WHERE is_active = true
   AND ($1::text IS NULL OR fci_group = $1::dog_shows.fci_group)
   AND ($2::text IS NULL OR (
-    name_pl ILIKE '%' || $2 || '%' OR 
+    name_pl ILIKE '%' || $2 || '%' OR
     name_en ILIKE '%' || $2 || '%'
   ))
 ORDER BY fci_group, fci_number, name_pl
 LIMIT $3 OFFSET $4;
 
 -- Rasy w grupie FCI
-SELECT 
+SELECT
   id, name_pl, name_en, fci_group, fci_number, is_active,
   created_at, updated_at
 FROM dictionary.breeds
@@ -404,7 +432,7 @@ ORDER BY fci_number, name_pl;
 
 ```sql
 -- Lista sędziów z specjalizacjami
-SELECT 
+SELECT
   j.id, j.first_name, j.last_name, j.license_number,
   j.email, j.phone, j.is_active, j.created_at, j.updated_at,
   array_agg(js.fci_group) FILTER (WHERE js.is_active = true) as specializations
@@ -414,7 +442,7 @@ WHERE j.deleted_at IS NULL
   AND ($1::text IS NULL OR js.fci_group = $1::dog_shows.fci_group)
   AND ($2::boolean IS NULL OR j.is_active = $2)
   AND ($3::text IS NULL OR (
-    j.first_name ILIKE '%' || $3 || '%' OR 
+    j.first_name ILIKE '%' || $3 || '%' OR
     j.last_name ILIKE '%' || $3 || '%' OR
     j.license_number ILIKE '%' || $3 || '%'
   ))
@@ -424,14 +452,14 @@ ORDER BY j.last_name, j.first_name
 LIMIT $4 OFFSET $5;
 
 -- Sędziowie w specjalizacji
-SELECT 
+SELECT
   j.id, j.first_name, j.last_name, j.license_number,
   j.email, j.phone, j.is_active, j.created_at, j.updated_at,
   array_agg(js.fci_group) FILTER (WHERE js.is_active = true) as specializations
 FROM dictionary.judges j
 JOIN dictionary.judge_specializations js ON j.id = js.judge_id
-WHERE j.deleted_at IS NULL 
-  AND js.fci_group = $1 
+WHERE j.deleted_at IS NULL
+  AND js.fci_group = $1
   AND js.is_active = true
   AND j.is_active = true
 GROUP BY j.id, j.first_name, j.last_name, j.license_number,
@@ -443,7 +471,7 @@ ORDER BY j.last_name, j.first_name;
 
 ```sql
 -- Lista obiektów z filtrowaniem
-SELECT 
+SELECT
   id, name, address, city, postal_code, country, is_active,
   created_at, updated_at
 FROM dictionary.venues
@@ -451,14 +479,14 @@ WHERE is_active = true
   AND ($1::text IS NULL OR city = $1)
   AND ($2::text IS NULL OR country = $2)
   AND ($3::text IS NULL OR (
-    name ILIKE '%' || $3 || '%' OR 
+    name ILIKE '%' || $3 || '%' OR
     address ILIKE '%' || $3 || '%'
   ))
 ORDER BY city, name
 LIMIT $4 OFFSET $5;
 
 -- Lista miast
-SELECT 
+SELECT
   city, country, COUNT(*) as venues_count
 FROM dictionary.venues
 WHERE is_active = true
@@ -476,37 +504,42 @@ const cacheConfig = {
   // Cache dla ras (1 godzina)
   breeds: {
     ttl: 60 * 60, // 1 godzina
-    key: 'breeds',
-    version: 'v1'
+    key: "breeds",
+    version: "v1",
   },
   // Cache dla sędziów (30 minut)
   judges: {
     ttl: 30 * 60, // 30 minut
-    key: 'judges',
-    version: 'v1'
+    key: "judges",
+    version: "v1",
   },
   // Cache dla obiektów (2 godziny)
   venues: {
     ttl: 2 * 60 * 60, // 2 godziny
-    key: 'venues',
-    version: 'v1'
-  }
+    key: "venues",
+    version: "v1",
+  },
 };
 
 // Implementacja cache
 class DictionaryCache {
-  async getBreeds(params: BreedQueryParams): Promise<BreedsListResponseDto | null> {
+  async getBreeds(
+    params: BreedQueryParams,
+  ): Promise<BreedsListResponseDto | null> {
     const cacheKey = `breeds:${JSON.stringify(params)}`;
     return await this.get(cacheKey);
   }
 
-  async setBreeds(params: BreedQueryParams, data: BreedsListResponseDto): Promise<void> {
+  async setBreeds(
+    params: BreedQueryParams,
+    data: BreedsListResponseDto,
+  ): Promise<void> {
     const cacheKey = `breeds:${JSON.stringify(params)}`;
     await this.set(cacheKey, data, cacheConfig.breeds.ttl);
   }
 
   async invalidateBreeds(): Promise<void> {
-    await this.delPattern('breeds:*');
+    await this.delPattern("breeds:*");
   }
 }
 ```
@@ -518,20 +551,24 @@ class DictionaryCache {
 ```typescript
 // Walidacja parametrów ras
 const breedQuerySchema = z.object({
-  fci_group: z.enum(['G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7', 'G8', 'G9', 'G10']).optional(),
+  fci_group: z
+    .enum(["G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8", "G9", "G10"])
+    .optional(),
   is_active: z.boolean().optional(),
   search: z.string().min(1).max(100).optional(),
   page: z.number().min(1).max(1000).optional(),
-  limit: z.number().min(1).max(200).optional()
+  limit: z.number().min(1).max(200).optional(),
 });
 
 // Walidacja parametrów sędziów
 const judgeQuerySchema = z.object({
-  fci_group: z.enum(['G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7', 'G8', 'G9', 'G10']).optional(),
+  fci_group: z
+    .enum(["G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8", "G9", "G10"])
+    .optional(),
   is_active: z.boolean().optional(),
   search: z.string().min(1).max(100).optional(),
   page: z.number().min(1).max(1000).optional(),
-  limit: z.number().min(1).max(100).optional()
+  limit: z.number().min(1).max(100).optional(),
 });
 
 // Walidacja parametrów obiektów
@@ -541,7 +578,7 @@ const venueQuerySchema = z.object({
   is_active: z.boolean().optional(),
   search: z.string().min(1).max(100).optional(),
   page: z.number().min(1).max(1000).optional(),
-  limit: z.number().min(1).max(100).optional()
+  limit: z.number().min(1).max(100).optional(),
 });
 ```
 
@@ -553,30 +590,30 @@ const venueQuerySchema = z.object({
 // Błędy słowników
 const DICTIONARY_ERRORS = {
   BREED_NOT_FOUND: {
-    code: 'BREED_NOT_FOUND',
-    message: 'Rasa nie została znaleziona',
-    status: 404
+    code: "BREED_NOT_FOUND",
+    message: "Rasa nie została znaleziona",
+    status: 404,
   },
   JUDGE_NOT_FOUND: {
-    code: 'JUDGE_NOT_FOUND',
-    message: 'Sędzia nie został znaleziony',
-    status: 404
+    code: "JUDGE_NOT_FOUND",
+    message: "Sędzia nie został znaleziony",
+    status: 404,
   },
   VENUE_NOT_FOUND: {
-    code: 'VENUE_NOT_FOUND',
-    message: 'Obiekt nie został znaleziony',
-    status: 404
+    code: "VENUE_NOT_FOUND",
+    message: "Obiekt nie został znaleziony",
+    status: 404,
   },
   INVALID_FCI_GROUP: {
-    code: 'INVALID_FCI_GROUP',
-    message: 'Nieprawidłowa grupa FCI',
-    status: 400
+    code: "INVALID_FCI_GROUP",
+    message: "Nieprawidłowa grupa FCI",
+    status: 400,
   },
   CACHE_ERROR: {
-    code: 'CACHE_ERROR',
-    message: 'Błąd cache',
-    status: 500
-  }
+    code: "CACHE_ERROR",
+    message: "Błąd cache",
+    status: 500,
+  },
 };
 ```
 
@@ -585,37 +622,37 @@ const DICTIONARY_ERRORS = {
 ### 10.1 Unit Tests
 
 ```typescript
-describe('DictionaryService', () => {
-  describe('getBreeds', () => {
-    it('should return paginated breeds list', async () => {
+describe("DictionaryService", () => {
+  describe("getBreeds", () => {
+    it("should return paginated breeds list", async () => {
       // Test listy ras
     });
 
-    it('should filter breeds by FCI group', async () => {
+    it("should filter breeds by FCI group", async () => {
       // Test filtrowania po grupie FCI
     });
 
-    it('should search breeds by name', async () => {
+    it("should search breeds by name", async () => {
       // Test wyszukiwania
     });
   });
 
-  describe('getJudges', () => {
-    it('should return judges with specializations', async () => {
+  describe("getJudges", () => {
+    it("should return judges with specializations", async () => {
       // Test listy sędziów
     });
 
-    it('should filter judges by specialization', async () => {
+    it("should filter judges by specialization", async () => {
       // Test filtrowania po specjalizacji
     });
   });
 
-  describe('getVenues', () => {
-    it('should return venues with statistics', async () => {
+  describe("getVenues", () => {
+    it("should return venues with statistics", async () => {
       // Test listy obiektów
     });
 
-    it('should filter venues by city', async () => {
+    it("should filter venues by city", async () => {
       // Test filtrowania po mieście
     });
   });
@@ -625,21 +662,21 @@ describe('DictionaryService', () => {
 ### 10.2 Integration Tests
 
 ```typescript
-describe('Dictionary API', () => {
-  describe('GET /api/breeds', () => {
-    it('should return breeds list', async () => {
+describe("Dictionary API", () => {
+  describe("GET /api/breeds", () => {
+    it("should return breeds list", async () => {
       // Test endpointu ras
     });
   });
 
-  describe('GET /api/judges', () => {
-    it('should return judges list', async () => {
+  describe("GET /api/judges", () => {
+    it("should return judges list", async () => {
       // Test endpointu sędziów
     });
   });
 
-  describe('GET /api/venues', () => {
-    it('should return venues list', async () => {
+  describe("GET /api/venues", () => {
+    it("should return venues list", async () => {
       // Test endpointu obiektów
     });
   });
@@ -701,24 +738,51 @@ const optimizedJudgesQuery = `
 const dictionaryMetrics = {
   // Czas odpowiedzi
   responseTime: {
-    breeds: new Histogram('dictionary_breeds_response_time', 'Breeds API response time'),
-    judges: new Histogram('dictionary_judges_response_time', 'Judges API response time'),
-    venues: new Histogram('dictionary_venues_response_time', 'Venues API response time')
+    breeds: new Histogram(
+      "dictionary_breeds_response_time",
+      "Breeds API response time",
+    ),
+    judges: new Histogram(
+      "dictionary_judges_response_time",
+      "Judges API response time",
+    ),
+    venues: new Histogram(
+      "dictionary_venues_response_time",
+      "Venues API response time",
+    ),
   },
-  
+
   // Liczba zapytań
   requestCount: {
-    breeds: new Counter('dictionary_breeds_requests_total', 'Total breeds requests'),
-    judges: new Counter('dictionary_judges_requests_total', 'Total judges requests'),
-    venues: new Counter('dictionary_venues_requests_total', 'Total venues requests')
+    breeds: new Counter(
+      "dictionary_breeds_requests_total",
+      "Total breeds requests",
+    ),
+    judges: new Counter(
+      "dictionary_judges_requests_total",
+      "Total judges requests",
+    ),
+    venues: new Counter(
+      "dictionary_venues_requests_total",
+      "Total venues requests",
+    ),
   },
-  
+
   // Cache hit rate
   cacheHitRate: {
-    breeds: new Gauge('dictionary_breeds_cache_hit_rate', 'Breeds cache hit rate'),
-    judges: new Gauge('dictionary_judges_cache_hit_rate', 'Judges cache hit rate'),
-    venues: new Gauge('dictionary_venues_cache_hit_rate', 'Venues cache hit rate')
-  }
+    breeds: new Gauge(
+      "dictionary_breeds_cache_hit_rate",
+      "Breeds cache hit rate",
+    ),
+    judges: new Gauge(
+      "dictionary_judges_cache_hit_rate",
+      "Judges cache hit rate",
+    ),
+    venues: new Gauge(
+      "dictionary_venues_cache_hit_rate",
+      "Venues cache hit rate",
+    ),
+  },
 };
 ```
 
@@ -754,12 +818,12 @@ paths:
             default: 50
             maximum: 200
       responses:
-        '200':
+        "200":
           description: Lista ras
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BreedsListResponseDto'
+                $ref: "#/components/schemas/BreedsListResponseDto"
 
   /api/judges:
     get:
@@ -776,12 +840,12 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Lista sędziów
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JudgesListResponseDto'
+                $ref: "#/components/schemas/JudgesListResponseDto"
 
   /api/venues:
     get:
@@ -797,12 +861,12 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Lista obiektów
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/VenuesListResponseDto'
+                $ref: "#/components/schemas/VenuesListResponseDto"
 ```
 
 ## 14. Podsumowanie
@@ -810,33 +874,38 @@ paths:
 Ten plan implementacji zapewnia:
 
 ### ✅ **Funkcjonalności Breeds Management:**
+
 - Lista ras psów z klasyfikacją FCI
 - Filtrowanie po grupach FCI i statusie aktywności
 - Wyszukiwanie w nazwach ras (polski/angielski)
 - Agregacja ras w grupach FCI
 
 ### ✅ **Funkcjonalności Judges Management:**
+
 - Lista sędziów z licencjami FCI
 - Specjalizacje sędziów w grupach FCI
 - Filtrowanie po specjalizacjach i statusie aktywności
 - Wyszukiwanie w danych sędziów
 
 ### ✅ **Funkcjonalności Venues Management:**
+
 - Lista obiektów wystawowych
 - Filtrowanie po lokalizacji i statusie aktywności
 - Statystyki obiektów (liczba wystaw, ostatnia wystawa)
 - Lista miast z obiektami
 
 ### ✅ **Wydajność i skalowalność:**
+
 - Cache strategy dla słowników
 - Zoptymalizowane zapytania SQL
 - Indeksy dla szybkiego wyszukiwania
 - Paginacja i filtrowanie
 
 ### ✅ **Monitoring:**
+
 - Metryki wydajności API
 - Cache hit rate monitoring
 - Error tracking
 - Performance optimization
 
-**Następne kroki:** Implementacja endpointów zgodnie z tym planem, konfiguracja cache, testy wydajnościowe, dokumentacja API. 
+**Następne kroki:** Implementacja endpointów zgodnie z tym planem, konfiguracja cache, testy wydajnościowe, dokumentacja API.

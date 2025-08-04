@@ -5,6 +5,7 @@
 10x Dog Show to aplikacja webowa oparta na nowoczesnym, skalowalnym tech stack, który zapewnia szybki development MVP przy zachowaniu możliwości rozbudowy w przyszłości.
 
 ### Kluczowe zasady:
+
 - **Prostota** - minimalna złożoność techniczna
 - **Wydajność** - szybkie ładowanie i responsywność
 - **Skalowalność** - możliwość rozbudowy bez refaktoryzacji
@@ -14,7 +15,9 @@
 ## 2. Frontend Stack
 
 ### Astro 5 + React 19
+
 **Uzasadnienie wyboru:**
+
 - Astro zapewnia szybkie ładowanie stron i optymalizację wydajności
 - React 19 dla komponentów interaktywnych z najnowszymi funkcjami
 - Zero JavaScript by default - tylko tam gdzie potrzebne
@@ -24,7 +27,9 @@
 - Gotowy bootstrap dostępny - szybszy start projektu
 
 ### TypeScript 5
+
 **Uzasadnienie:**
+
 - Statyczne typowanie dla bezpieczeństwa kodu
 - Lepsze wsparcie IDE i autouzupełnianie
 - Wykrywanie błędów na etapie kompilacji
@@ -32,7 +37,9 @@
 - Łatwiejsze refaktoringi
 
 ### Tailwind CSS 4
+
 **Uzasadnienie:**
+
 - Utility-first CSS framework
 - Szybkie prototypowanie UI
 - Spójny design system
@@ -40,7 +47,9 @@
 - Doskonała dokumentacja
 
 ### Shadcn/ui
+
 **Uzasadnienie:**
+
 - Gotowe, dostępne komponenty React
 - Możliwość kopiowania i modyfikacji kodu
 - Spójny design z Tailwind
@@ -50,7 +59,9 @@
 ## 3. Backend Stack
 
 ### Supabase
+
 **Uzasadnienie wyboru:**
+
 - Kompleksowe rozwiązanie Backend-as-a-Service
 - PostgreSQL jako baza danych
 - Wbudowana autentykacja i autoryzacja
@@ -60,6 +71,7 @@
 - Storage dla plików
 
 **Komponenty Supabase:**
+
 - **Database:** PostgreSQL z automatycznymi migracjami
 - **Auth:** Email/password, magic links, OAuth
 - **Storage:** Buckets dla plików PDF i dokumentów
@@ -69,7 +81,9 @@
 ## 4. Narzędzia deweloperskie
 
 ### GitHub Actions
+
 **Uzasadnienie:**
+
 - Automatyzacja CI/CD
 - Integracja z GitHub
 - Darmowe dla publicznych repo
@@ -77,7 +91,9 @@
 - Deployment do różnych środowisk
 
 ### Docker
+
 **Uzasadnienie:**
+
 - Konteneryzacja aplikacji
 - Spójne środowiska deweloperskie
 - Łatwy deployment
@@ -85,11 +101,13 @@
 - Skalowalność
 
 ### TypeScript
+
 - Statyczne typowanie
 - Lepsze wsparcie IDE
 - Wykrywanie błędów na etapie kompilacji
 
 ### ESLint + Prettier
+
 - Spójny kod
 - Automatyczne formatowanie
 - Wykrywanie potencjalnych błędów
@@ -97,7 +115,9 @@
 ## 5. Usługi zewnętrzne
 
 ### Resend (dla emaili)
+
 **Uzasadnienie:**
+
 - Wysokie deliverability
 - Prosty API
 - Tanie dla małych wolumenów
@@ -105,14 +125,18 @@
 - Template system
 
 ### React-PDF (dla generowania PDF)
+
 **Uzasadnienie:**
+
 - Generowanie PDF po stronie klienta
 - Integracja z React
 - Możliwość customizacji
 - Brak dodatkowych kosztów serwera
 
 ### DigitalOcean (dla hostingu)
+
 **Uzasadnienie:**
+
 - Hosting przez obraz Docker zgodnie z wymaganiami
 - Pełna kontrola nad infrastrukturą
 - Skalowalność
@@ -122,6 +146,7 @@
 ## 6. Architektura systemu
 
 ### Struktura aplikacji:
+
 ```
 10x-dog-show/
 ├── src/
@@ -142,6 +167,7 @@
 ```
 
 ### Flow danych:
+
 1. **Autentykacja:** Supabase Auth
 2. **CRUD operacje:** Supabase Client + RLS
 3. **Real-time:** Supabase Realtime
@@ -152,17 +178,20 @@
 ## 7. Bezpieczeństwo i RODO
 
 ### Supabase RLS (Row Level Security):
+
 - Kontrola dostępu na poziomie wierszy
 - Różne polityki dla różnych ról
 - Automatyczne filtrowanie danych
 
 ### Autentykacja:
+
 - JWT tokens
 - Refresh token rotation
 - Session management
 - Password policies
 
 ### RODO compliance:
+
 - Automatyczne usuwanie danych po 3 latach
 - Consent management
 - Data export/delete
@@ -171,17 +200,20 @@
 ## 8. Deployment i DevOps
 
 ### GitHub Actions workflow:
+
 1. **Test:** ESLint, TypeScript, unit tests
 2. **Build:** Astro build
 3. **Deploy:** Docker image build i deployment na DigitalOcean
 4. **Database:** Supabase migrations
 
 ### Docker:
+
 - Development environment
 - Production-like testing
 - Easy onboarding dla nowych developerów
 
 ### Monitoring:
+
 - DigitalOcean Monitoring
 - Supabase Dashboard
 - Error tracking (Sentry)
@@ -189,6 +221,7 @@
 ## 9. Koszty i skalowanie
 
 ### Koszty MVP (miesięcznie):
+
 - **DigitalOcean:** $5-10 (droplet)
 - **Supabase:** $0 (Free tier)
 - **Resend:** $0 (100 emails/day)
@@ -196,6 +229,7 @@
 - **Docker:** $0 (local development)
 
 ### Koszty przy skalowaniu:
+
 - **DigitalOcean:** $20-40/miesiąc (większy droplet)
 - **Supabase:** $25/miesiąc (Pro plan)
 - **Resend:** $20/miesiąc (1000 emails/day)
@@ -203,6 +237,7 @@
 ## 10. Roadmap techniczny
 
 ### Faza 1 (MVP):
+
 - Astro + React + Supabase setup
 - Podstawowa autentykacja
 - CRUD dla wystaw i psów
@@ -210,12 +245,14 @@
 - Wysyłanie emaili
 
 ### Faza 2 (Rozbudowa):
+
 - Real-time notifications
 - Advanced RLS policies
 - Performance optimization
 - Mobile responsiveness
 
 ### Faza 3 (Skalowanie):
+
 - Supabase Edge Functions
 - Caching strategies
 - Advanced monitoring
@@ -224,20 +261,25 @@
 ## 11. Ryzyka i mitigacje
 
 ### Ryzyko: Vendor lock-in (Supabase)
+
 **Mitigacja:** Używanie standardowego PostgreSQL, możliwość migracji
 
 ### Ryzyko: Koszty przy skalowaniu
+
 **Mitigacja:** Monitoring usage, optymalizacja queries
 
 ### Ryzyko: Bezpieczeństwo danych
+
 **Mitigacja:** RLS policies, regularne audyty, encryption
 
 ### Ryzyko: Performance
+
 **Mitigacja:** Astro optimization, Supabase query optimization
 
 ## 12. Podsumowanie
 
 Wybrany tech stack zapewnia:
+
 - ✅ Szybki development MVP
 - ✅ Niskie koszty początkowe
 - ✅ Skalowalność
@@ -246,9 +288,10 @@ Wybrany tech stack zapewnia:
 - ✅ Łatwość utrzymania
 
 **Kluczowe technologie:**
+
 - **Frontend:** Astro 5 + React 19 + TypeScript + Tailwind + Shadcn/ui
 - **Backend:** Supabase (PostgreSQL + Auth + Storage + Realtime)
 - **DevOps:** GitHub Actions + Docker
 - **Usługi:** Resend (email) + React-PDF + DigitalOcean (hosting)
 
-Ten stack pozwoli na szybkie dostarczenie MVP przy zachowaniu możliwości rozbudowy w przyszłości. 
+Ten stack pozwoli na szybkie dostarczenie MVP przy zachowaniu możliwości rozbudowy w przyszłości.
