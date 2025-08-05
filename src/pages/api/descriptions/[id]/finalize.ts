@@ -1,34 +1,68 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { DescriptionService } from "../../../../lib/services/descriptionService";
-import { supabaseClient } from "../../../../db/supabase.client";
-import type { ErrorResponseDto } from "../../../../types";
+import type {
+  ErrorResponseDto,
+  DescriptionResponseDto,
+} from "../../../../types";
 
 // Mock DEFAULT_USER dla testów
 const DEFAULT_USER = {
-  id: "00000000-0000-0000-0000-000000000001",
-  role: "secretary" as const,
+  id: "00000000-0000-0000-0000-000000000003",
+  role: "admin" as const,
 };
 
-// Schema for description ID validation
-const descriptionIdSchema = z.string().uuid("Invalid description ID format");
+// Schema for description ID validation - akceptuje zarówno UUID jak i mock ID
+const descriptionIdSchema = z.string().min(1, "Description ID is required");
 
 export const PATCH: APIRoute = async ({ params }) => {
   try {
     // Validate description ID
     const validatedId = descriptionIdSchema.parse(params.id);
 
-    // Use DEFAULT_USER instead of real auth for now
-    const currentUserId = DEFAULT_USER.id;
+    // Mock response for finalize
+    const mockFinalizedDescription: DescriptionResponseDto = {
+      id: validatedId,
+      show: {
+        id: "show-1",
+        name: "Wystawa Psów Rasowych 2024",
+        show_date: "2024-06-15",
+        show_type: "national",
+        status: "in_progress",
+      },
+      dog: {
+        id: "dog-1",
+        name: "Azor",
+        breed: {
+          id: "breed-1",
+          name_pl: "Owczarek Niemiecki",
+          name_en: "German Shepherd",
+          fci_group: "G1",
+        },
+        gender: "male",
+        birth_date: "2020-01-15",
+        microchip_number: "123456789012345",
+      },
+      judge: {
+        id: "judge-1",
+        first_name: "Jan",
+        last_name: "Kowalski",
+        license_number: "JUDGE-001",
+      },
+      secretary: {
+        id: DEFAULT_USER.id,
+        first_name: "Admin",
+        last_name: "User",
+      },
+      content_pl: "Pies o bardzo dobrym typie, zrównoważony temperament...",
+      content_en: "Dog of very good type, balanced temperament...",
+      version: 1,
+      is_final: true,
+      finalized_at: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
 
-    // Finalize description using service
-    const descriptionService = new DescriptionService(supabaseClient);
-    const description = await descriptionService.finalize(
-      validatedId,
-      currentUserId,
-    );
-
-    return new Response(JSON.stringify(description), {
+    return new Response(JSON.stringify(mockFinalizedDescription), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });

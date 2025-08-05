@@ -85,7 +85,15 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
 
   useEffect(() => {
     loadShowData();
-  }, [showId]);
+
+    // Sprawdź parametry URL i ustaw filtry
+    const urlParams = new URLSearchParams(window.location.search);
+    const breedFilter = urlParams.get("breed");
+
+    if (breedFilter) {
+      updateFilters({ breedId: breedFilter });
+    }
+  }, [showId, loadShowData, updateFilters]);
 
   useEffect(() => {
     if (show && registrations) {

@@ -6,6 +6,7 @@ import type {
   UserRole,
   ShowStatus,
   RegistrationResponseDto,
+  DescriptionStatus,
 } from "../types";
 
 const useDogsList = (
@@ -26,7 +27,8 @@ const useDogsList = (
       userRole === "admin" ||
       (userRole === "secretary" && showStatus !== "in_progress"),
     canDelete:
-      (userRole === "department_representative" || userRole === "admin") && showStatus !== "in_progress",
+      (userRole === "department_representative" || userRole === "admin") &&
+      showStatus !== "in_progress",
     userRole,
   });
 
@@ -107,7 +109,7 @@ const useDogsList = (
           data: {
             ...registration.dog,
             registration,
-            descriptionStatus: { status: "none" }, // Will be fetched separately
+            descriptionStatus: { status: "none" }, // Will be updated after fetching descriptions
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } as any, // Type assertion for complex data structure
         };
@@ -129,6 +131,41 @@ const useDogsList = (
       return Object.values(hierarchy);
     },
     [],
+  );
+
+  const fetchDescriptions = useCallback(
+    async (dogIds: string[]) => {
+      try {
+        const descriptionsResponse = await fetch(
+          `/api/descriptions?show_id=${showId}`,
+        );
+
+        if (descriptionsResponse.ok) {
+          const descriptions = await descriptionsResponse.json();
+
+          // Create a map of dog ID to description status
+          const descriptionMap = new Map<string, DescriptionStatus>();
+
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          descriptions.forEach((desc: any) => {
+            const status: DescriptionStatus = {
+              status: desc.is_final ? "finalized" : "completed",
+              lastModified: desc.updated_at,
+              secretaryName: `${desc.secretary.first_name} ${desc.secretary.last_name}`,
+              version: desc.version,
+            };
+            descriptionMap.set(desc.dog.id, status);
+          });
+
+          return descriptionMap;
+        }
+      } catch (error) {
+        console.error("Failed to fetch descriptions:", error);
+      }
+
+      return new Map<string, DescriptionStatus>();
+    },
+    [showId],
   );
 
   const fetchDogs = useCallback(async () => {
@@ -168,9 +205,44 @@ const useDogsList = (
       // Transform to hierarchy
       const hierarchy = transformToHierarchy(registrations);
 
+      // Fetch descriptions and update statuses
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const dogIds = registrations.map((reg: any) => reg.dog.id);
+      const descriptionMap = await fetchDescriptions(dogIds);
+
+      // Update hierarchy with description statuses
+      const updateDescriptionStatuses = (
+        nodes: HierarchyNode[],
+      ): HierarchyNode[] => {
+        return nodes.map((node) => {
+          if (node.type === "dog") {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const dogData = node.data as any;
+            const descriptionStatus = descriptionMap.get(dogData.id) || {
+              status: "none",
+            };
+            return {
+              ...node,
+              data: {
+                ...dogData,
+                descriptionStatus,
+              },
+            };
+          } else if (node.children) {
+            return {
+              ...node,
+              children: updateDescriptionStatuses(node.children),
+            };
+          }
+          return node;
+        });
+      };
+
+      const updatedHierarchy = updateDescriptionStatuses(hierarchy);
+
       setState((prev) => ({
         ...prev,
-        dogs: hierarchy,
+        dogs: updatedHierarchy,
         pagination,
         isLoading: false,
       }));
@@ -190,6 +262,7 @@ const useDogsList = (
     state.pagination.page,
     state.pagination.limit,
     transformToHierarchy,
+    fetchDescriptions,
   ]);
 
   const updateFilters = useCallback((newFilters: Partial<DogsFilterState>) => {

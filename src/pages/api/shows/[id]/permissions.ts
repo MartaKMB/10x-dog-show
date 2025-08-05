@@ -7,8 +7,8 @@ const showIdSchema = z.string().uuid("Invalid show ID format");
 
 // Mock DEFAULT_USER dla testów
 const DEFAULT_USER = {
-  id: "00000000-0000-0000-0000-000000000001",
-  role: "secretary" as const,
+  id: "00000000-0000-0000-0000-000000000003",
+  role: "admin" as const,
 };
 
 export const GET: APIRoute = async ({ params }) => {
@@ -18,24 +18,6 @@ export const GET: APIRoute = async ({ params }) => {
 
     // TODO: W rzeczywistej aplikacji pobierać user z kontekstu autentykacji
     const currentUser = DEFAULT_USER;
-
-    // Sprawdź czy użytkownik jest sekretarzem
-    if (currentUser.role !== "secretary") {
-      return new Response(
-        JSON.stringify({
-          error: {
-            code: "AUTHORIZATION_ERROR",
-            message: "Only secretaries can access permissions",
-          },
-          timestamp: new Date().toISOString(),
-          request_id: crypto.randomUUID(),
-        } as ErrorResponseDto),
-        {
-          status: 403,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
-    }
 
     // TODO: W rzeczywistej aplikacji pobierać uprawnienia z bazy danych
     // Na razie zwracamy mock data - wszystkie rasy są dozwolone

@@ -356,6 +356,7 @@ export interface RegistrationResponseDto
     gender: DogGender;
     birth_date: string;
   };
+  descriptionStatus?: DescriptionStatus;
 }
 
 export interface UpdateRegistrationDto {
@@ -762,6 +763,7 @@ export interface DescriptionStatus {
   lastModified?: string;
   secretaryName?: string;
   version?: number;
+  descriptionId?: string;
 }
 
 export interface QuickAction {

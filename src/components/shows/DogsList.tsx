@@ -196,7 +196,9 @@ const DogsList: React.FC<DogsListProps> = ({
                             owners: [],
                           },
                           registration: registration,
-                          descriptionStatus: { status: "none" },
+                          descriptionStatus: registration.descriptionStatus || {
+                            status: "none",
+                          },
                           canEdit,
                           canDelete,
                           canCreateDescription: true,
@@ -208,8 +210,25 @@ const DogsList: React.FC<DogsListProps> = ({
                           if (action === "edit") onEditDog(registration);
                           if (action === "delete") onDeleteDog(registration);
                           if (action === "create_description") {
-                            // Navigate to description creation page
-                            window.location.href = `/shows/${registration.show_id}/dogs/${registration.dog.id}/description/new`;
+                            const descriptionStatus =
+                              registration.descriptionStatus || {
+                                status: "none",
+                              };
+
+                            if (descriptionStatus.status === "none") {
+                              // Navigate to description creation page
+                              window.location.href = `/shows/${registration.show_id}/dogs/${registration.dog.id}/description/new`;
+                            } else {
+                              // Navigate to description edit page
+                              const descriptionId =
+                                descriptionStatus.descriptionId;
+                              if (descriptionId) {
+                                window.location.href = `/shows/${registration.show_id}/dogs/${registration.dog.id}/description/${descriptionId}`;
+                              } else {
+                                // Fallback to creation page if no description ID
+                                window.location.href = `/shows/${registration.show_id}/dogs/${registration.dog.id}/description/new`;
+                              }
+                            }
                           }
                         }}
                         userRole={

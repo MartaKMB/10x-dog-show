@@ -175,8 +175,11 @@ const DogCard: React.FC<DogCardProps> = ({ dog, onAction, userRole }) => {
                 },
                 {
                   id: "create_description",
-                  label: "Utwórz opis",
-                  icon: "📝",
+                  label:
+                    dog.descriptionStatus.status === "none"
+                      ? "Utwórz opis"
+                      : "Edytuj opis",
+                  icon: dog.descriptionStatus.status === "none" ? "📝" : "✏️",
                   action: "create_description",
                   disabled: !dog.canCreateDescription,
                   requiresPermission: [

@@ -12,71 +12,104 @@ interface EvaluationFormProps {
   value: CreateEvaluationDto;
   onChange: (value: CreateEvaluationDto) => void;
   dogClass: DogClass;
+  language?: "pl" | "en";
   disabled?: boolean;
   errors?: string[];
 }
 
-const gradeOptions: Record<
-  DogClass,
-  { label: string; value: EvaluationGrade | "" }[]
-> = {
-  baby: [],
-  puppy: [],
-  junior: [
-    { label: "Excellent", value: "excellent" },
-    { label: "Very Good", value: "very_good" },
-    { label: "Good", value: "good" },
-    { label: "Satisfactory", value: "satisfactory" },
-    { label: "Disqualified", value: "disqualified" },
-    { label: "Absent", value: "absent" },
-  ],
-  intermediate: [
-    { label: "Excellent", value: "excellent" },
-    { label: "Very Good", value: "very_good" },
-    { label: "Good", value: "good" },
-    { label: "Satisfactory", value: "satisfactory" },
-    { label: "Disqualified", value: "disqualified" },
-    { label: "Absent", value: "absent" },
-  ],
-  open: [
-    { label: "Excellent", value: "excellent" },
-    { label: "Very Good", value: "very_good" },
-    { label: "Good", value: "good" },
-    { label: "Satisfactory", value: "satisfactory" },
-    { label: "Disqualified", value: "disqualified" },
-    { label: "Absent", value: "absent" },
-  ],
-  working: [
-    { label: "Excellent", value: "excellent" },
-    { label: "Very Good", value: "very_good" },
-    { label: "Good", value: "good" },
-    { label: "Satisfactory", value: "satisfactory" },
-    { label: "Disqualified", value: "disqualified" },
-    { label: "Absent", value: "absent" },
-  ],
-  champion: [
-    { label: "Excellent", value: "excellent" },
-    { label: "Very Good", value: "very_good" },
-    { label: "Good", value: "good" },
-    { label: "Satisfactory", value: "satisfactory" },
-    { label: "Disqualified", value: "disqualified" },
-    { label: "Absent", value: "absent" },
-  ],
-  veteran: [
-    { label: "Excellent", value: "excellent" },
-    { label: "Very Good", value: "very_good" },
-    { label: "Good", value: "good" },
-    { label: "Satisfactory", value: "satisfactory" },
-    { label: "Disqualified", value: "disqualified" },
-    { label: "Absent", value: "absent" },
-  ],
+const getGradeOptions = (
+  language: "pl" | "en" = "pl",
+): Record<DogClass, { label: string; value: EvaluationGrade | "" }[]> => {
+  const labels =
+    language === "pl"
+      ? {
+          excellent: "Doskonały",
+          very_good: "Bardzo dobry",
+          good: "Dobry",
+          satisfactory: "Zadowalający",
+          disqualified: "Dyskwalifikacja",
+          absent: "Nieobecny",
+        }
+      : {
+          excellent: "Excellent",
+          very_good: "Very Good",
+          good: "Good",
+          satisfactory: "Satisfactory",
+          disqualified: "Disqualified",
+          absent: "Absent",
+        };
+
+  return {
+    baby: [],
+    puppy: [],
+    junior: [
+      { label: labels.excellent, value: "excellent" },
+      { label: labels.very_good, value: "very_good" },
+      { label: labels.good, value: "good" },
+      { label: labels.satisfactory, value: "satisfactory" },
+      { label: labels.disqualified, value: "disqualified" },
+      { label: labels.absent, value: "absent" },
+    ],
+    intermediate: [
+      { label: labels.excellent, value: "excellent" },
+      { label: labels.very_good, value: "very_good" },
+      { label: labels.good, value: "good" },
+      { label: labels.satisfactory, value: "satisfactory" },
+      { label: labels.disqualified, value: "disqualified" },
+      { label: labels.absent, value: "absent" },
+    ],
+    open: [
+      { label: labels.excellent, value: "excellent" },
+      { label: labels.very_good, value: "very_good" },
+      { label: labels.good, value: "good" },
+      { label: labels.satisfactory, value: "satisfactory" },
+      { label: labels.disqualified, value: "disqualified" },
+      { label: labels.absent, value: "absent" },
+    ],
+    working: [
+      { label: labels.excellent, value: "excellent" },
+      { label: labels.very_good, value: "very_good" },
+      { label: labels.good, value: "good" },
+      { label: labels.satisfactory, value: "satisfactory" },
+      { label: labels.disqualified, value: "disqualified" },
+      { label: labels.absent, value: "absent" },
+    ],
+    champion: [
+      { label: labels.excellent, value: "excellent" },
+      { label: labels.very_good, value: "very_good" },
+      { label: labels.good, value: "good" },
+      { label: labels.satisfactory, value: "satisfactory" },
+      { label: labels.disqualified, value: "disqualified" },
+      { label: labels.absent, value: "absent" },
+    ],
+    veteran: [
+      { label: labels.excellent, value: "excellent" },
+      { label: labels.very_good, value: "very_good" },
+      { label: labels.good, value: "good" },
+      { label: labels.satisfactory, value: "satisfactory" },
+      { label: labels.disqualified, value: "disqualified" },
+      { label: labels.absent, value: "absent" },
+    ],
+  };
 };
 
-const babyPuppyGradeOptions: { label: string; value: BabyPuppyGrade }[] = [
-  { label: "Very Promising", value: "very_promising" },
-  { label: "Promising", value: "promising" },
-  { label: "Quite Promising", value: "quite_promising" },
-];
+const getBabyPuppyGradeOptions = (
+  language: "pl" | "en" = "pl",
+): { label: string; value: BabyPuppyGrade }[] => {
+  if (language === "pl") {
+    return [
+      { label: "Bardzo obiecujący", value: "very_promising" },
+      { label: "Obiiecujący", value: "promising" },
+      { label: "Dość obiecujący", value: "quite_promising" },
+    ];
+  } else {
+    return [
+      { label: "Very Promising", value: "very_promising" },
+      { label: "Promising", value: "promising" },
+      { label: "Quite Promising", value: "quite_promising" },
+    ];
+  }
+};
 
 const titleOptions: { label: string; value: TitleType }[] = [
   { label: "CWC", value: "CWC" },
@@ -96,6 +129,7 @@ export function EvaluationForm({
   value,
   onChange,
   dogClass,
+  language = "pl",
   disabled,
   errors,
 }: EvaluationFormProps) {
@@ -127,7 +161,7 @@ export function EvaluationForm({
             disabled={disabled}
           >
             <option value="">Wybierz ocenę</option>
-            {babyPuppyGradeOptions.map((opt) => (
+            {getBabyPuppyGradeOptions(language).map((opt) => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
               </option>
@@ -150,7 +184,7 @@ export function EvaluationForm({
             disabled={disabled}
           >
             <option value="">Wybierz ocenę</option>
-            {gradeOptions[dogClass].map((opt) => (
+            {getGradeOptions(language)[dogClass].map((opt) => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
               </option>
@@ -207,31 +241,6 @@ export function EvaluationForm({
             </option>
           ))}
         </select>
-      </div>
-
-      {/* Punkty */}
-      <div>
-        <label
-          htmlFor="points"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Punkty
-        </label>
-        <input
-          id="points"
-          type="number"
-          value={value.points ?? ""}
-          onChange={(e) =>
-            handleChange(
-              "points",
-              e.target.value ? Number(e.target.value) : undefined,
-            )
-          }
-          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-          min={0}
-          max={4}
-          disabled={disabled}
-        />
       </div>
 
       {/* Best in group/show */}

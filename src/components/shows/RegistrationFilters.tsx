@@ -106,7 +106,7 @@ const RegistrationFilters: React.FC<RegistrationFiltersProps> = ({
     <div className="bg-white rounded-lg shadow-md p-6">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
         <h2 className="text-xl font-semibold text-gray-900">
-          Filtry rejestracji
+          Filtry zarejestrowanych psów
         </h2>
 
         {hasActiveFilters && (

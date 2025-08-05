@@ -23,60 +23,71 @@ export async function checkDescriptionPermissions(
       };
     }
 
-    // Sprawdź status wystawy
-    const showResponse = await fetch(`/api/shows/${showId}`);
-    if (!showResponse.ok) {
-      throw new Error("Nie można pobrać informacji o wystawie");
+    // Sprawdź status wystawy (admin ma dostęp niezależnie od statusu)
+    let showStatus: ShowStatus = "in_progress";
+    if (userRole !== "admin") {
+      const showResponse = await fetch(`/api/shows/${showId}`);
+      if (!showResponse.ok) {
+        throw new Error("Nie można pobrać informacji o wystawie");
+      }
+
+      const show = await showResponse.json();
+      showStatus = show.status;
+
+      if (show.status === "completed" || show.status === "cancelled") {
+        return {
+          canEdit: false,
+          canFinalize: false,
+          showStatus: show.status,
+          reason: "Wystawa została zakończona lub anulowana",
+        };
+      }
     }
 
-    const show = await showResponse.json();
+    // Sprawdź czy sekretarz ma uprawnienia do rasy psa na tej wystawie (admin pomija to sprawdzenie)
+    let dog = null;
+    if (userRole !== "admin") {
+      const dogResponse = await fetch(`/api/dogs/${dogId}`);
+      if (!dogResponse.ok) {
+        throw new Error("Nie można pobrać informacji o psie");
+      }
 
-    if (show.status === "completed" || show.status === "cancelled") {
-      return {
-        canEdit: false,
-        canFinalize: false,
-        showStatus: show.status,
-        reason: "Wystawa została zakończona lub anulowana",
-      };
+      dog = await dogResponse.json();
     }
 
-    // Sprawdź czy sekretarz ma uprawnienia do rasy psa na tej wystawie
-    const dogResponse = await fetch(`/api/dogs/${dogId}`);
-    if (!dogResponse.ok) {
-      throw new Error("Nie można pobrać informacji o psie");
-    }
+    // Sprawdź uprawnienia do rasy (admin ma dostęp do wszystkich ras)
+    if (userRole !== "admin" && dog) {
+      const permissionsResponse = await fetch(
+        `/api/shows/${showId}/permissions`,
+      );
+      if (!permissionsResponse.ok) {
+        throw new Error("Nie można sprawdzić uprawnień");
+      }
 
-    const dog = await dogResponse.json();
+      const permissions = await permissionsResponse.json();
 
-    // Sprawdź uprawnienia sekretarza do rasy
-    const permissionsResponse = await fetch(`/api/shows/${showId}/permissions`);
-    if (!permissionsResponse.ok) {
-      throw new Error("Nie można sprawdzić uprawnień");
-    }
+      const hasBreedPermission = permissions.allowed_breeds?.includes(
+        dog.breed.id,
+      );
 
-    const permissions = await permissionsResponse.json();
-
-    const hasBreedPermission = permissions.allowed_breeds?.includes(
-      dog.breed.id,
-    );
-
-    if (!hasBreedPermission) {
-      return {
-        canEdit: false,
-        canFinalize: false,
-        showStatus: show.status,
-        reason:
-          "Nie masz uprawnień do edycji opisów dla tej rasy psów na tej wystawie",
-      };
+      if (!hasBreedPermission) {
+        return {
+          canEdit: false,
+          canFinalize: false,
+          showStatus: showStatus,
+          reason:
+            "Nie masz uprawnień do edycji opisów dla tej rasy psów na tej wystawie",
+        };
+      }
     }
 
     // Sprawdź czy można finalizować (wystawa w trakcie)
-    const canFinalize = show.status === "in_progress";
+    const canFinalize = showStatus === "in_progress";
 
     return {
       canEdit: true,
       canFinalize,
-      showStatus: show.status,
+      showStatus: showStatus,
     };
   } catch (error) {
     console.error("Error checking permissions:", error);

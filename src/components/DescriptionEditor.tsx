@@ -146,6 +146,56 @@ export function DescriptionEditor({
             initialData: null,
           });
         }
+      } else if (mode === "create" && showId && dogId) {
+        // Tryb tworzenia - sprawdź czy opis już istnieje
+        try {
+          setApiState((prev) => ({ ...prev, isLoading: true, error: null }));
+
+          const response = await fetch(
+            `/api/descriptions?show_id=${showId}&dog_id=${dogId}`,
+          );
+          if (response.ok) {
+            const descriptions = await response.json();
+
+            if (descriptions.length > 0) {
+              // Opis już istnieje - przełącz w tryb edycji
+              const existingDescription = descriptions[0];
+              setApiState({
+                isLoading: false,
+                error: null,
+                initialData: existingDescription,
+              });
+
+              // Przekieruj do trybu edycji
+              window.location.href = `/shows/${showId}/dogs/${dogId}/description/${existingDescription.id}`;
+              return;
+            }
+          }
+
+          // Brak istniejącego opisu - kontynuuj w trybie tworzenia
+          setApiState({
+            isLoading: false,
+            error: null,
+            initialData: null,
+          });
+
+          // Animacja po załadowaniu danych w trybie tworzenia
+          setTimeout(() => {
+            setAnimationState((prev) => ({ ...prev, isVisible: true }));
+          }, 200);
+        } catch (error) {
+          console.error("Error checking for existing description:", error);
+          // W przypadku błędu, kontynuuj w trybie tworzenia
+          setApiState({
+            isLoading: false,
+            error: null,
+            initialData: null,
+          });
+
+          setTimeout(() => {
+            setAnimationState((prev) => ({ ...prev, isVisible: true }));
+          }, 200);
+        }
       } else {
         // Tryb tworzenia - nie ma danych początkowych
         setApiState({
@@ -153,6 +203,11 @@ export function DescriptionEditor({
           error: null,
           initialData: null,
         });
+
+        // Animacja po załadowaniu danych w trybie tworzenia
+        setTimeout(() => {
+          setAnimationState((prev) => ({ ...prev, isVisible: true }));
+        }, 200);
       }
     };
 
@@ -222,7 +277,7 @@ export function DescriptionEditor({
 
     try {
       // Mock user role - w rzeczywistej aplikacji pobierane z kontekstu użytkownika
-      const userRole = "secretary" as const;
+      const userRole = "admin" as const;
 
       const permissions = await checkDescriptionPermissions(
         showId,
@@ -333,176 +388,167 @@ export function DescriptionEditor({
   };
 
   // Funkcje API z obsługą błędów
-  const saveDescription = useCallback(
-    async (finalize = false) => {
-      if (!permissions.canEdit && !finalize) return;
+  const saveDescription = useCallback(async () => {
+    console.log("saveDescription called");
+    console.log("permissions.canEdit:", permissions.canEdit);
 
-      try {
-        setSavingState(true);
+    if (!permissions.canEdit) {
+      console.log("Early return - no edit permissions");
+      return;
+    }
 
-        let response: Response;
+    try {
+      setSavingState(true);
 
-        if (mode === "create") {
-          // Tworzenie nowego opisu
-          const createData: CreateDescriptionDto = {
-            show_id: showId || "",
-            dog_id: dogId || "",
-            judge_id: "judge-id", // TODO: pobrać z kontekstu użytkownika
-            content_pl: formState.content_pl || undefined,
-            content_en: formState.content_en || undefined,
-          };
+      let response: Response;
 
-          response = await fetch("/api/descriptions", {
+      if (mode === "create") {
+        // Tworzenie nowego opisu
+        const createData: CreateDescriptionDto = {
+          show_id: showId || "",
+          dog_id: dogId || "",
+          judge_id: "550e8400-e29b-41d4-a716-446655440001", // Mock judge ID
+          content_pl: formState.content_pl || undefined,
+          content_en: formState.content_en || undefined,
+        };
+
+        response = await fetch("/api/descriptions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(createData),
+        });
+      } else {
+        // Aktualizacja istniejącego opisu
+        const updateData: UpdateDescriptionDto = {
+          content_pl: formState.content_pl || undefined,
+          content_en: formState.content_en || undefined,
+        };
+
+        response = await fetch(`/api/descriptions/${descriptionId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updateData),
+        });
+      }
+
+      if (!response.ok) {
+        console.log("Response not ok:", response.status, response.statusText);
+        const errorData = await response.json();
+        console.log("Error data:", errorData);
+        const apiError = parseError(response, errorData);
+
+        // Obsługa konkretnych błędów
+        if (isConflictError(apiError)) {
+          // Przekieruj do edycji istniejącego opisu
+          window.location.href = `/descriptions/${errorData.existing_id}/edit`;
+          return;
+        }
+
+        if (isPermissionError(apiError)) {
+          // Blokada edycji - sprawdź uprawnienia ponownie
+          await checkPermissions();
+          setError(getErrorMessage(apiError));
+          return;
+        }
+
+        if (isShowCompletedError(apiError)) {
+          // Wystawa zakończona - zaktualizuj status
+          setPermissions((prev) => ({
+            ...prev,
+            canEdit: false,
+            canFinalize: false,
+          }));
+          setError(getErrorMessage(apiError));
+          return;
+        }
+
+        throw new Error(getErrorMessage(apiError));
+      }
+
+      const savedDescription: DescriptionResponseDto = await response.json();
+      console.log("Saved description response:", savedDescription);
+
+      // Reset saving state and show success animation
+      setSavingState(false);
+      setAnimationState((prev) => ({
+        ...prev,
+        isSaving: false,
+        showSuccess: true,
+      }));
+
+      setTimeout(() => {
+        setAnimationState((prev) => ({ ...prev, showSuccess: false }));
+      }, 3000);
+
+      // Zapisz ocenę jeśli istnieje
+      if (formState.evaluation.grade || formState.evaluation.baby_puppy_grade) {
+        const evaluationData: CreateEvaluationDto = formState.evaluation;
+
+        const evaluationResponse = await fetch(
+          `/api/descriptions/${savedDescription.id}/evaluations`,
+          {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(createData),
-          });
-        } else {
-          // Aktualizacja istniejącego opisu
-          const updateData: UpdateDescriptionDto = {
-            content_pl: formState.content_pl || undefined,
-            content_en: formState.content_en || undefined,
-          };
+            body: JSON.stringify(evaluationData),
+          },
+        );
 
-          response = await fetch(`/api/descriptions/${descriptionId}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(updateData),
-          });
+        if (!evaluationResponse.ok) {
+          const evalErrorData = await evaluationResponse.json();
+          parseError(evaluationResponse, evalErrorData);
+          // Błąd podczas zapisywania oceny - logujemy ale nie przerywamy
         }
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          const apiError = parseError(response, errorData);
-
-          // Obsługa konkretnych błędów
-          if (isConflictError(apiError)) {
-            // Przekieruj do edycji istniejącego opisu
-            window.location.href = `/descriptions/${errorData.existing_id}/edit`;
-            return;
-          }
-
-          if (isPermissionError(apiError)) {
-            // Blokada edycji - sprawdź uprawnienia ponownie
-            await checkPermissions();
-            setError(getErrorMessage(apiError));
-            return;
-          }
-
-          if (isShowCompletedError(apiError)) {
-            // Wystawa zakończona - zaktualizuj status
-            setPermissions((prev) => ({
-              ...prev,
-              canEdit: false,
-              canFinalize: false,
-            }));
-            setError(getErrorMessage(apiError));
-            return;
-          }
-
-          throw new Error(getErrorMessage(apiError));
-        }
-
-        const savedDescription: DescriptionResponseDto = await response.json();
-
-        // Jeśli finalizujemy, wywołaj endpoint finalizacji
-        if (finalize) {
-          const finalizeResponse = await fetch(
-            `/api/descriptions/${savedDescription.id}/finalize`,
-            {
-              method: "PATCH",
-            },
-          );
-
-          if (!finalizeResponse.ok) {
-            const finalizeErrorData = await finalizeResponse.json();
-            const finalizeApiError = parseError(
-              finalizeResponse,
-              finalizeErrorData,
-            );
-            throw new Error(getErrorMessage(finalizeApiError));
-          }
-        }
-
-        // Animacja sukcesu
-        setAnimationState((prev) => ({
-          ...prev,
-          isSaving: false,
-          showSuccess: true,
-        }));
-
-        setTimeout(() => {
-          setAnimationState((prev) => ({ ...prev, showSuccess: false }));
-        }, 3000);
-
-        // Zapisz ocenę jeśli istnieje
-        if (
-          formState.evaluation.grade ||
-          formState.evaluation.baby_puppy_grade
-        ) {
-          const evaluationData: CreateEvaluationDto = formState.evaluation;
-
-          const evaluationResponse = await fetch(
-            `/api/descriptions/${savedDescription.id}/evaluations`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(evaluationData),
-            },
-          );
-
-          if (!evaluationResponse.ok) {
-            const evalErrorData = await evaluationResponse.json();
-            parseError(evaluationResponse, evalErrorData);
-            // Błąd podczas zapisywania oceny - logujemy ale nie przerywamy
-          }
-        }
-
-        updateSaveState(new Date().toISOString());
-
-        // Przekieruj do trybu edycji jeśli był w trybie tworzenia
-        if (mode === "create") {
-          window.location.href = `/descriptions/${savedDescription.id}/edit`;
-        }
-      } catch (error) {
-        setError(error instanceof Error ? error.message : "Nieznany błąd");
-
-        // Animacja błędu
-        setAnimationState((prev) => ({
-          ...prev,
-          isSaving: false,
-          showError: true,
-        }));
-
-        setTimeout(() => {
-          setAnimationState((prev) => ({ ...prev, showError: false }));
-        }, 5000);
       }
-    },
-    [
-      permissions.canEdit,
-      mode,
-      descriptionId,
-      showId,
-      dogId,
-      formState,
-      setSavingState,
-      setError,
-      updateSaveState,
-      checkPermissions,
-      setPermissions,
-      setAnimationState,
-    ],
-  );
 
-  const handleSave = useCallback(
-    () => saveDescription(false),
-    [saveDescription],
-  );
-  const handleFinalize = useCallback(
-    () => saveDescription(true),
-    [saveDescription],
-  );
+      updateSaveState(new Date().toISOString());
+
+      // Reset dirty state przed przekierowaniem
+      setSavingState(false);
+
+      // Małe opóźnienie przed przekierowaniem aby przeglądarka zaktualizowała stan
+      setTimeout(async () => {
+        // Po zapisie przekieruj do widoku wystawy z filtrem na rasę
+        const dogResponse = await fetch(`/api/dogs/${dogId}`);
+        if (dogResponse.ok) {
+          const dog = await dogResponse.json();
+          // Przekieruj do widoku wystawy z filtrem na rasę
+          window.location.href = `/shows/${showId}?breed=${dog.breed.id}`;
+        } else {
+          // Fallback - przekieruj do widoku wystawy bez filtra
+          window.location.href = `/shows/${showId}`;
+        }
+      }, 100);
+    } catch (error) {
+      console.error("Error saving description:", error);
+      setError(error instanceof Error ? error.message : "Nieznany błąd");
+
+      // Animacja błędu
+      setAnimationState((prev) => ({
+        ...prev,
+        isSaving: false,
+        showError: true,
+      }));
+
+      setTimeout(() => {
+        setAnimationState((prev) => ({ ...prev, showError: false }));
+      }, 5000);
+    }
+  }, [
+    permissions.canEdit,
+    mode,
+    descriptionId,
+    showId,
+    dogId,
+    formState,
+    setSavingState,
+    setError,
+    updateSaveState,
+    checkPermissions,
+    setPermissions,
+    setAnimationState,
+  ]);
+
+  const handleSave = useCallback(() => saveDescription(), [saveDescription]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -515,15 +561,11 @@ export function DescriptionEditor({
         }
       }
 
-      // Ctrl/Cmd + Enter - Finalizuj
+      // Ctrl/Cmd + Enter - Zapisz
       if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
         event.preventDefault();
-        if (
-          permissions.canEdit &&
-          permissions.canFinalize &&
-          !saveState.isSaving
-        ) {
-          handleFinalize();
+        if (permissions.canEdit && !saveState.isSaving) {
+          handleSave();
         }
       }
 
@@ -552,11 +594,9 @@ export function DescriptionEditor({
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [
     permissions.canEdit,
-    permissions.canFinalize,
     saveState.isSaving,
     offlineState.hasDraft,
     handleSave,
-    handleFinalize,
     handleConfirmAction,
     saveState.isDirty,
     restoreDraft,
@@ -564,9 +604,11 @@ export function DescriptionEditor({
 
   // Inicjalizacja
   useEffect(() => {
+    // Sprawdź uprawnienia zarówno w trybie edycji jak i tworzenia
+    checkPermissions();
+
     if (descriptionId) {
       // loadVersions(); // This function is not defined in the original file, so it's commented out.
-      checkPermissions();
     }
   }, [descriptionId, checkPermissions]);
 
@@ -662,6 +704,7 @@ export function DescriptionEditor({
             value={formState.evaluation}
             onChange={updateEvaluation}
             dogClass={formState.evaluation.dog_class}
+            language="pl"
             disabled={!permissions.canEdit}
             errors={validationResult.errors}
           />
@@ -708,7 +751,6 @@ export function DescriptionEditor({
         >
           <ActionButtons
             onSave={handleSave}
-            onFinalize={handleFinalize}
             onCancel={() => handleConfirmAction(() => window.history.back())}
             disabled={!permissions.canEdit}
             isDirty={saveState.isDirty}

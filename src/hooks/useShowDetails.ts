@@ -30,11 +30,11 @@ export const useShowDetails = (showId: string) => {
       // Load registrations using mock data for development
       const mockRegistrations: RegistrationResponseDto[] = [
         {
-          id: "550e8400-e29b-41d4-a716-446655440010",
+          id: "reg-1",
           show_id: showId,
           dog: {
-            id: "550e8400-e29b-41d4-a716-446655440011",
-            name: "Bella",
+            id: "dog-1",
+            name: "Azor",
             breed: {
               name_pl: "Owczarek Niemiecki",
               name_en: "German Shepherd",
@@ -52,11 +52,11 @@ export const useShowDetails = (showId: string) => {
           updated_at: "2025-01-15T10:00:00Z",
         },
         {
-          id: "550e8400-e29b-41d4-a716-446655440012",
+          id: "reg-2",
           show_id: showId,
           dog: {
-            id: "550e8400-e29b-41d4-a716-446655440013",
-            name: "Max",
+            id: "dog-2",
+            name: "Luna",
             breed: {
               name_pl: "Owczarek Niemiecki",
               name_en: "German Shepherd",
@@ -74,10 +74,10 @@ export const useShowDetails = (showId: string) => {
           updated_at: "2025-01-16T14:30:00Z",
         },
         {
-          id: "550e8400-e29b-41d4-a716-446655440014",
+          id: "reg-3",
           show_id: showId,
           dog: {
-            id: "550e8400-e29b-41d4-a716-446655440015",
+            id: "dog-3",
             name: "Rex",
             breed: {
               name_pl: "Labrador Retriever",
@@ -144,7 +144,44 @@ export const useShowDetails = (showId: string) => {
       // Simulate API delay
       await new Promise((resolve) => setTimeout(resolve, 300));
 
-      setRegistrations(mockRegistrations);
+      // Fetch descriptions and update registrations with status
+      try {
+        const descriptionsResponse = await fetch(
+          `/api/descriptions?show_id=${showId}`,
+        );
+        if (descriptionsResponse.ok) {
+          const descriptions = await descriptionsResponse.json();
+
+          // Create a map of dog ID to description status
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const descriptionMap = new Map<string, any>();
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          descriptions.forEach((desc: any) => {
+            descriptionMap.set(desc.dog.id, {
+              status: desc.is_final ? "finalized" : "completed",
+              lastModified: desc.updated_at,
+              secretaryName: `${desc.secretary.first_name} ${desc.secretary.last_name}`,
+              version: desc.version,
+              descriptionId: desc.id, // Add description ID for editing
+            });
+          });
+
+          // Update registrations with description status
+          const updatedRegistrations = mockRegistrations.map((reg) => ({
+            ...reg,
+            descriptionStatus: descriptionMap.get(reg.dog.id) || {
+              status: "none",
+            },
+          }));
+
+          setRegistrations(updatedRegistrations);
+        } else {
+          setRegistrations(mockRegistrations);
+        }
+      } catch (error) {
+        console.error("Failed to fetch descriptions:", error);
+        setRegistrations(mockRegistrations);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Nieznany błąd");
     } finally {
@@ -187,9 +224,11 @@ export const useShowDetails = (showId: string) => {
     }
 
     if (filters.breedId) {
-      // For now, we'll filter by breed name since we don't have breed IDs in mock data
-      // In real implementation, this would filter by breed_id
+      // Mapowanie ID ras na nazwy
       const breedNames: Record<string, string> = {
+        "breed-1": "Owczarek Niemiecki",
+        "breed-2": "Labrador Retriever",
+        "breed-3": "Border Collie",
         "550e8400-e29b-41d4-a716-446655440101": "Owczarek Niemiecki",
         "550e8400-e29b-41d4-a716-446655440102": "Labrador Retriever",
         "550e8400-e29b-41d4-a716-446655440103": "Golden Retriever",

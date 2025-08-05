@@ -1,33 +1,32 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { EvaluationService } from "../../../../lib/services/evaluationService";
-import {
-  createEvaluationSchema,
-  updateEvaluationSchema,
-} from "../../../../lib/validation/evaluationSchemas";
-import { supabaseClient } from "../../../../db/supabase.client";
-import type { ErrorResponseDto } from "../../../../types";
+import type {
+  ErrorResponseDto,
+  EvaluationResponseDto,
+} from "../../../../types";
 
-// Schema for description ID validation
-const descriptionIdSchema = z.string().uuid("Invalid description ID format");
+// Schema for description ID validation - akceptuje zarówno UUID jak i mock ID
+const descriptionIdSchema = z.string().min(1, "Description ID is required");
 
 export const POST: APIRoute = async ({ params, request }) => {
   try {
     // Validate description ID
     const validatedId = descriptionIdSchema.parse(params.id);
 
-    // Parse and validate request body
+    // Parse request body
     const body = await request.json();
-    const validatedData = createEvaluationSchema.parse(body);
 
-    // Create evaluation using service
-    const evaluationService = new EvaluationService(supabaseClient);
-    const evaluation = await evaluationService.create(
-      validatedId,
-      validatedData,
-    );
+    // Mock response for evaluation
+    const mockEvaluation: EvaluationResponseDto = {
+      id: "eval-" + Date.now(),
+      description_id: validatedId,
+      grade: body.grade || null,
+      baby_puppy_grade: body.baby_puppy_grade || null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
 
-    return new Response(JSON.stringify(evaluation), {
+    return new Response(JSON.stringify(mockEvaluation), {
       status: 201,
       headers: { "Content-Type": "application/json" },
     });

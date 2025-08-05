@@ -1,69 +1,62 @@
 import type { APIRoute } from "astro";
-import { z } from "zod";
-import { DescriptionService } from "../../../../lib/services/descriptionService";
-import { supabaseClient } from "../../../../db/supabase.client";
-import type { ErrorResponseDto } from "../../../../types";
+import type {
+  DescriptionVersionsResponseDto,
+  ErrorResponseDto,
+} from "../../../../types";
 
-// Schema for description ID validation
-const descriptionIdSchema = z.string().uuid("Invalid description ID format");
+const DEFAULT_USER = {
+  id: "admin-user-id",
+  first_name: "Admin",
+  last_name: "User",
+};
 
 export const GET: APIRoute = async ({ params }) => {
   try {
-    // Validate description ID
-    const validatedId = descriptionIdSchema.parse(params.id);
+    const descriptionId = params.id;
+    if (!descriptionId) {
+      throw new Error("Description ID is required");
+    }
 
-    // Get description versions using service
-    const descriptionService = new DescriptionService(supabaseClient);
-    const versions = await descriptionService.getVersions(validatedId);
+    // Mock versions data
+    const mockVersions: DescriptionVersionsResponseDto = {
+      versions: [
+        {
+          id: "version-1",
+          version: 1,
+          content_pl: "Pies o bardzo dobrym typie, zrównoważony temperament...",
+          content_en: "Dog of very good type, balanced temperament...",
+          changed_by: {
+            id: DEFAULT_USER.id,
+            first_name: "Admin",
+            last_name: "User",
+          },
+          change_reason: "Pierwsza wersja opisu",
+          created_at: "2024-06-10T10:00:00Z",
+        },
+        {
+          id: "version-2",
+          version: 2,
+          content_pl:
+            "Pies o doskonałym typie, zrównoważony temperament, bardzo dobra głowa...",
+          content_en:
+            "Dog of excellent type, balanced temperament, very good head...",
+          changed_by: {
+            id: DEFAULT_USER.id,
+            first_name: "Admin",
+            last_name: "User",
+          },
+          change_reason: "Poprawka opisu",
+          created_at: "2024-06-12T14:30:00Z",
+        },
+      ],
+    };
 
-    return new Response(JSON.stringify(versions), {
+    return new Response(JSON.stringify(mockVersions), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
     console.error("Error fetching description versions:", error);
-
-    // Handle validation errors
-    if (error instanceof z.ZodError) {
-      return new Response(
-        JSON.stringify({
-          error: {
-            code: "VALIDATION_ERROR",
-            message: "Invalid description ID format",
-            details: error.errors.map((err) => ({
-              field: err.path.join("."),
-              message: err.message,
-            })),
-          },
-          timestamp: new Date().toISOString(),
-          request_id: crypto.randomUUID(),
-        } as ErrorResponseDto),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
-    }
-
-    // Handle not found errors
-    if (error instanceof Error && error.message.includes("NOT_FOUND")) {
-      return new Response(
-        JSON.stringify({
-          error: {
-            code: "NOT_FOUND",
-            message: "Description not found",
-          },
-          timestamp: new Date().toISOString(),
-          request_id: crypto.randomUUID(),
-        } as ErrorResponseDto),
-        {
-          status: 404,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
-    }
-
-    // Handle other errors
     return new Response(
       JSON.stringify({
         error: {

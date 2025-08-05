@@ -1,21 +1,120 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { DogService } from "../../../lib/services/dogService";
-import {
-  dogIdSchema,
-  updateDogSchema,
-} from "../../../lib/validation/dogSchemas";
-import { supabaseClient } from "../../../db/supabase.client";
-import type { ErrorResponseDto } from "../../../types";
+import type { ErrorResponseDto, DogResponseDto } from "../../../types";
 
 export const GET: APIRoute = async ({ params }) => {
   try {
-    // Validate dog ID
-    const validatedId = dogIdSchema.parse(params.id);
+    // Validate dog ID - akceptuje zarówno UUID jak i mock ID
+    const dogId = params.id;
+    if (!dogId) {
+      throw new Error("Dog ID is required");
+    }
 
-    // Get dog using service
-    const dogService = new DogService(supabaseClient);
-    const dog = await dogService.getById(validatedId);
+    // Mock response for dog data
+    const mockDogs: Record<string, DogResponseDto> = {
+      "dog-1": {
+        id: "dog-1",
+        name: "Azor",
+        breed: {
+          id: "breed-1",
+          name_pl: "Owczarek Niemiecki",
+          name_en: "German Shepherd",
+          fci_group: "G1",
+        },
+        gender: "male",
+        birth_date: "2020-01-15",
+        microchip_number: "123456789012345",
+        kennel_club_number: null,
+        kennel_name: null,
+        father_name: null,
+        mother_name: null,
+        owners: [
+          {
+            id: "owner-1",
+            first_name: "Jan",
+            last_name: "Kowalski",
+            email: "jan.kowalski@example.com",
+            is_primary: true,
+          },
+        ],
+        created_at: "2024-01-15T10:00:00Z",
+        updated_at: "2024-01-15T10:00:00Z",
+      },
+      "dog-2": {
+        id: "dog-2",
+        name: "Luna",
+        breed: {
+          id: "breed-2",
+          name_pl: "Labrador Retriever",
+          name_en: "Labrador Retriever",
+          fci_group: "G8",
+        },
+        gender: "female",
+        birth_date: "2019-03-20",
+        microchip_number: "987654321098765",
+        kennel_club_number: null,
+        kennel_name: null,
+        father_name: null,
+        mother_name: null,
+        owners: [
+          {
+            id: "owner-2",
+            first_name: "Anna",
+            last_name: "Nowak",
+            email: "anna.nowak@example.com",
+            is_primary: true,
+          },
+        ],
+        created_at: "2024-01-16T11:30:00Z",
+        updated_at: "2024-01-16T11:30:00Z",
+      },
+      "dog-3": {
+        id: "dog-3",
+        name: "Rex",
+        breed: {
+          id: "breed-3",
+          name_pl: "Border Collie",
+          name_en: "Border Collie",
+          fci_group: "G1",
+        },
+        gender: "male",
+        birth_date: "2021-07-10",
+        microchip_number: "555666777888999",
+        kennel_club_number: null,
+        kennel_name: null,
+        father_name: null,
+        mother_name: null,
+        owners: [
+          {
+            id: "owner-3",
+            first_name: "Piotr",
+            last_name: "Wiśniewski",
+            email: "piotr.wisniewski@example.com",
+            is_primary: true,
+          },
+        ],
+        created_at: "2024-01-17T09:15:00Z",
+        updated_at: "2024-01-17T09:15:00Z",
+      },
+    };
+
+    const dog = mockDogs[dogId];
+    if (!dog) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            code: "NOT_FOUND",
+            message: "Dog not found",
+          },
+          timestamp: new Date().toISOString(),
+          request_id: crypto.randomUUID(),
+        } as ErrorResponseDto),
+        {
+          status: 404,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
 
     return new Response(JSON.stringify(dog), {
       status: 200,
