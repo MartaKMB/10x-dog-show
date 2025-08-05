@@ -449,6 +449,43 @@ export interface JudgeResponseDto extends Judge {
 export type VenueResponseDto = Venue;
 
 // =============================================================================
+// BRANCHES DTOs
+// =============================================================================
+
+export interface Branch extends BaseEntity {
+  name: string;
+  address: string | null;
+  city: string | null;
+  postal_code: string | null;
+  region: string;
+  is_active: boolean;
+}
+
+export interface BranchResponseDto {
+  id: string;
+  name: string;
+  address: string | null;
+  city: string | null;
+  postal_code: string | null;
+  region: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BranchesListResponseDto {
+  branches: BranchResponseDto[];
+  pagination: PaginationDto;
+}
+
+export interface BranchQueryParams {
+  region?: string;
+  is_active?: boolean;
+  page?: number;
+  limit?: number;
+}
+
+// =============================================================================
 // PDF & EMAIL DTOs
 // =============================================================================
 
