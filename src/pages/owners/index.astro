@@ -1,0 +1,13 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import OwnersListView from "../../components/owners/OwnersListView.tsx";
+
+// TODO: Get user role from authentication
+const userRole = "department_representative";
+---
+
+<Layout title="Zarządzanie właścicielami">
+  <div class="container mx-auto px-4 py-8">
+    <OwnersListView client:load userRole={userRole} />
+  </div>
+</Layout> 
