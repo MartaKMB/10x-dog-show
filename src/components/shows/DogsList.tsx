@@ -101,17 +101,19 @@ const DogsList: React.FC<DogsListProps> = ({
           </p>
         </div>
 
-        {canAddDogs && userRole === "department_representative" && (
-          <button
-            onClick={onAddDog}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-            disabled={
-              showStatus === "in_progress" || showStatus === "completed"
-            }
-          >
-            + Dodaj psa
-          </button>
-        )}
+        {canAddDogs &&
+          (userRole === "department_representative" ||
+            userRole === "admin") && (
+            <button
+              onClick={onAddDog}
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              disabled={
+                showStatus === "in_progress" || showStatus === "completed"
+              }
+            >
+              + Dodaj psa
+            </button>
+          )}
       </div>
 
       {/* Sort Controls */}
@@ -211,7 +213,10 @@ const DogsList: React.FC<DogsListProps> = ({
                           }
                         }}
                         userRole={
-                          userRole as "department_representative" | "secretary"
+                          userRole as
+                            | "department_representative"
+                            | "secretary"
+                            | "admin"
                         }
                         showStatus={showStatus}
                       />

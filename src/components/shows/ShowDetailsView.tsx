@@ -38,7 +38,7 @@ interface ShowDetailsViewModel {
 
 const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
   showId,
-  userRole = "department_representative",
+  userRole = "admin",
 }) => {
   const [viewModel, setViewModel] = useState<ShowDetailsViewModel>({
     show: null,
@@ -170,6 +170,10 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
 
   const canUserEditShow = useCallback(
     (show: ShowDetailResponseDto): boolean => {
+      // Administratorzy mogą edytować wszystko
+      if (userRole === "admin") {
+        return true;
+      }
       // Sekretarze nie mogą edytować wystaw - tylko przedstawiciele oddziałów
       if (userRole === "secretary") {
         return false;
@@ -181,6 +185,10 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
 
   const canUserDeleteShow = useCallback(
     (show: ShowDetailResponseDto): boolean => {
+      // Administratorzy mogą usuwać wszystko
+      if (userRole === "admin") {
+        return true;
+      }
       // Sekretarze nie mogą usuwać wystaw - tylko przedstawiciele oddziałów
       if (userRole === "secretary") {
         return false;

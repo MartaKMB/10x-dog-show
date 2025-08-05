@@ -1,11 +1,12 @@
 ---
 import Layout from "../../../layouts/Layout.astro";
 import ShowDetailsView from "../../../components/shows/ShowDetailsView.tsx";
+import type { UserRole } from "../../../types";
 
 const { showId } = Astro.params;
 
 // TODO: Get user role from authentication
-const userRole = "department_representative";
+const userRole: UserRole = "admin";
 
 if (!showId) {
   return Astro.redirect("/shows");
@@ -22,7 +23,11 @@ if (!showId) {
           <p class="text-gray-600">Zarządzanie wystawą i rejestracjami psów</p>
         </div>
         <div class="flex items-center gap-2 text-sm text-gray-500">
-          <span>Rola: {userRole === "department_representative" ? "Przedstawiciel związku" : "Sekretarz"}</span>
+          <span>Rola: {
+            userRole === "department_representative" ? "Przedstawiciel związku" : 
+            userRole === "admin" ? "Administrator" : 
+            "Sekretarz"
+          }</span>
         </div>
       </div>
     </div>

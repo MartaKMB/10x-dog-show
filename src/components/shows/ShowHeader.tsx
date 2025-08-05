@@ -141,7 +141,7 @@ const ShowHeader: React.FC<ShowHeaderProps> = ({
         </div>
 
         {/* Actions */}
-        {userRole === "department_representative" && (
+        {(userRole === "department_representative" || userRole === "admin") && (
           <div className="flex flex-col gap-2">
             {/* Temporarily disabled - edit show functionality
             {canEdit && (

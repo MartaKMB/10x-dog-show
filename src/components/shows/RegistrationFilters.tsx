@@ -120,7 +120,7 @@ const RegistrationFilters: React.FC<RegistrationFiltersProps> = ({
       </div>
 
       <div
-        className={`grid gap-4 ${userRole === "department_representative" ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5"}`}
+        className={`grid gap-4 ${userRole === "department_representative" || userRole === "admin" ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5"}`}
       >
         {/* Search */}
         <div>
@@ -237,8 +237,8 @@ const RegistrationFilters: React.FC<RegistrationFiltersProps> = ({
           </select>
         </div>
 
-        {/* Payment Status - Only for department representatives */}
-        {userRole === "department_representative" && (
+        {/* Payment Status - Only for department representatives and admins */}
+        {(userRole === "department_representative" || userRole === "admin") && (
           <div>
             <label
               htmlFor="paymentStatus"
@@ -344,7 +344,8 @@ const RegistrationFilters: React.FC<RegistrationFiltersProps> = ({
             )}
 
             {localFilters.isPaid !== undefined &&
-              userRole === "department_representative" && (
+              (userRole === "department_representative" ||
+                userRole === "admin") && (
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-yellow-100 text-yellow-800">
                   Płatność: {localFilters.isPaid ? "Opłacone" : "Nieopłacone"}
                   <button

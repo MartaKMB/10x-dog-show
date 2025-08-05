@@ -2,10 +2,10 @@
 import Layout from "../../layouts/Layout.astro";
 
 // TODO: Get user role from authentication
-const userRole = "department_representative";
+const userRole = "admin";
 
-// Redirect secretaries to shows list
-if (userRole !== "department_representative") {
+// Redirect non-authorized users to shows list
+if (userRole !== "department_representative" && userRole !== "admin") {
   return Astro.redirect("/shows");
 }
 

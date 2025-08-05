@@ -23,9 +23,10 @@ const useDogsList = (
     error: null,
     canEdit:
       userRole === "department_representative" ||
+      userRole === "admin" ||
       (userRole === "secretary" && showStatus !== "in_progress"),
     canDelete:
-      userRole === "department_representative" && showStatus !== "in_progress",
+      (userRole === "department_representative" || userRole === "admin") && showStatus !== "in_progress",
     userRole,
   });
 

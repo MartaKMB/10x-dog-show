@@ -8,8 +8,8 @@ interface NextShowCardProps {
 const NextShowCard: React.FC<NextShowCardProps> = ({ userRole }) => {
   const { nextShow, isLoading, error } = useNextShow(userRole);
 
-  // Explicitly check if user is a secretary - if not, don't render anything
-  if (userRole !== "secretary") {
+  // Explicitly check if user is a secretary or admin - if not, don't render anything
+  if (userRole !== "secretary" && userRole !== "admin") {
     return null;
   }
 

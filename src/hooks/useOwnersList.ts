@@ -33,9 +33,9 @@ const useOwnersList = (userRole: UserRole) => {
     search: "",
     isLoading: false,
     error: null,
-    canCreate: userRole === "department_representative",
-    canEdit: userRole === "department_representative",
-    canDelete: userRole === "department_representative",
+    canCreate: userRole === "department_representative" || userRole === "admin",
+    canEdit: userRole === "department_representative" || userRole === "admin",
+    canDelete: userRole === "department_representative" || userRole === "admin",
     userRole,
     sortConfig: { field: "created_at", direction: "desc" },
   });

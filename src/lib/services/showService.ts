@@ -51,6 +51,14 @@ const MOCK_DATA = {
       },
       role: "department_representative",
     },
+    {
+      id: "00000000-0000-0000-0000-000000000003",
+      raw_user_meta_data: {
+        first_name: "Admin",
+        last_name: "User",
+      },
+      role: "admin",
+    },
   ],
   shows: [
     {
@@ -334,9 +342,9 @@ export class ShowService {
       throw new Error("NOT_FOUND: Organizer not found");
     }
 
-    if (organizer.role !== "department_representative") {
+    if (organizer.role !== "department_representative" && organizer.role !== "admin") {
       throw new Error(
-        "AUTHORIZATION_ERROR: Only department representatives can create shows",
+        "AUTHORIZATION_ERROR: Only department representatives and administrators can create shows",
       );
     }
 

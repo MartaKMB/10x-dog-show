@@ -263,7 +263,8 @@ const MembersList: React.FC<MembersListProps> = ({
                 >
                   {owner.gdpr_consent ? "RODO ✓" : "RODO ✗"}
                 </span>
-                {userRole === "department_representative" && (
+                {(userRole === "department_representative" ||
+                  userRole === "admin") && (
                   <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
                     Edytuj
                   </button>
@@ -278,7 +279,8 @@ const MembersList: React.FC<MembersListProps> = ({
                 <h4 className="text-sm font-medium text-gray-700">
                   Psy ({owner.dogs.length})
                 </h4>
-                {userRole === "department_representative" && (
+                {(userRole === "department_representative" ||
+                  userRole === "admin") && (
                   <button className="text-blue-600 hover:text-blue-800 text-sm">
                     + Dodaj psa
                   </button>
@@ -324,7 +326,8 @@ const MembersList: React.FC<MembersListProps> = ({
                           {new Date(dog.birth_date).toLocaleDateString("pl-PL")}
                         </div>
                       </div>
-                      {userRole === "department_representative" && (
+                      {(userRole === "department_representative" ||
+                        userRole === "admin") && (
                         <div className="mt-2 pt-2 border-t border-gray-100 flex gap-1">
                           <button className="text-blue-600 hover:text-blue-800 text-xs">
                             Edytuj

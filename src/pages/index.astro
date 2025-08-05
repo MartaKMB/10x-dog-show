@@ -3,7 +3,7 @@ import Layout from "../layouts/Layout.astro";
 import NextShowCard from "../components/shows/NextShowCard.tsx";
 
 // TODO: Get user role from authentication
-const userRole = "department_representative";
+const userRole = "admin";
 ---
 
 <Layout title="Dashboard - 10x Dog Show">
@@ -23,7 +23,7 @@ const userRole = "department_representative";
           <div class="font-medium">Wystawy</div>
           <div class="text-sm opacity-90">Zarządzaj wystawami</div>
         </a>
-        {userRole === "department_representative" && (
+        {(userRole === "department_representative" || userRole === "admin") && (
           <a href="/members" class="bg-green-600 hover:bg-green-700 text-white p-4 rounded-lg text-center transition-colors">
             <div class="text-2xl mb-2">👥</div>
             <div class="font-medium">Członkowie</div>
@@ -39,7 +39,7 @@ const userRole = "department_representative";
     </div>
 
     <!-- Role-specific actions -->
-    {userRole === "department_representative" && (
+    {(userRole === "department_representative" || userRole === "admin") && (
       <div class="bg-white shadow rounded-lg p-6">
         <h2 class="text-lg font-semibold text-gray-900 mb-4">Akcje organizatora</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -57,16 +57,16 @@ const userRole = "department_representative";
       </div>
     )}
 
-    {/* Sekcja "Najbliższe wystawy" - widoczna TYLKO dla sekretarzy */}
-    {userRole === "secretary" ? (
+    {/* Sekcja "Najbliższe wystawy" - widoczna dla sekretarzy i administratorów */}
+    {(userRole === "secretary" || userRole === "admin") ? (
       <div class="bg-white shadow rounded-lg p-6">
         <!-- Najbliższe wystawy - tylko dla sekretarzy -->
         <NextShowCard client:load userRole={userRole} />
       </div>
     ) : null}
 
-    {/* Sekcja dla przedstawicieli - statystyki zamiast najbliższych wystaw */}
-    {userRole === "department_representative" && (
+    {/* Sekcja dla przedstawicieli i administratorów - statystyki zamiast najbliższych wystaw */}
+    {(userRole === "department_representative" || userRole === "admin") && (
       <div class="bg-white shadow rounded-lg p-6">
         <h2 class="text-lg font-semibold text-gray-900 mb-4">Statystyki</h2>
         <div class="text-center py-8">
@@ -95,7 +95,11 @@ const userRole = "department_representative";
         </div>
         <div class="text-center p-3 bg-gray-50 rounded-lg">
           <div class="font-medium text-gray-900">Rola użytkownika</div>
-          <div class="text-gray-600">{userRole === "department_representative" ? "Przedstawiciel związku" : "Sekretarz"}</div>
+          <div class="text-gray-600">{
+            userRole === "department_representative" ? "Przedstawiciel związku" : 
+            userRole === "admin" ? "Administrator" : 
+            "Sekretarz"
+          }</div>
         </div>
       </div>
     </div>

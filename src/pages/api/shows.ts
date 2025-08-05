@@ -8,10 +8,10 @@ import {
 import { supabaseClient } from "../../db/supabase.client";
 import type { ErrorResponseDto } from "../../types";
 
-// Mock DEFAULT_USER dla testów (department_representative)
+// Mock DEFAULT_USER dla testów (admin)
 const DEFAULT_USER = {
-  id: "00000000-0000-0000-0000-000000000002",
-  role: "department_representative" as const,
+  id: "00000000-0000-0000-0000-000000000003",
+  role: "admin" as const,
 };
 
 export const POST: APIRoute = async ({ request }) => {

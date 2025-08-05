@@ -163,7 +163,7 @@ const DogCard: React.FC<DogCardProps> = ({ dog, onAction, userRole }) => {
                   icon: "✏️",
                   action: "edit",
                   disabled: !dog.canEdit,
-                  requiresPermission: ["department_representative"],
+                  requiresPermission: ["department_representative", "admin"],
                 },
                 {
                   id: "delete",
@@ -171,7 +171,7 @@ const DogCard: React.FC<DogCardProps> = ({ dog, onAction, userRole }) => {
                   icon: "🗑️",
                   action: "delete",
                   disabled: !dog.canDelete,
-                  requiresPermission: ["department_representative"],
+                  requiresPermission: ["department_representative", "admin"],
                 },
                 {
                   id: "create_description",
@@ -182,6 +182,7 @@ const DogCard: React.FC<DogCardProps> = ({ dog, onAction, userRole }) => {
                   requiresPermission: [
                     "secretary",
                     "department_representative",
+                    "admin",
                   ],
                 },
               ]}

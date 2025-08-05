@@ -8,7 +8,7 @@ interface Props {
 const { title = "10x Dog Show" } = Astro.props;
 
 // TODO: Get user role from authentication
-const userRole = "department_representative";
+const userRole = "admin";
 ---
 
 <!doctype html>
@@ -50,7 +50,7 @@ const userRole = "department_representative";
               <a href="/judges" class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
                 Sędziowie
               </a>
-              {userRole === "department_representative" && (
+              {(userRole === "department_representative" || userRole === "admin") && (
                 <a href="/members" class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
                   Członkowie
                 </a>
@@ -60,7 +60,11 @@ const userRole = "department_representative";
             <!-- User menu -->
             <div class="flex items-center space-x-4">
               <div class="text-sm text-gray-500">
-                Demo User ({userRole === "department_representative" ? "Department Representative" : "Secretary"})
+                Demo User ({
+                  userRole === "department_representative" ? "Department Representative" : 
+                  userRole === "admin" ? "Administrator" : 
+                  "Secretary"
+                })
               </div>
             </div>
           </div>

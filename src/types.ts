@@ -2,7 +2,7 @@
 // ENUMS - Based on Database Schema
 // =============================================================================
 
-export type UserRole = "department_representative" | "secretary";
+export type UserRole = "department_representative" | "secretary" | "admin";
 export type ShowType = "national" | "international";
 export type ShowStatus =
   | "draft"

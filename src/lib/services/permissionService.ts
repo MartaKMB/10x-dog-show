@@ -14,12 +14,12 @@ export async function checkDescriptionPermissions(
 ): Promise<PermissionCheck> {
   try {
     // Sprawdź uprawnienia użytkownika
-    if (userRole !== "secretary") {
+    if (userRole !== "secretary" && userRole !== "admin") {
       return {
         canEdit: false,
         canFinalize: false,
         showStatus: "completed",
-        reason: "Tylko sekretarze mogą edytować opisy",
+        reason: "Tylko sekretarze i administratorzy mogą edytować opisy",
       };
     }
 
