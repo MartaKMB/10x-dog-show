@@ -18,7 +18,7 @@ const regionSchema = z
   .refine(
     (val) => {
       if (!val) return true;
-      // Allow only alphanumeric characters, spaces, and common punctuation
+      // Allow alphanumeric characters, spaces, Polish characters, and common punctuation
       return /^[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ0-9\s\-.]+$/.test(val);
     },
     {
