@@ -1,8 +1,34 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import ShowsListView from "../../components/shows/ShowsListView.tsx";
+
+// TODO: Get user role from authentication
+const userRole = "department_representative";
 ---
 
-<Layout title="Zarządzanie wystawami">
-  <ShowsListView client:load />
+<Layout title="Wystawy - 10x Dog Show">
+  <div class="space-y-6">
+    <!-- Header -->
+    <div class="bg-white shadow rounded-lg p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900 mb-2">Wystawy psów rasowych</h1>
+          <p class="text-gray-600">Zarządzanie wystawami i rejestracjami</p>
+        </div>
+        {userRole === "department_representative" && (
+          <a
+            href="/shows/new"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+          >
+            + Nowa wystawa
+          </a>
+        )}
+      </div>
+    </div>
+
+    <!-- Shows List -->
+    <div class="bg-white shadow rounded-lg">
+      <ShowsListView userRole={userRole} client:load />
+    </div>
+  </div>
 </Layout>

@@ -1,5 +1,14 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+
+// TODO: Get user role from authentication
+const userRole = "department_representative";
+
+// Redirect secretaries to shows list
+if (userRole !== "department_representative") {
+  return Astro.redirect("/shows");
+}
+
 import ShowCreator from "../../components/shows/ShowCreator.tsx";
 ---
 

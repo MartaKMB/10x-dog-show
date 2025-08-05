@@ -6,7 +6,9 @@ import ErrorDisplay from "./ErrorDisplay";
 import EmptyState from "./EmptyState";
 import { useShowsList } from "../../hooks/useShowsList.ts";
 
-type ShowsListViewProps = object;
+type ShowsListViewProps = {
+  userRole?: string;
+};
 
 interface ShowsListViewModel {
   shows: ShowResponseDto[];
@@ -33,7 +35,7 @@ interface PaginationState {
   pages: number;
 }
 
-const ShowsListView: React.FC<ShowsListViewProps> = () => {
+const ShowsListView: React.FC<ShowsListViewProps> = ({ userRole }) => {
   const [viewModel, setViewModel] = useState<ShowsListViewModel>({
     shows: [],
     isLoading: true,
@@ -45,7 +47,7 @@ const ShowsListView: React.FC<ShowsListViewProps> = () => {
       total: 0,
       pages: 0,
     },
-    canCreateShow: false,
+    canCreateShow: userRole === "department_representative",
   });
 
   const { shows, pagination, isLoading, error, loadShows } = useShowsList();

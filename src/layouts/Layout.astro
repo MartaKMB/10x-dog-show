@@ -6,6 +6,9 @@ interface Props {
 }
 
 const { title = "10x Dog Show" } = Astro.props;
+
+// TODO: Get user role from authentication
+const userRole = "department_representative";
 ---
 
 <!doctype html>
@@ -41,15 +44,23 @@ const { title = "10x Dog Show" } = Astro.props;
               <a href="/shows" class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
                 Wystawy
               </a>
-              <a href="/shows/new" class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
-                Nowa wystawa
+              <a href="/dictionaries" class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+                Słowniki
               </a>
+              <a href="/judges" class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+                Sędziowie
+              </a>
+              {userRole === "department_representative" && (
+                <a href="/members" class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+                  Członkowie
+                </a>
+              )}
             </nav>
 
             <!-- User menu -->
             <div class="flex items-center space-x-4">
               <div class="text-sm text-gray-500">
-                Demo User (Department Representative)
+                Demo User ({userRole === "department_representative" ? "Department Representative" : "Secretary"})
               </div>
             </div>
           </div>

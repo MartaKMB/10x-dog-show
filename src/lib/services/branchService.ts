@@ -1,9 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type {
-  BranchResponseDto,
-  BranchesListResponseDto,
-  PaginationDto,
-} from "../../types";
+import type { BranchResponseDto, PaginatedResponseDto } from "../../types";
 import type { BranchQueryInput } from "../validation/branchSchemas";
 
 export class BranchService {
@@ -14,7 +10,7 @@ export class BranchService {
    */
   async getMany(
     query: BranchQueryInput,
-  ): Promise<BranchesListResponseDto> {
+  ): Promise<PaginatedResponseDto<BranchResponseDto>> {
     const { region, is_active, page, limit } = query;
 
     // Build query using Supabase
@@ -49,7 +45,7 @@ export class BranchService {
     }
 
     return {
-      branches: (data as BranchResponseDto[]) || [],
+      data: (data as BranchResponseDto[]) || [],
       pagination: {
         page,
         limit,
@@ -96,4 +92,4 @@ export class BranchService {
 
     return (data as BranchResponseDto[]) || [];
   }
-} 
+}

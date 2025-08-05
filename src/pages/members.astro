@@ -1,0 +1,27 @@
+---
+import Layout from "../layouts/Layout.astro";
+import MembersList from "../components/members/MembersList.tsx";
+
+// TODO: Get user role from authentication
+const userRole = "department_representative";
+
+// Redirect secretaries away from this page
+if (userRole !== "department_representative") {
+  return Astro.redirect("/");
+}
+---
+
+<Layout title="Członkowie - 10x Dog Show">
+  <div class="space-y-6">
+    <!-- Header -->
+    <div class="bg-white shadow rounded-lg p-6">
+      <h1 class="text-2xl font-bold text-gray-900 mb-2">Członkowie ZKwP</h1>
+      <p class="text-gray-600">Zarządzanie właścicielami psów i ich pupilami</p>
+    </div>
+
+    <!-- Members List -->
+    <div class="bg-white shadow rounded-lg">
+      <MembersList client:load userRole={userRole} />
+    </div>
+  </div>
+</Layout> 
