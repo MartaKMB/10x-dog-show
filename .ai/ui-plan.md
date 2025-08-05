@@ -120,15 +120,15 @@ System 10x Dog Show wykorzystuje **unified interface approach** z jednym wspóln
 
 - **Ścieżka**: `/shows/new`
 - **Cel**: Multi-step wizard tworzenia nowej wystawy
-- **API**: `POST /shows`, `GET /venues`, `GET /judges`
+- **API**: `POST /shows`, `GET /branches`, `GET /judges`
 - **User Stories**: US-004
 - **Kluczowe informacje**:
   - Step 1: Podstawowe dane (nazwa, typ, data)
-  - Step 2: Lokalizacja i venue
+  - Step 2: Lokalizacja i oddział organizujący
   - Step 3: Sędziowie i kategorie
   - Step 4: Ustawienia rejestracji
   - Step 5: Podsumowanie i publikacja
-- **Komponenty**: `FormWizard`, `StepIndicator`, `VenueSelector`, `JudgeAssignment`
+- **Komponenty**: `FormWizard`, `StepIndicator`, `BranchSelector`, `JudgeAssignment`
 - **UX/Dostępność**: Progress indication, save draft functionality
 - **Bezpieczeństwo**: Draft auto-save, confirmation before publication
 
@@ -291,7 +291,7 @@ Description Review → PDF Generation → Data Export
 **Szczegółowe kroki:**
 
 1. **Planowanie wystawy**: Dashboard → Shows List → Show Creator
-2. **Konfiguracja**: Venue selection → Judge assignment → Registration settings
+2. **Konfiguracja**: Branch selection → Judge assignment → Registration settings
 3. **Zarządzanie rejestracjami**: Dog Registration → Owner management → GDPR consent
 4. **Przypisanie sekretarzy**: User Management → Breed assignments → Permission setup
 5. **Monitoring postępów**: Show Details → Dogs List → Description status overview

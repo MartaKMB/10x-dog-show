@@ -148,7 +148,7 @@ CreateShowDto {
   show_type: ShowType;
   show_date: string;
   registration_deadline: string;
-  venue_id: string;
+  branch_id: string;
   max_participants?: number;
   entry_fee?: number;
   description?: string;
@@ -159,7 +159,7 @@ UpdateShowDto {
   name?: string;
   show_date?: string;
   registration_deadline?: string;
-  venue_id?: string;
+  branch_id?: string;
   max_participants?: number;
   entry_fee?: number;
   description?: string;
@@ -177,7 +177,7 @@ ShowResponseDto {
   status: ShowStatus;
   show_date: string;
   registration_deadline: string;
-  venue: VenueSummaryDto;
+  branch: BranchSummaryDto;
   organizer: UserSummaryDto;
   max_participants?: number;
   registered_dogs: number;
@@ -189,7 +189,7 @@ ShowResponseDto {
 }
 
 ShowDetailResponseDto extends ShowResponseDto {
-  venue: VenueDetailDto;
+  branch: BranchDetailDto;
   organizer: UserDetailDto;
   stats: ShowStatsDto;
 }
@@ -288,16 +288,16 @@ FCIGroup: 'G1' | 'G2' | 'G3' | 'G4' | 'G5' | 'G6' | 'G7' | 'G8' | 'G9' | 'G10';
 Language: 'pl' | 'en';
 
 // Summary DTOs
-VenueSummaryDto {
+BranchSummaryDto {
   id: string;
   name: string;
-  city: string;
+  region: string;
 }
 
-VenueDetailDto extends VenueSummaryDto {
+BranchDetailDto extends BranchSummaryDto {
   address: string;
+  city: string;
   postal_code: string;
-  country: string;
 }
 
 UserSummaryDto {
@@ -377,10 +377,10 @@ BreedSummaryDto {
       "status": "open_for_registration",
       "show_date": "2024-03-15",
       "registration_deadline": "2024-03-01",
-      "venue": {
+      "branch": {
         "id": "uuid",
-        "name": "Warsaw Expo Center",
-        "city": "Warsaw"
+        "name": "Oddział Warszawa",
+        "region": "Mazowieckie"
       },
       "organizer": {
         "id": "uuid",
@@ -615,7 +615,7 @@ BreedSummaryDto {
 ### 8.1 Optymalizacja zapytań
 
 - **Indexing:** Indeksy na (organizer_id, status), (show_date), (registration_deadline)
-- **JOIN Optimization:** Efektywne JOINy z tabelami venues, users, dogs, owners
+- **JOIN Optimization:** Efektywne JOINy z tabelami branches, users, dogs, owners
 - **Pagination:** Cursor-based pagination dla dużych zbiorów
 - **Query Caching:** Cache dla często używanych danych
 

@@ -14,8 +14,8 @@ The API is organized around the following main resources, each corresponding to 
 | **Evaluations**   | `dog_shows.evaluations`        | Grades, titles, and placements for dogs                        |
 | **Registrations** | `dog_shows.show_registrations` | Dog registrations for specific shows                           |
 | **Breeds**        | `dictionary.breeds`            | FCI breed classifications and groups                           |
-| **Judges**        | `dictionary.judges`            | Certified judges with specializations                          |
-| **Venues**        | `dictionary.venues`            | Show locations and facilities                                  |
+| **Judges**        | `dictionary.judges`            | Certified judges with specializations (CRUD)                  |
+| **Branches**      | `dictionary.branches`          | Show organizing branches (dictionary)                          |
 
 ## 2. Endpoints
 
@@ -230,7 +230,7 @@ List dog shows
         "status": "open_for_registration",
         "show_date": "2024-03-15",
         "registration_deadline": "2024-03-01",
-        "venue": {
+        "branch": {
           "id": "uuid",
           "name": "Warsaw Expo Center",
           "city": "Warsaw"
@@ -303,7 +303,7 @@ Create new show (department_representative only)
     "show_type": "national",
     "show_date": "2024-03-15",
     "registration_deadline": "2024-03-01",
-    "venue_id": "uuid",
+    "branch_id": "uuid",
     "max_participants": 200,
     "entry_fee": 50.0,
     "description": "Annual national dog show featuring all FCI groups",
@@ -319,7 +319,7 @@ Create new show (department_representative only)
     "status": "draft",
     "show_date": "2024-03-15",
     "registration_deadline": "2024-03-01",
-    "venue_id": "uuid",
+    "branch_id": "uuid",
     "organizer_id": "uuid",
     "max_participants": 200,
     "entry_fee": 50.0,
@@ -1222,35 +1222,34 @@ List judges
   }
   ```
 
-#### GET /venues
+#### GET /branches
 
-List venues
+List show organizing branches
 
 - **Query Parameters:**
-  - `city` (optional): Filter by city
-  - `country` (optional): Filter by country
+  - `region` (optional): Filter by region
   - `is_active` (optional): Filter by active status
   - `page` (optional): Page number (default: 1)
   - `limit` (optional): Items per page (default: 20, max: 100)
 - **Response (200 OK):**
   ```json
   {
-    "venues": [
+    "branches": [
       {
         "id": "uuid",
-        "name": "Warsaw Expo Center",
-        "address": "ul. Marywilska 44",
-        "city": "Warsaw",
-        "postal_code": "03-042",
-        "country": "Poland",
+        "name": "Oddział Warszawa",
+        "region": "Mazowieckie",
+        "address": "ul. Marszałkowska 1",
+        "city": "Warszawa",
+        "postal_code": "00-001",
         "is_active": true
       }
     ],
     "pagination": {
       "page": 1,
       "limit": 20,
-      "total": 25,
-      "pages": 2
+      "total": 15,
+      "pages": 1
     }
   }
   ```

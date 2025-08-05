@@ -2,8 +2,8 @@
 
 ## Mock Data IDs do testowania:
 
-- **Venue ID**: `550e8400-e29b-41d4-a716-446655440201` (Warsaw Expo Center, active)
-- **Venue ID**: `550e8400-e29b-41d4-a716-446655440202` (Krakow Congress Center, active)
+- **Branch ID**: `550e8400-e29b-41d4-a716-446655440201` (Oddział Warszawa, active)
+- **Branch ID**: `550e8400-e29b-41d4-a716-446655440202` (Oddział Kraków, active)
 - **Organizer ID**: `00000000-0000-0000-0000-000000000002` (John Organizer, department_representative)
 
 ## 1. Pomyślne utworzenie wystawy ✅
@@ -16,7 +16,7 @@ curl -X POST http://localhost:3000/api/shows \
     "show_type": "national",
     "show_date": "2024-06-15T10:00:00.000Z",
     "registration_deadline": "2024-06-01T23:59:59.000Z",
-    "venue_id": "550e8400-e29b-41d4-a716-446655440201",
+    "branch_id": "550e8400-e29b-41d4-a716-446655440201",
     "language": "pl",
     "max_participants": 200,
     "entry_fee": 50.00,
@@ -34,10 +34,10 @@ curl -X POST http://localhost:3000/api/shows \
   "status": "draft",
   "show_date": "2024-06-15T10:00:00.000Z",
   "registration_deadline": "2024-06-01T23:59:59.000Z",
-  "venue": {
+  "branch": {
     "id": "550e8400-e29b-41d4-a716-446655440201",
-    "name": "Warsaw Expo Center",
-    "city": "Warsaw"
+    "name": "Oddział Warszawa",
+    "region": "Mazowieckie"
   },
   "organizer": {
     "id": "00000000-0000-0000-0000-000000000002",
@@ -64,7 +64,7 @@ curl -X POST http://localhost:3000/api/shows \
     "show_type": "national",
     "show_date": "2024-06-15T10:00:00.000Z",
     "registration_deadline": "2024-06-01T23:59:59.000Z",
-    "venue_id": "invalid-uuid",
+    "branch_id": "invalid-uuid",
     "language": "pl"
   }'
 ```
@@ -78,7 +78,7 @@ curl -X POST http://localhost:3000/api/shows \
     "message": "The provided data is invalid",
     "details": [
       {
-        "field": "venue_id",
+        "field": "branch_id",
         "message": "Invalid UUID format"
       }
     ]
@@ -98,7 +98,7 @@ curl -X POST http://localhost:3000/api/shows \
     "show_type": "national",
     "show_date": "2024-06-15T10:00:00.000Z",
     "registration_deadline": "2024-06-20T23:59:59.000Z",
-    "venue_id": "550e8400-e29b-41d4-a716-446655440201",
+    "branch_id": "550e8400-e29b-41d4-a716-446655440201",
     "language": "pl"
   }'
 ```
@@ -132,7 +132,7 @@ curl -X POST http://localhost:3000/api/shows \
     "show_type": "national",
     "show_date": "2023-06-15T10:00:00.000Z",
     "registration_deadline": "2023-06-01T23:59:59.000Z",
-    "venue_id": "550e8400-e29b-41d4-a716-446655440201",
+    "branch_id": "550e8400-e29b-41d4-a716-446655440201",
     "language": "pl"
   }'
 ```
@@ -160,7 +160,7 @@ curl -X POST http://localhost:3000/api/shows \
     "show_type": "national",
     "show_date": "2024-06-15T10:00:00.000Z",
     "registration_deadline": "2024-06-01T23:59:59.000Z",
-    "venue_id": "999e8400-e29b-41d4-a716-446655440999",
+    "branch_id": "999e8400-e29b-41d4-a716-446655440999",
     "language": "pl"
   }'
 ```
@@ -171,7 +171,7 @@ curl -X POST http://localhost:3000/api/shows \
 {
   "error": {
     "code": "NOT_FOUND",
-    "message": "Venue not found"
+    "message": "Branch not found"
   },
   "timestamp": "2024-01-15T11:30:00Z",
   "request_id": "uuid"
@@ -188,7 +188,7 @@ curl -X POST http://localhost:3000/api/shows \
     "show_type": "international",
     "show_date": "2024-08-15T10:00:00.000Z",
     "registration_deadline": "2024-08-01T23:59:59.000Z",
-    "venue_id": "550e8400-e29b-41d4-a716-446655440202",
+    "branch_id": "550e8400-e29b-41d4-a716-446655440202",
     "language": "en"
   }'
 ```
@@ -218,10 +218,10 @@ curl -X GET "http://localhost:3000/api/shows?from_date=2024-01-01T00:00:00.000Z&
       "status": "draft",
       "show_date": "2024-06-15T10:00:00.000Z",
       "registration_deadline": "2024-06-01T23:59:59.000Z",
-      "venue": {
+      "branch": {
         "id": "550e8400-e29b-41d4-a716-446655440201",
-        "name": "Warsaw Expo Center",
-        "city": "Warsaw"
+        "name": "Oddział Warszawa",
+        "region": "Mazowieckie"
       },
       "organizer": {
         "id": "00000000-0000-0000-0000-000000000002",

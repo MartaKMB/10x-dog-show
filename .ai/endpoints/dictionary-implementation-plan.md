@@ -18,10 +18,10 @@ System słowników referencyjnych dla aplikacji 10x Dog Show, obejmujący zarzą
 - Filtrowanie po specjalizacjach i statusie aktywności
 - Dane referencyjne dla przypisań do wystaw
 
-### Venues Management
+### Branches Management
 
-- Lista obiektów wystawowych
-- Filtrowanie po lokalizacji i statusie aktywności
+- Lista oddziałów organizujących wystawy
+- Filtrowanie po regionie i statusie aktywności
 - Dane referencyjne dla tworzenia wystaw
 
 ## 2. Szczegóły żądań
@@ -88,36 +88,35 @@ System słowników referencyjnych dla aplikacji 10x Dog Show, obejmujący zarzą
 - **Autoryzacja:** Wszyscy uwierzytelnieni użytkownicy
 - **Opis:** Lista sędziów specjalizujących się w konkretnej grupie FCI
 
-### 2.3 Venues Management Endpoints
+### 2.3 Branches Management Endpoints
 
-#### GET /venues
+#### GET /branches
 
 - **Metoda HTTP:** GET
-- **Struktura URL:** `/api/venues`
+- **Struktura URL:** `/api/branches`
 - **Parametry query:**
-  - `city` (optional): Filtr po mieście
-  - `country` (optional): Filtr po kraju
+  - `region` (optional): Filtr po regionie
   - `is_active` (optional): Filtr po statusie aktywności
   - `search` (optional): Wyszukiwanie w nazwie lub adresie
   - `page` (optional): Numer strony (default: 1)
   - `limit` (optional): Elementów na stronę (default: 20, max: 100)
 - **Autoryzacja:** Wszyscy uwierzytelnieni użytkownicy
-- **Opis:** Lista obiektów wystawowych z filtrowaniem i paginacją
+- **Opis:** Lista oddziałów organizujących wystawy z filtrowaniem i paginacją
 
-#### GET /venues/{id}
-
-- **Metoda HTTP:** GET
-- **Struktura URL:** `/api/venues/{id}`
-- **Parametry:** `id` (UUID) - Identyfikator obiektu
-- **Autoryzacja:** Wszyscy uwierzytelnieni użytkownicy
-- **Opis:** Szczegóły konkretnego obiektu
-
-#### GET /venues/cities
+#### GET /branches/{id}
 
 - **Metoda HTTP:** GET
-- **Struktura URL:** `/api/venues/cities`
+- **Struktura URL:** `/api/branches/{id}`
+- **Parametry:** `id` (UUID) - Identyfikator oddziału
 - **Autoryzacja:** Wszyscy uwierzytelnieni użytkownicy
-- **Opis:** Lista miast z obiektami wystawowymi
+- **Opis:** Szczegóły konkretnego oddziału
+
+#### GET /branches/regions
+
+- **Metoda HTTP:** GET
+- **Struktura URL:** `/api/branches/regions`
+- **Autoryzacja:** Wszyscy uwierzytelnieni użytkownicy
+- **Opis:** Lista regionów z oddziałami organizującymi wystawy
 
 ## 3. Wykorzystywane typy
 
@@ -196,41 +195,40 @@ interface JudgesBySpecializationResponseDto {
 }
 ```
 
-### 3.3 Venues DTOs
+### 3.3 Branches DTOs
 
 ```typescript
-// Odpowiedź obiektu (podstawowa)
-interface VenueResponseDto {
+// Odpowiedź oddziału (podstawowa)
+interface BranchResponseDto {
   id: string;
   name: string;
   address: string;
   city: string;
   postal_code: string | null;
-  country: string;
+  region: string;
   is_active: boolean;
   created_at: string;
   updated_at: string;
 }
 
-// Odpowiedź obiektu (szczegółowa)
-interface VenueDetailResponseDto extends VenueResponseDto {
+// Odpowiedź oddziału (szczegółowa)
+interface BranchDetailResponseDto extends BranchResponseDto {
   total_shows: number;
   last_show_date: string | null;
   upcoming_shows: number;
 }
 
-// Lista obiektów z paginacją
-interface VenuesListResponseDto {
-  venues: VenueResponseDto[];
+// Lista oddziałów z paginacją
+interface BranchesListResponseDto {
+  branches: BranchResponseDto[];
   pagination: PaginationDto;
 }
 
-// Lista miast
-interface CitiesResponseDto {
-  cities: {
-    city: string;
-    country: string;
-    venues_count: number;
+// Lista regionów
+interface RegionsResponseDto {
+  regions: {
+    region: string;
+    branches_count: number;
   }[];
 }
 ```
@@ -254,9 +252,8 @@ interface JudgeQueryParams {
   limit?: number;
 }
 
-interface VenueQueryParams {
-  city?: string;
-  country?: string;
+interface BranchQueryParams {
+  region?: string;
   is_active?: boolean;
   search?: string;
   page?: number;
@@ -321,13 +318,13 @@ interface VenueQueryParams {
    - Tylko sędziowie z aktywną specjalizacją
    - Sortowanie po last_name, first_name
 
-### 4.3 Venues Management Logic
+### 4.3 Branches Management Logic
 
-#### Lista obiektów:
+#### Lista oddziałów:
 
 1. **Filtrowanie:**
 
-   - Po mieście i kraju
+   - Po regionie
    - Po statusie aktywności
    - Wyszukiwanie w nazwie i adresie
 
@@ -335,19 +332,19 @@ interface VenueQueryParams {
 
    - Domyślnie 20 elementów na stronę
    - Maksymalnie 100 elementów na stronę
-   - Sortowanie po city, name
+   - Sortowanie po region, name
 
 3. **Statystyki:**
-   - Liczba wystaw w obiekcie
+   - Liczba wystaw organizowanych przez oddział
    - Data ostatniej wystawy
    - Liczba nadchodzących wystaw
 
-#### Lista miast:
+#### Lista regionów:
 
 1. **Agregacja:**
-   - Grupowanie po city, country
-   - Liczenie obiektów w mieście
-   - Sortowanie po city
+   - Grupowanie po region
+   - Liczenie oddziałów w regionie
+   - Sortowanie po region
 
 ## 5. Implementacja serwisów
 
@@ -385,17 +382,17 @@ class DictionaryService {
     // Implementacja sędziów w specjalizacji
   }
 
-  // Venues Management
-  async getVenues(params: VenueQueryParams): Promise<VenuesListResponseDto> {
-    // Implementacja listy obiektów
+  // Branches Management
+  async getBranches(params: BranchQueryParams): Promise<BranchesListResponseDto> {
+    // Implementacja listy oddziałów
   }
 
-  async getVenueById(id: string): Promise<VenueDetailResponseDto> {
-    // Implementacja szczegółów obiektu
+  async getBranchById(id: string): Promise<BranchDetailResponseDto> {
+    // Implementacja szczegółów oddziału
   }
 
-  async getCities(): Promise<CitiesResponseDto> {
-    // Implementacja listy miast
+  async getRegions(): Promise<RegionsResponseDto> {
+    // Implementacja listy regionów
   }
 }
 ```
@@ -467,31 +464,30 @@ GROUP BY j.id, j.first_name, j.last_name, j.license_number,
 ORDER BY j.last_name, j.first_name;
 ```
 
-### 6.3 Venues Queries
+### 6.3 Branches Queries
 
 ```sql
--- Lista obiektów z filtrowaniem
+-- Lista oddziałów z filtrowaniem
 SELECT
-  id, name, address, city, postal_code, country, is_active,
+  id, name, address, city, postal_code, region, is_active,
   created_at, updated_at
-FROM dictionary.venues
+FROM dictionary.branches
 WHERE is_active = true
-  AND ($1::text IS NULL OR city = $1)
-  AND ($2::text IS NULL OR country = $2)
-  AND ($3::text IS NULL OR (
-    name ILIKE '%' || $3 || '%' OR
-    address ILIKE '%' || $3 || '%'
+  AND ($1::text IS NULL OR region = $1)
+  AND ($2::text IS NULL OR (
+    name ILIKE '%' || $2 || '%' OR
+    address ILIKE '%' || $2 || '%'
   ))
-ORDER BY city, name
-LIMIT $4 OFFSET $5;
+ORDER BY region, name
+LIMIT $3 OFFSET $4;
 
--- Lista miast
+-- Lista regionów
 SELECT
-  city, country, COUNT(*) as venues_count
-FROM dictionary.venues
+  region, COUNT(*) as branches_count
+FROM dictionary.branches
 WHERE is_active = true
-GROUP BY city, country
-ORDER BY city, country;
+GROUP BY region
+ORDER BY region;
 ```
 
 ## 7. Cache Strategy
@@ -513,10 +509,10 @@ const cacheConfig = {
     key: "judges",
     version: "v1",
   },
-  // Cache dla obiektów (2 godziny)
-  venues: {
+  // Cache dla oddziałów (2 godziny)
+  branches: {
     ttl: 2 * 60 * 60, // 2 godziny
-    key: "venues",
+    key: "branches",
     version: "v1",
   },
 };
@@ -572,9 +568,8 @@ const judgeQuerySchema = z.object({
 });
 
 // Walidacja parametrów obiektów
-const venueQuerySchema = z.object({
-  city: z.string().min(1).max(100).optional(),
-  country: z.string().min(1).max(100).optional(),
+const branchQuerySchema = z.object({
+      region: z.string().min(1).max(100).optional(),
   is_active: z.boolean().optional(),
   search: z.string().min(1).max(100).optional(),
   page: z.number().min(1).max(1000).optional(),
@@ -599,9 +594,9 @@ const DICTIONARY_ERRORS = {
     message: "Sędzia nie został znaleziony",
     status: 404,
   },
-  VENUE_NOT_FOUND: {
-    code: "VENUE_NOT_FOUND",
-    message: "Obiekt nie został znaleziony",
+  BRANCH_NOT_FOUND: {
+    code: "BRANCH_NOT_FOUND",
+    message: "Oddział nie został znaleziony",
     status: 404,
   },
   INVALID_FCI_GROUP: {
@@ -647,13 +642,13 @@ describe("DictionaryService", () => {
     });
   });
 
-  describe("getVenues", () => {
-    it("should return venues with statistics", async () => {
-      // Test listy obiektów
+  describe("getBranches", () => {
+    it("should return branches with statistics", async () => {
+      // Test listy oddziałów
     });
 
-    it("should filter venues by city", async () => {
-      // Test filtrowania po mieście
+    it("should filter branches by region", async () => {
+      // Test filtrowania po regionie
     });
   });
 });
@@ -675,9 +670,9 @@ describe("Dictionary API", () => {
     });
   });
 
-  describe("GET /api/venues", () => {
-    it("should return venues list", async () => {
-      // Test endpointu obiektów
+  describe("GET /api/branches", () => {
+    it("should return branches list", async () => {
+      // Test endpointu oddziałów
     });
   });
 });
@@ -697,10 +692,9 @@ CREATE INDEX IF NOT EXISTS idx_judges_active ON dictionary.judges(is_active) WHE
 CREATE INDEX IF NOT EXISTS idx_judges_name_search ON dictionary.judges USING gin(to_tsvector('polish', first_name || ' ' || last_name)) WHERE deleted_at IS NULL;
 CREATE INDEX IF NOT EXISTS idx_judge_specializations_group ON dictionary.judge_specializations(fci_group) WHERE is_active = true;
 
--- Indeksy dla obiektów
-CREATE INDEX IF NOT EXISTS idx_venues_city ON dictionary.venues(city) WHERE is_active = true;
-CREATE INDEX IF NOT EXISTS idx_venues_country ON dictionary.venues(country) WHERE is_active = true;
-CREATE INDEX IF NOT EXISTS idx_venues_name_search ON dictionary.venues USING gin(to_tsvector('polish', name || ' ' || address)) WHERE is_active = true;
+-- Indeksy dla oddziałów
+CREATE INDEX IF NOT EXISTS idx_branches_region ON dictionary.branches(region) WHERE is_active = true;
+CREATE INDEX IF NOT EXISTS idx_branches_name_search ON dictionary.branches USING gin(to_tsvector('polish', name || ' ' || address)) WHERE is_active = true;
 ```
 
 ### 11.2 Query Optimization
@@ -746,9 +740,9 @@ const dictionaryMetrics = {
       "dictionary_judges_response_time",
       "Judges API response time",
     ),
-    venues: new Histogram(
-      "dictionary_venues_response_time",
-      "Venues API response time",
+    branches: new Histogram(
+      "dictionary_branches_response_time",
+      "Branches API response time",
     ),
   },
 
@@ -762,9 +756,9 @@ const dictionaryMetrics = {
       "dictionary_judges_requests_total",
       "Total judges requests",
     ),
-    venues: new Counter(
-      "dictionary_venues_requests_total",
-      "Total venues requests",
+    branches: new Counter(
+      "dictionary_branches_requests_total",
+      "Total branches requests",
     ),
   },
 
@@ -778,9 +772,9 @@ const dictionaryMetrics = {
       "dictionary_judges_cache_hit_rate",
       "Judges cache hit rate",
     ),
-    venues: new Gauge(
-      "dictionary_venues_cache_hit_rate",
-      "Venues cache hit rate",
+    branches: new Gauge(
+      "dictionary_branches_cache_hit_rate",
+      "Branches cache hit rate",
     ),
   },
 };
@@ -847,26 +841,26 @@ paths:
               schema:
                 $ref: "#/components/schemas/JudgesListResponseDto"
 
-  /api/venues:
+  /api/branches:
     get:
-      summary: Lista obiektów wystawowych
+      summary: Lista oddziałów organizujących wystawy
       tags: [Dictionary]
       parameters:
-        - name: city
+        - name: region
           in: query
           schema:
             type: string
-        - name: country
+        - name: search
           in: query
           schema:
             type: string
       responses:
         "200":
-          description: Lista obiektów
+          description: Lista oddziałów
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/VenuesListResponseDto"
+                $ref: "#/components/schemas/BranchesListResponseDto"
 ```
 
 ## 14. Podsumowanie
@@ -887,12 +881,12 @@ Ten plan implementacji zapewnia:
 - Filtrowanie po specjalizacjach i statusie aktywności
 - Wyszukiwanie w danych sędziów
 
-### ✅ **Funkcjonalności Venues Management:**
+### ✅ **Funkcjonalności Branches Management:**
 
-- Lista obiektów wystawowych
-- Filtrowanie po lokalizacji i statusie aktywności
-- Statystyki obiektów (liczba wystaw, ostatnia wystawa)
-- Lista miast z obiektami
+- Lista oddziałów organizujących wystawy
+- Filtrowanie po regionie i statusie aktywności
+- Statystyki oddziałów (liczba wystaw, ostatnia wystawa)
+- Lista regionów z oddziałami
 
 ### ✅ **Wydajność i skalowalność:**
 

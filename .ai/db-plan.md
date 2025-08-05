@@ -118,14 +118,14 @@ CREATE TABLE dictionary.judge_specializations (
     UNIQUE(judge_id, fci_group)
 );
 
--- Lokalizacje wystaw
-CREATE TABLE dictionary.venues (
+-- Oddziały organizujące wystawy
+CREATE TABLE dictionary.branches (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(200) NOT NULL,
     address TEXT NOT NULL,
     city VARCHAR(100) NOT NULL,
     postal_code VARCHAR(20),
-    country VARCHAR(100) DEFAULT 'Poland',
+    region VARCHAR(100) NOT NULL,
     is_active BOOLEAN DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -143,7 +143,7 @@ CREATE TABLE dog_shows.shows (
     status dog_shows.show_status DEFAULT 'draft',
     show_date DATE NOT NULL,
     registration_deadline DATE NOT NULL,
-    venue_id UUID REFERENCES dictionary.venues(id),
+    branch_id UUID REFERENCES dictionary.branches(id),
     organizer_id UUID NOT NULL REFERENCES auth.users(id),
     max_participants INTEGER,
     description TEXT,
@@ -651,18 +651,18 @@ SELECT
     s.status,
     s.show_date,
     s.registration_deadline,
-    v.name as venue_name,
-    v.city as venue_city,
+    b.name as branch_name,
+    b.region as branch_region,
     u.first_name || ' ' || u.last_name as organizer_name,
     COUNT(sr.id) as registered_dogs,
     s.max_participants,
     s.language
 FROM dog_shows.shows s
-LEFT JOIN dictionary.venues v ON s.venue_id = v.id
+LEFT JOIN dictionary.branches b ON s.branch_id = b.id
 LEFT JOIN auth.users u ON s.organizer_id = u.id
 LEFT JOIN dog_shows.show_registrations sr ON s.id = sr.show_id
 WHERE s.deleted_at IS NULL
-GROUP BY s.id, s.name, s.show_type, s.status, s.show_date, s.registration_deadline, v.name, v.city, u.first_name, u.last_name, s.max_participants, s.language;
+GROUP BY s.id, s.name, s.show_type, s.status, s.show_date, s.registration_deadline, b.name, b.region, u.first_name, u.last_name, s.max_participants, s.language;
 
 -- Widok opisów z pełnymi informacjami
 CREATE VIEW dog_shows.description_details AS
@@ -710,11 +710,11 @@ INSERT INTO dictionary.breeds (name_pl, name_en, fci_group, fci_number) VALUES
 ('Buldog francuski', 'French Bulldog', 'G9', 101),
 ('Rottweiler', 'Rottweiler', 'G2', 147);
 
--- Przykładowe lokalizacje
-INSERT INTO dictionary.venues (name, address, city, postal_code) VALUES
-('Centrum Wystawiennicze PTAK', 'ul. Marywilska 44', 'Warszawa', '03-042'),
-('Spodek', 'al. Korfantego 35', 'Katowice', '40-005'),
-('Centrum Kongresowe ICE', 'ul. Marii Konopnickiej 17', 'Kraków', '30-302');
+-- Przykładowe oddziały
+INSERT INTO dictionary.branches (name, address, city, postal_code, region) VALUES
+('Oddział Warszawa', 'ul. Marszałkowska 1', 'Warszawa', '00-001', 'Mazowieckie'),
+('Oddział Katowice', 'ul. Mariacka 15', 'Katowice', '40-001', 'Śląskie'),
+('Oddział Kraków', 'ul. Floriańska 5', 'Kraków', '31-019', 'Małopolskie');
 
 -- Domyślny użytkownik admin
 INSERT INTO auth.users (email, password_hash, first_name, last_name, role) VALUES

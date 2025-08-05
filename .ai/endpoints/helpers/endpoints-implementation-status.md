@@ -189,19 +189,24 @@ Dokument zawiera kompleksową analizę statusu implementacji endpointów API w p
 
 #### Zaimplementowane endpointy:
 
-- ✅ `GET /api/breeds` - Lista ras
-- ❌ `GET /api/judges` - Lista sędziów
-- ❌ `GET /api/venues` - Lista obiektów
+- ✅ `GET /api/breeds` - Lista ras (słownik zamknięty)
+- ❌ `GET /api/judges` - Lista sędziów (CRUD - edytowalna)
+- ❌ `GET /api/branches` - Lista oddziałów (słownik zamknięty)
 
 #### Brakujące komponenty UI:
 
 - ❌ `BreedsSelector.tsx` - Wybór rasy
 - ❌ `JudgesSelector.tsx` - Wybór sędziego
-- ❌ `VenuesSelector.tsx` - Wybór obiektu
+- ❌ `BranchesSelector.tsx` - Wybór oddziału
 
 #### Zaimplementowane serwisy:
 
 - ✅ `BreedService` - Logika słowników
+
+#### Brakujące serwisy:
+
+- ❌ `JudgeService` - Logika zarządzania sędziami (CRUD)
+- ❌ `BranchService` - Logika słowników oddziałów
 
 ### 2.10 GDPR Compliance ❌ NIE ZAIMPLEMENTOWANE
 
