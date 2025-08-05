@@ -74,7 +74,7 @@ export interface Show extends SoftDeletableEntity {
   status: ShowStatus;
   show_date: string;
   registration_deadline: string;
-  venue_id: string;
+  branch_id: string;
   organizer_id: string;
   max_participants: number | null;
   description: string | null;
@@ -173,12 +173,12 @@ export interface JudgeSpecialization extends BaseEntity {
   is_active: boolean;
 }
 
-export interface Venue extends BaseEntity {
+export interface Branch extends BaseEntity {
   name: string;
-  address: string;
-  city: string;
+  address: string | null;
+  city: string | null;
   postal_code: string | null;
-  country: string;
+  region: string;
   is_active: boolean;
 }
 
@@ -234,7 +234,7 @@ export interface CreateShowDto {
   show_type: ShowType;
   show_date: string;
   registration_deadline: string;
-  venue_id: string;
+  branch_id: string;
   max_participants?: number;
   entry_fee?: number;
   description?: string;
@@ -242,14 +242,14 @@ export interface CreateShowDto {
 }
 
 export interface ShowResponseDto
-  extends Omit<Show, "venue_id" | "organizer_id"> {
-  venue: Pick<Venue, "id" | "name" | "city">;
+  extends Omit<Show, "branch_id" | "organizer_id"> {
+  branch: Pick<Branch, "id" | "name" | "city" | "region">;
   organizer: Pick<User, "id" | "first_name" | "last_name">;
   registered_dogs?: number; // Count of registered dogs
 }
 
 export interface ShowDetailResponseDto extends ShowResponseDto {
-  venue: Venue;
+  branch: Branch;
   organizer: Pick<User, "id" | "first_name" | "last_name" | "email">;
 }
 
@@ -446,20 +446,9 @@ export interface JudgeResponseDto extends Judge {
   specializations: FCIGroup[];
 }
 
-export type VenueResponseDto = Venue;
-
 // =============================================================================
 // BRANCHES DTOs
 // =============================================================================
-
-export interface Branch extends BaseEntity {
-  name: string;
-  address: string | null;
-  city: string | null;
-  postal_code: string | null;
-  region: string;
-  is_active: boolean;
-}
 
 export interface BranchResponseDto {
   id: string;
@@ -549,6 +538,7 @@ export interface ShowQueryParams {
   from_date?: string;
   to_date?: string;
   organizer_id?: string;
+  branch_id?: string;
   page?: number;
   limit?: number;
 }
@@ -604,14 +594,6 @@ export interface JudgeQueryParams {
   fci_group?: FCIGroup;
   is_active?: boolean;
   search?: string;
-  page?: number;
-  limit?: number;
-}
-
-export interface VenueQueryParams {
-  city?: string;
-  country?: string;
-  is_active?: boolean;
   page?: number;
   limit?: number;
 }

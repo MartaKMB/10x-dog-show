@@ -5,32 +5,32 @@ import type { ShowResponseDto, PaginatedResponseDto } from "../../types";
 
 // Mock data dla testów
 const MOCK_DATA = {
-  venues: [
+  branches: [
     {
       id: "550e8400-e29b-41d4-a716-446655440201",
-      name: "Centrum Wystawowe EXPO XXI",
+      name: "Oddział Warszawa",
       address: "ul. Prądzyńskiego 12/14",
       city: "Warszawa",
       postal_code: "01-222",
-      country: "Polska",
+      region: "Mazowieckie",
       is_active: true,
     },
     {
       id: "550e8400-e29b-41d4-a716-446655440202",
-      name: "Międzynarodowe Centrum Kongresowe",
+      name: "Oddział Katowice",
       address: "plac Sławika i Antalla 1",
       city: "Katowice",
       postal_code: "40-163",
-      country: "Polska",
+      region: "Śląskie",
       is_active: true,
     },
     {
       id: "550e8400-e29b-41d4-a716-446655440203",
-      name: "Centrum Targowo-Kongresowe",
+      name: "Oddział Poznań",
       address: "ul. Głogowska 14",
       city: "Poznań",
       postal_code: "60-734",
-      country: "Polska",
+      region: "Wielkopolskie",
       is_active: true,
     },
   ],
@@ -60,7 +60,7 @@ const MOCK_DATA = {
       status: "in_progress",
       show_date: "2024-03-15",
       registration_deadline: "2024-03-01",
-      venue_id: "550e8400-e29b-41d4-a716-446655440201",
+      branch_id: "550e8400-e29b-41d4-a716-446655440201",
       organizer_id: "00000000-0000-0000-0000-000000000002",
       max_participants: 500,
       description: "Międzynarodowa wystawa psów rasowych",
@@ -316,15 +316,15 @@ export class ShowService {
     data: CreateShowInput,
     organizerId: string,
   ): Promise<void> {
-    // Mock: Check if venue exists
-    const venue = MOCK_DATA.venues.find((v) => v.id === data.venue_id);
+    // Mock: Check if branch exists
+    const branch = MOCK_DATA.branches.find((b) => b.id === data.branch_id);
 
-    if (!venue) {
-      throw new Error("NOT_FOUND: Venue not found");
+    if (!branch) {
+      throw new Error("NOT_FOUND: Branch not found");
     }
 
-    if (!venue.is_active) {
-      throw new Error("BUSINESS_RULE_ERROR: Venue is not active");
+    if (!branch.is_active) {
+      throw new Error("BUSINESS_RULE_ERROR: Branch is not active");
     }
 
     // Mock: Check if organizer exists and has correct role
@@ -360,7 +360,7 @@ export class ShowService {
       status: "draft" as const, // Always starts as draft
       show_date: data.show_date,
       registration_deadline: data.registration_deadline,
-      venue_id: data.venue_id,
+      branch_id: data.branch_id,
       organizer_id: organizerId,
       max_participants: data.max_participants || null,
       description: data.description || null,
@@ -754,7 +754,7 @@ export class ShowService {
     show: Record<string, any>,
   ): Promise<ShowResponseDto> {
     // Mock: Fetch related data for response
-    const venue = MOCK_DATA.venues.find((v) => v.id === show.venue_id);
+    const branch = MOCK_DATA.branches.find((b) => b.id === show.branch_id);
     const organizer = MOCK_DATA.users.find((u) => u.id === show.organizer_id);
 
     return {
@@ -764,16 +764,18 @@ export class ShowService {
       status: show.status,
       show_date: show.show_date,
       registration_deadline: show.registration_deadline,
-      venue: venue
+      branch: branch
         ? {
-            id: venue.id,
-            name: venue.name,
-            city: venue.city,
+            id: branch.id,
+            name: branch.name,
+            city: branch.city,
+            region: branch.region,
           }
         : {
             id: "",
             name: "",
             city: "",
+            region: "",
           },
       organizer: organizer
         ? {

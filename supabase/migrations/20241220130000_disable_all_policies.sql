@@ -28,7 +28,7 @@ drop policy if exists hide_deleted_owners on dog_shows.owners;
 
 -- Drop public access policies
 drop policy if exists public_breeds_select on dictionary.breeds;
-drop policy if exists public_venues_select on dictionary.venues;
+drop policy if exists public_branches_select on dictionary.branches;
 drop policy if exists public_judges_select on dictionary.judges;
 drop policy if exists public_judge_specializations_select on dictionary.judge_specializations;
 
@@ -48,7 +48,7 @@ alter table dog_shows.pdf_documents disable row level security;
 
 -- Disable RLS on dictionary tables
 alter table dictionary.breeds disable row level security;
-alter table dictionary.venues disable row level security;
+alter table dictionary.branches disable row level security;
 alter table dictionary.judges disable row level security;
 alter table dictionary.judge_specializations disable row level security;
 

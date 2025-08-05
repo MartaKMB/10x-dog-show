@@ -110,14 +110,14 @@ create table dictionary.judge_specializations (
     unique(judge_id, fci_group)
 );
 
--- venues where shows can be held
-create table dictionary.venues (
+-- branches organizing shows
+create table dictionary.branches (
     id uuid primary key default gen_random_uuid(),
     name varchar(200) not null,
-    address text not null,
-    city varchar(100) not null,
+    address text,
+    city varchar(100),
     postal_code varchar(20),
-    country varchar(100) default 'Poland',
+    region varchar(100) not null,
     is_active boolean default true,
     created_at timestamp with time zone default now(),
     updated_at timestamp with time zone default now()
@@ -135,7 +135,7 @@ create table dog_shows.shows (
     status dog_shows.show_status default 'draft',
     show_date date not null,
     registration_deadline date not null,
-    venue_id uuid references dictionary.venues(id),
+    branch_id uuid references dictionary.branches(id),
     organizer_id uuid not null references auth.users(id),
     max_participants integer,
     description text,
@@ -663,7 +663,7 @@ create policy hide_deleted_owners on dog_shows.owners
 create policy public_breeds_select on dictionary.breeds
     for select using (is_active = true);
 
-create policy public_venues_select on dictionary.venues
+create policy public_branches_select on dictionary.branches
     for select using (is_active = true);
 
 create policy public_judges_select on dictionary.judges
@@ -671,7 +671,7 @@ create policy public_judges_select on dictionary.judges
 
 -- enable rls on reference tables
 alter table dictionary.breeds enable row level security;
-alter table dictionary.venues enable row level security;
+alter table dictionary.branches enable row level security;
 alter table dictionary.judges enable row level security;
 alter table dictionary.judge_specializations enable row level security;
 
@@ -696,13 +696,13 @@ insert into dictionary.breeds (name_pl, name_en, fci_group, fci_number) values
 ('Bokser', 'Boxer', 'G2', 144),
 ('Cocker spaniel angielski', 'English Cocker Spaniel', 'G8', 5);
 
--- example venues
-insert into dictionary.venues (name, address, city, postal_code) values
-('Centrum Wystawiennicze PTAK', 'ul. Marywilska 44', 'Warszawa', '03-042'),
-('Spodek', 'al. Korfantego 35', 'Katowice', '40-005'),
-('Centrum Kongresowe ICE', 'ul. Marii Konopnickiej 17', 'Kraków', '30-302'),
-('Hala Ludowa', 'pl. Wróblewskiego 1', 'Wrocław', '51-618'),
-('Gdańsk Congress Centre', 'ul. Karowej 35', 'Gdańsk', '80-104');
+-- example branches
+insert into dictionary.branches (name, address, city, postal_code, region) values
+('Oddział Warszawa', 'ul. Marywilska 44', 'Warszawa', '03-042', 'Mazowieckie'),
+('Oddział Katowice', 'al. Korfantego 35', 'Katowice', '40-005', 'Śląskie'),
+('Oddział Kraków', 'ul. Marii Konopnickiej 17', 'Kraków', '30-302', 'Małopolskie'),
+('Oddział Wrocław', 'pl. Wróblewskiego 1', 'Wrocław', '51-618', 'Dolnośląskie'),
+('Oddział Gdańsk', 'ul. Karowej 35', 'Gdańsk', '80-104', 'Pomorskie');
 
 -- example judges
 insert into dictionary.judges (first_name, last_name, license_number, email) values

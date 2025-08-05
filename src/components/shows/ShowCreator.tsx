@@ -21,8 +21,8 @@ interface ShowCreatorData {
   registrationDeadline: string;
   language: "pl" | "en";
 
-  // Step 2: Venue
-  venueId: string;
+  // Step 2: Branch
+  branchId: string;
 
   // Step 3: Registration Settings
   maxParticipants: number | null;
@@ -40,7 +40,7 @@ const ShowCreator: React.FC<ShowCreatorProps> = () => {
     showDate: "",
     registrationDeadline: "",
     language: "pl",
-    venueId: "",
+    branchId: "",
     maxParticipants: null,
     entryFee: null,
     description: "",
@@ -49,11 +49,12 @@ const ShowCreator: React.FC<ShowCreatorProps> = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { venues, isLoading, error, loadVenues, createShow } = useShowCreator();
+  const { branches, isLoading, error, loadBranches, createShow } =
+    useShowCreator();
 
   useEffect(() => {
-    loadVenues();
-  }, [loadVenues]);
+    loadBranches();
+  }, [loadBranches]);
 
   function isStepCompleted(step: number): boolean {
     switch (step) {
@@ -65,7 +66,7 @@ const ShowCreator: React.FC<ShowCreatorProps> = () => {
           formData.registrationDeadline
         );
       case 2:
-        return !!formData.venueId;
+        return !!formData.branchId;
       case 3:
         return true; // Optional fields
       case 4:
@@ -132,8 +133,8 @@ const ShowCreator: React.FC<ShowCreatorProps> = () => {
         }
         break;
       case 2:
-        if (!formData.venueId) {
-          newErrors.venueId = "Wybór obiektu jest wymagany";
+        if (!formData.branchId) {
+          newErrors.branchId = "Wybór oddziału jest wymagany";
         }
         break;
     }
@@ -174,7 +175,7 @@ const ShowCreator: React.FC<ShowCreatorProps> = () => {
         show_type: formData.showType,
         show_date: showDate,
         registration_deadline: registrationDeadline,
-        venue_id: formData.venueId,
+        branch_id: formData.branchId,
         max_participants: formData.maxParticipants || undefined,
         entry_fee: formData.entryFee || undefined,
         description: formData.description || undefined,
@@ -387,56 +388,58 @@ const ShowCreator: React.FC<ShowCreatorProps> = () => {
 
         {currentStep === 2 && (
           <div className="space-y-6">
-            <h2 className="text-xl font-semibold mb-6">Wybór obiektu</h2>
+            <h2 className="text-xl font-semibold mb-6">Wybór oddziału</h2>
 
             <div>
               <label
-                htmlFor="venue-select"
+                htmlFor="branch-select"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                Obiekt *
+                Oddział *
               </label>
               <select
-                id="venue-select"
-                value={formData.venueId}
-                onChange={(e) => handleInputChange("venueId", e.target.value)}
+                id="branch-select"
+                value={formData.branchId}
+                onChange={(e) => handleInputChange("branchId", e.target.value)}
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.venueId ? "border-red-500" : "border-gray-300"
+                  errors.branchId ? "border-red-500" : "border-gray-300"
                 }`}
               >
-                <option value="">Wybierz obiekt</option>
-                {venues.map((venue) => (
-                  <option key={venue.id} value={venue.id}>
-                    {venue.name}, {venue.city}
+                <option value="">Wybierz oddział</option>
+                {branches.map((branch) => (
+                  <option key={branch.id} value={branch.id}>
+                    {branch.name}, {branch.city}
                   </option>
                 ))}
               </select>
-              {errors.venueId && (
-                <p className="mt-1 text-sm text-red-600">{errors.venueId}</p>
+              {errors.branchId && (
+                <p className="mt-1 text-sm text-red-600">{errors.branchId}</p>
               )}
             </div>
 
-            {formData.venueId && (
+            {formData.branchId && (
               <div className="bg-gray-50 p-4 rounded-md">
                 <h3 className="font-medium text-gray-900 mb-2">
-                  Szczegóły obiektu
+                  Szczegóły oddziału
                 </h3>
                 {(() => {
-                  const venue = venues.find((v) => v.id === formData.venueId);
-                  return venue ? (
+                  const branch = branches.find(
+                    (b) => b.id === formData.branchId,
+                  );
+                  return branch ? (
                     <div className="text-sm text-gray-600">
                       <p>
-                        <strong>Adres:</strong> {venue.address}
+                        <strong>Adres:</strong> {branch.address}
                       </p>
                       <p>
-                        <strong>Miasto:</strong> {venue.city}
+                        <strong>Miasto:</strong> {branch.city}
                       </p>
                       <p>
                         <strong>Kod pocztowy:</strong>{" "}
-                        {venue.postal_code || "Brak"}
+                        {branch.postal_code || "Brak"}
                       </p>
                       <p>
-                        <strong>Kraj:</strong> {venue.country}
+                        <strong>Region:</strong> {branch.region}
                       </p>
                     </div>
                   ) : null;
@@ -570,10 +573,12 @@ const ShowCreator: React.FC<ShowCreatorProps> = () => {
                   {formData.language === "pl" ? "Polski" : "English"}
                 </div>
                 <div>
-                  <span className="font-medium">Obiekt:</span>{" "}
+                  <span className="font-medium">Oddział:</span>{" "}
                   {(() => {
-                    const venue = venues.find((v) => v.id === formData.venueId);
-                    return venue ? `${venue.name}, ${venue.city}` : "";
+                    const branch = branches.find(
+                      (b) => b.id === formData.branchId,
+                    );
+                    return branch ? `${branch.name}, ${branch.city}` : "";
                   })()}
                 </div>
                 {formData.maxParticipants && (

@@ -69,7 +69,7 @@ interface ShowRow {
   status: ShowStatus;
   show_date: string;
   registration_deadline: string;
-  venue_id: string | null;
+  branch_id: string | null;
   organizer_id: string;
   max_participants: number | null;
   description: string | null;

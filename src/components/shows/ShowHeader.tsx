@@ -114,9 +114,9 @@ const ShowHeader: React.FC<ShowHeaderProps> = ({
               {formatDate(show.registration_deadline)}
             </div>
             <div>
-              <span className="font-medium">Lokalizacja:</span>
+              <span className="font-medium">Oddział:</span>
               <br />
-              {show.venue.name}, {show.venue.city}
+              {show.branch.name}, {show.branch.city}
             </div>
             <div>
               <span className="font-medium">Organizator:</span>

@@ -23,15 +23,15 @@ INSERT INTO public.breeds (name_pl, name_en, fci_group, fci_number, is_active) V
 ON CONFLICT (fci_number) DO NOTHING;
 
 -- =============================================================================
--- 2. INSERT VENUES
+-- 2. INSERT BRANCHES
 -- =============================================================================
 
-INSERT INTO dictionary.venues (name, address, city, postal_code, country, is_active) VALUES
-('Centrum Wystawowe EXPO XXI', 'ul. Prądzyńskiego 12/14', 'Warszawa', '01-222', 'Polska', true),
-('Międzynarodowe Centrum Kongresowe', 'plac Sławika i Antalla 1', 'Katowice', '40-163', 'Polska', true),
-('Centrum Targowo-Kongresowe', 'ul. Głogowska 14', 'Poznań', '60-734', 'Polska', true),
-('Centrum Kongresowe ICE', 'ul. Marii Konopnickiej 17', 'Kraków', '30-302', 'Polska', true),
-('Centrum Wystawienniczo-Kongresowe', 'ul. Marszałkowska 104/122', 'Warszawa', '00-017', 'Polska', true);
+INSERT INTO dictionary.branches (name, address, city, postal_code, region, is_active) VALUES
+('Oddział Warszawa', 'ul. Prądzyńskiego 12/14', 'Warszawa', '01-222', 'Mazowieckie', true),
+('Oddział Katowice', 'plac Sławika i Antalla 1', 'Katowice', '40-163', 'Śląskie', true),
+('Oddział Poznań', 'ul. Głogowska 14', 'Poznań', '60-734', 'Wielkopolskie', true),
+('Oddział Kraków', 'ul. Marii Konopnickiej 17', 'Kraków', '30-302', 'Małopolskie', true),
+('Oddział Gdańsk', 'ul. Marszałkowska 104/122', 'Gdańsk', '80-828', 'Pomorskie', true);
 
 -- =============================================================================
 -- 3. INSERT JUDGES
@@ -113,7 +113,7 @@ INSERT INTO dog_shows.shows (
     status, 
     show_date, 
     registration_deadline, 
-    venue_id, 
+    branch_id, 
     organizer_id, 
     max_participants, 
     description, 
@@ -126,7 +126,7 @@ INSERT INTO dog_shows.shows (
     'open_for_registration',
     '2024-06-15',
     '2024-06-01',
-    (SELECT id FROM dictionary.venues WHERE name = 'Centrum Wystawowe EXPO XXI' LIMIT 1),
+    (SELECT id FROM dictionary.branches WHERE name = 'Oddział Warszawa' LIMIT 1),
     '00000000-0000-0000-0000-000000000001', -- Placeholder organizer ID
     500,
     'Międzynarodowa wystawa psów rasowych zgodna ze standardami FCI. Wystawa obejmuje wszystkie grupy FCI.',
@@ -139,7 +139,7 @@ INSERT INTO dog_shows.shows (
     'draft',
     '2024-07-20',
     '2024-07-10',
-    (SELECT id FROM dictionary.venues WHERE name = 'Międzynarodowe Centrum Kongresowe' LIMIT 1),
+    (SELECT id FROM dictionary.branches WHERE name = 'Oddział Katowice' LIMIT 1),
     '00000000-0000-0000-0000-000000000001', -- Placeholder organizer ID
     300,
     'Narodowa wystawa psów rasowych w Katowicach.',
@@ -152,7 +152,7 @@ INSERT INTO dog_shows.shows (
     'completed',
     '2024-05-10',
     '2024-05-01',
-    (SELECT id FROM dictionary.venues WHERE name = 'Centrum Targowo-Kongresowe' LIMIT 1),
+    (SELECT id FROM dictionary.branches WHERE name = 'Oddział Poznań' LIMIT 1),
     '00000000-0000-0000-0000-000000000001', -- Placeholder organizer ID
     200,
     'Wystawa psów rasowych w Poznaniu.',
@@ -292,7 +292,7 @@ ON CONFLICT DO NOTHING;
 -- 
 -- Summary of inserted data:
 -- - 10 breeds (G1, G2, G5, G8)
--- - 5 venues (Warszawa, Katowice, Poznań, Kraków, Gdańsk)
+-- - 5 branches (Warszawa, Katowice, Poznań, Kraków, Gdańsk)
 -- - 5 judges with specializations
 -- - 3 shows (different statuses: draft, open_for_registration, completed)
 -- - 5 owners with GDPR consent

@@ -20,7 +20,7 @@ export const createShowSchema = z
     }),
     show_date: dateSchema,
     registration_deadline: dateSchema,
-    venue_id: uuidSchema,
+    branch_id: uuidSchema,
     language: z.enum(["pl", "en"], {
       errorMap: () => ({ message: "Language must be 'pl' or 'en'" }),
     }),
@@ -81,6 +81,7 @@ export const showQuerySchema = z.object({
   from_date: z.string().datetime().optional(),
   to_date: z.string().datetime().optional(),
   organizer_id: z.string().uuid().optional(),
+  branch_id: z.string().uuid().optional(),
   page: z.number().min(1).default(1),
   limit: z.number().min(1).max(100).default(20),
 });

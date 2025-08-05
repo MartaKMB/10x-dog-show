@@ -112,12 +112,12 @@ const ShowCard: React.FC<ShowCardProps> = ({ show }) => {
         </div>
       </div>
 
-      {/* Venue */}
-      {show.venue && (
+      {/* Branch */}
+      {show.branch && (
         <div className="mb-3">
           <div className="text-sm text-gray-600">
-            <span className="font-medium">Lokalizacja:</span> {show.venue.name},{" "}
-            {show.venue.city}
+            <span className="font-medium">Oddział:</span> {show.branch.name},{" "}
+            {show.branch.city}
           </div>
         </div>
       )}

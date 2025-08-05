@@ -1,8 +1,8 @@
 import { useState, useCallback } from "react";
-import type { CreateShowDto, VenueResponseDto } from "../types";
+import type { CreateShowDto, BranchResponseDto } from "../types";
 
 interface ShowCreatorState {
-  venues: VenueResponseDto[];
+  branches: BranchResponseDto[];
   isLoading: boolean;
   error: string | null;
 }
@@ -15,46 +15,46 @@ interface CreateShowResult {
 
 export const useShowCreator = () => {
   const [state, setState] = useState<ShowCreatorState>({
-    venues: [],
+    branches: [],
     isLoading: false,
     error: null,
   });
 
-  const loadVenues = useCallback(async () => {
+  const loadBranches = useCallback(async () => {
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      // For now, use mock venues since venues API is not implemented yet
-      const mockVenues: VenueResponseDto[] = [
+      // For now, use mock branches since branches API is not implemented yet
+      const mockBranches: BranchResponseDto[] = [
         {
           id: "550e8400-e29b-41d4-a716-446655440201",
-          name: "Centrum Wystawowe EXPO XXI",
+          name: "Oddział Warszawa",
           address: "ul. Prądzyńskiego 12/14",
           city: "Warszawa",
           postal_code: "01-222",
-          country: "Polska",
+          region: "Mazowieckie",
           is_active: true,
           created_at: "2024-01-01T00:00:00Z",
           updated_at: "2024-01-01T00:00:00Z",
         },
         {
           id: "550e8400-e29b-41d4-a716-446655440202",
-          name: "Międzynarodowe Centrum Kongresowe",
+          name: "Oddział Katowice",
           address: "plac Sławika i Antalla 1",
           city: "Katowice",
           postal_code: "40-163",
-          country: "Polska",
+          region: "Śląskie",
           is_active: true,
           created_at: "2024-01-01T00:00:00Z",
           updated_at: "2024-01-01T00:00:00Z",
         },
         {
           id: "550e8400-e29b-41d4-a716-446655440203",
-          name: "Centrum Targowo-Kongresowe",
+          name: "Oddział Poznań",
           address: "ul. Głogowska 14",
           city: "Poznań",
           postal_code: "60-734",
-          country: "Polska",
+          region: "Wielkopolskie",
           is_active: true,
           created_at: "2024-01-01T00:00:00Z",
           updated_at: "2024-01-01T00:00:00Z",
@@ -63,7 +63,7 @@ export const useShowCreator = () => {
 
       setState((prev) => ({
         ...prev,
-        venues: mockVenues,
+        branches: mockBranches,
         isLoading: false,
       }));
     } catch (error) {
@@ -73,7 +73,7 @@ export const useShowCreator = () => {
         error:
           error instanceof Error
             ? error.message
-            : "Błąd podczas ładowania obiektów",
+            : "Błąd podczas ładowania oddziałów",
       }));
     }
   }, []);
@@ -134,10 +134,10 @@ export const useShowCreator = () => {
   );
 
   return {
-    venues: state.venues,
+    branches: state.branches,
     isLoading: state.isLoading,
     error: state.error,
-    loadVenues,
+    loadBranches,
     loadJudges,
     createShow,
   };
