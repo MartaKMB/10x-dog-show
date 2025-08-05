@@ -97,7 +97,6 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
       const breedsData = await response.json();
       setBreeds(breedsData.data || breedsData);
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error("Error loading breeds:", error);
       setErrors({ breeds: ["Nie udało się załadować listy ras"] });
     } finally {
@@ -266,7 +265,6 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
       onSuccess();
       resetForm();
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error("Error adding dog:", error);
       setErrors({
         submit: [error instanceof Error ? error.message : "Nieznany błąd"],

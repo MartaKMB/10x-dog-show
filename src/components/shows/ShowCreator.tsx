@@ -153,15 +153,12 @@ const ShowCreator: React.FC<ShowCreatorProps> = () => {
   };
 
   const handleSubmit = async () => {
-    console.log("handleSubmit called, currentStep:", currentStep);
-    console.log("formData:", formData);
-
     if (!validateCurrentStep()) {
+      // eslint-disable-next-line no-console
       console.log("Validation failed");
       return;
     }
 
-    console.log("Validation passed, creating show...");
     setIsSubmitting(true);
     try {
       // Convert dates from YYYY-MM-DD to ISO 8601 format
@@ -191,7 +188,6 @@ const ShowCreator: React.FC<ShowCreatorProps> = () => {
         window.location.href = `/shows/${result.showId}`;
       }
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error("Error creating show:", error);
     } finally {
       setIsSubmitting(false);

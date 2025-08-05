@@ -22,7 +22,6 @@ export const GET: APIRoute = async ({ params }) => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Error fetching owner:", error);
 
     if (error instanceof z.ZodError) {
@@ -112,7 +111,6 @@ export const PUT: APIRoute = async ({ params, request }) => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Error updating owner:", error);
 
     if (error instanceof z.ZodError) {
@@ -201,7 +199,6 @@ export const DELETE: APIRoute = async ({ params }) => {
       },
     );
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Error deleting owner:", error);
 
     if (error instanceof z.ZodError) {

@@ -18,7 +18,7 @@ const gitignorePath = path.resolve(__dirname, ".gitignore");
 const baseConfig = tseslint.config({
   extends: [eslint.configs.recommended, tseslint.configs.strict],
   rules: {
-    "no-console": "warn",
+    "no-console": ["error", { allow: ["error", "warn"] }],
     "no-unused-vars": "off",
     // Disable all formatting rules that conflict with Prettier
     "@typescript-eslint/comma-dangle": "off",

@@ -97,7 +97,6 @@ const EditDogModal: React.FC<EditDogModalProps> = ({
       await onEditDog(registration.id, updateData);
       onSuccess();
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error("Error updating registration:", error);
       setErrors({
         submit: [error instanceof Error ? error.message : "Nieznany błąd"],

@@ -67,7 +67,6 @@ const useDogActions = () => {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error("Failed to edit dog:", error);
       throw error;
     } finally {
@@ -95,7 +94,6 @@ const useDogActions = () => {
         // Close modal after successful deletion
         closeModals();
       } catch (error) {
-        // eslint-disable-next-line no-console
         console.error("Failed to delete dog:", error);
         throw error;
       } finally {
@@ -116,7 +114,6 @@ const useDogActions = () => {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error("Failed to create description:", error);
       throw error;
     } finally {

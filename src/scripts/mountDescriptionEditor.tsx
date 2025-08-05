@@ -7,7 +7,6 @@ export function mountDescriptionEditor() {
   const container = document.getElementById("description-editor-root");
 
   if (!container) {
-    // eslint-disable-next-line no-console
     console.warn("DescriptionEditor container not found");
     return;
   }
@@ -23,7 +22,6 @@ export function mountDescriptionEditor() {
     (mode === "edit" && !descriptionId) ||
     (mode === "create" && (!showId || !dogId))
   ) {
-    // eslint-disable-next-line no-console
     console.error("Invalid DescriptionEditor configuration");
     return;
   }

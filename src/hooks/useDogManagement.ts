@@ -25,7 +25,6 @@ export const useDogManagement = (showId: string, onSuccess: () => void) => {
 
       onSuccessRef.current();
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error("Error adding dog:", error);
 
       // Handle validation errors
@@ -76,7 +75,6 @@ export const useDogManagement = (showId: string, onSuccess: () => void) => {
 
         onSuccessRef.current();
       } catch (error) {
-        // eslint-disable-next-line no-console
         console.error("Error editing dog:", error);
         throw error;
       } finally {
@@ -107,7 +105,6 @@ export const useDogManagement = (showId: string, onSuccess: () => void) => {
 
         onSuccessRef.current();
       } catch (error) {
-        // eslint-disable-next-line no-console
         console.error("Error deleting dog:", error);
         throw error;
       } finally {

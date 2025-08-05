@@ -49,7 +49,6 @@ export const GET: APIRoute = async ({ params }) => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Error fetching registration:", error);
 
     // Handle business logic errors
@@ -135,7 +134,6 @@ export const PUT: APIRoute = async ({ params, request }) => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Error updating registration:", error);
 
     // Handle validation errors
@@ -245,7 +243,6 @@ export const PATCH: APIRoute = async ({ params, request }) => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Error updating payment status:", error);
 
     // Handle validation errors
@@ -344,7 +341,6 @@ export const DELETE: APIRoute = async ({ params }) => {
       status: 204,
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Error deleting registration:", error);
 
     // Handle business logic errors

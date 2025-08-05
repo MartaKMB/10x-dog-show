@@ -30,7 +30,6 @@ export const useShowActions = (show: ShowDetailResponseDto | null) => {
       // Redirect to shows list after successful deletion
       window.location.href = "/shows";
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error("Error deleting show:", error);
       throw error;
     } finally {
@@ -65,7 +64,6 @@ export const useShowActions = (show: ShowDetailResponseDto | null) => {
         // Refresh the page to show updated status
         window.location.reload();
       } catch (error) {
-        // eslint-disable-next-line no-console
         console.error("Error updating show status:", error);
         throw error;
       } finally {

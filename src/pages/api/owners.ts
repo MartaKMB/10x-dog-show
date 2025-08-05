@@ -142,7 +142,6 @@ export const GET: APIRoute = async ({ request }) => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Error fetching owners:", error);
 
     return new Response(
@@ -170,7 +169,6 @@ export const POST: APIRoute = async () => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Error creating owner:", error);
 
     return new Response(

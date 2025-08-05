@@ -32,7 +32,6 @@ export const POST: APIRoute = async ({ params, request }) => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Error creating evaluation:", error);
 
     // Handle validation errors
@@ -125,7 +124,6 @@ export const PUT: APIRoute = async ({ params, request }) => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Error updating evaluation:", error);
 
     // Handle validation errors

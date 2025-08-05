@@ -278,7 +278,6 @@ export const GET: APIRoute = async ({ params, request }) => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Error fetching registrations:", error);
 
     return new Response(

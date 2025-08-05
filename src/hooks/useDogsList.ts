@@ -174,7 +174,6 @@ const useDogsList = (
         isLoading: false,
       }));
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error("Failed to fetch dogs:", error);
       setState((prev) => ({
         ...prev,

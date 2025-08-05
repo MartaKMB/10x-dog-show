@@ -210,7 +210,6 @@ export const GET: APIRoute = async ({ request }) => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Error fetching dogs:", error);
 
     return new Response(
@@ -238,7 +237,6 @@ export const POST: APIRoute = async () => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Error creating dog:", error);
 
     return new Response(

@@ -164,7 +164,6 @@ export const GET: APIRoute = async ({ request }) => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Error fetching descriptions:", error);
 
     return new Response(
@@ -195,7 +194,6 @@ export const POST: APIRoute = async () => {
       },
     );
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Error creating description:", error);
 
     // Handle validation errors

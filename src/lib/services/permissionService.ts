@@ -79,7 +79,6 @@ export async function checkDescriptionPermissions(
       showStatus: show.status,
     };
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Error checking permissions:", error);
     return {
       canEdit: false,
@@ -100,7 +99,6 @@ export async function checkShowStatus(showId: string): Promise<ShowStatus> {
     const show = await response.json();
     return show.status;
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Error checking show status:", error);
     return "completed"; // Domyślnie zakończona jeśli błąd
   }

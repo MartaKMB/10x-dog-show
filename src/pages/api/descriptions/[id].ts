@@ -28,7 +28,6 @@ export const GET: APIRoute = async ({ params }) => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Error fetching description:", error);
 
     // Handle validation errors
@@ -114,7 +113,6 @@ export const PUT: APIRoute = async ({ params, request }) => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Error updating description:", error);
 
     // Handle validation errors
@@ -206,7 +204,6 @@ export const DELETE: APIRoute = async ({ params }) => {
       },
     );
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Error deleting description:", error);
 
     // Handle validation errors

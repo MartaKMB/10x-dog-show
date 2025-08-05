@@ -33,7 +33,6 @@ export const PATCH: APIRoute = async ({ params }) => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Error finalizing description:", error);
 
     // Handle validation errors

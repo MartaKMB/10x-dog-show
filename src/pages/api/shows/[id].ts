@@ -8,12 +8,6 @@ import {
 import { supabaseClient } from "../../../db/supabase.client";
 import type { ErrorResponseDto } from "../../../types";
 
-// Mock DEFAULT_USER dla testów (department_representative)
-const DEFAULT_USER = {
-  id: "00000000-0000-0000-0000-000000000002",
-  role: "department_representative" as const,
-};
-
 export const GET: APIRoute = async ({ params }) => {
   try {
     const { id } = params;
@@ -44,7 +38,6 @@ export const GET: APIRoute = async ({ params }) => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Error fetching show:", error);
 
     // Handle business logic errors
@@ -117,19 +110,15 @@ export const PUT: APIRoute = async ({ params, request }) => {
     // Validate input data
     const validatedData = updateShowSchema.parse(body);
 
-    // Use DEFAULT_USER instead of real auth for now
-    const currentUserId = DEFAULT_USER.id;
-
     // Update show using service
     const showService = new ShowService(supabaseClient);
-    const show = await showService.update(id, validatedData, currentUserId);
+    const show = await showService.update(id, validatedData);
 
     return new Response(JSON.stringify(show), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Error updating show:", error);
 
     // Handle validation errors
@@ -220,18 +209,14 @@ export const DELETE: APIRoute = async ({ params }) => {
       );
     }
 
-    // Use DEFAULT_USER instead of real auth for now
-    const currentUserId = DEFAULT_USER.id;
-
     // Delete show using service
     const showService = new ShowService(supabaseClient);
-    await showService.delete(id, currentUserId);
+    await showService.delete(id);
 
     return new Response(null, {
       status: 204,
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Error deleting show:", error);
 
     // Handle business logic errors
@@ -307,23 +292,15 @@ export const PATCH: APIRoute = async ({ params, request }) => {
     // Validate input data
     const validatedData = updateShowStatusSchema.parse(body);
 
-    // Use DEFAULT_USER instead of real auth for now
-    const currentUserId = DEFAULT_USER.id;
-
     // Update show status using service
     const showService = new ShowService(supabaseClient);
-    const show = await showService.updateStatus(
-      id,
-      validatedData.status,
-      currentUserId,
-    );
+    const show = await showService.updateStatus(id, validatedData.status);
 
     return new Response(JSON.stringify(show), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Error updating show status:", error);
 
     // Handle validation errors

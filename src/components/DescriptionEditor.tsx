@@ -240,7 +240,6 @@ export function DescriptionEditor({
         }));
       }
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error("Error checking permissions:", error);
       setPermissions({
         canEdit: false,

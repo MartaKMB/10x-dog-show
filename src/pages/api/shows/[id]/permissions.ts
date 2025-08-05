@@ -58,7 +58,6 @@ export const GET: APIRoute = async ({ params }) => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Error fetching permissions:", error);
 
     if (error instanceof z.ZodError) {

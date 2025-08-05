@@ -82,7 +82,6 @@ const DogsListView: React.FC<DogsListViewProps> = ({
         createDescription(dogId);
         break;
       default:
-        // eslint-disable-next-line no-console
         console.warn("Unknown action:", action);
     }
   };

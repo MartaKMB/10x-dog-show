@@ -49,7 +49,6 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
           setBreeds(data.data || data);
         }
       } catch (error) {
-        // eslint-disable-next-line no-console
         console.error("Failed to fetch breeds:", error);
       } finally {
         setIsLoadingBreeds(false);

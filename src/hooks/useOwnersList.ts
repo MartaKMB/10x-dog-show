@@ -81,7 +81,6 @@ const useOwnersList = (userRole: UserRole) => {
         isLoading: false,
       }));
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error("Failed to fetch owners:", error);
       setState((prev) => ({
         ...prev,
@@ -167,7 +166,6 @@ const useOwnersList = (userRole: UserRole) => {
         // Refresh the list after successful creation
         await fetchOwners();
       } catch (error) {
-        // eslint-disable-next-line no-console
         console.error("Failed to create owner:", error);
         setState((prev) => ({
           ...prev,
@@ -204,7 +202,6 @@ const useOwnersList = (userRole: UserRole) => {
         // Refresh the list after successful update
         await fetchOwners();
       } catch (error) {
-        // eslint-disable-next-line no-console
         console.error("Failed to update owner:", error);
         setState((prev) => ({
           ...prev,
@@ -239,7 +236,6 @@ const useOwnersList = (userRole: UserRole) => {
         // Refresh the list after successful deletion
         await fetchOwners();
       } catch (error) {
-        // eslint-disable-next-line no-console
         console.error("Failed to delete owner:", error);
         setState((prev) => ({
           ...prev,
@@ -274,7 +270,6 @@ const useOwnersList = (userRole: UserRole) => {
         // Refresh the list after successful withdrawal
         await fetchOwners();
       } catch (error) {
-        // eslint-disable-next-line no-console
         console.error("Failed to withdraw GDPR consent:", error);
         setState((prev) => ({
           ...prev,
