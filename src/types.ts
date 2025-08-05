@@ -670,6 +670,7 @@ export interface FilterState {
   search?: string;
   gender?: DogGender;
   breedId?: string;
+  fciGroup?: FCIGroup;
 }
 
 export interface DogCardViewModel {

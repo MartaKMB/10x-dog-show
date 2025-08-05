@@ -22,6 +22,7 @@ import { useDogManagement } from "../../hooks/useDogManagement";
 
 interface ShowDetailsViewProps {
   showId: string;
+  userRole?: string;
 }
 
 interface ShowDetailsViewModel {
@@ -35,7 +36,10 @@ interface ShowDetailsViewModel {
   filters: FilterState;
 }
 
-const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({ showId }) => {
+const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
+  showId,
+  userRole = "department_representative",
+}) => {
   const [viewModel, setViewModel] = useState<ShowDetailsViewModel>({
     show: null,
     registrations: [],
@@ -261,25 +265,28 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({ showId }) => {
     <>
       <OfflineIndicator />
       <div className="container mx-auto px-4 py-8">
-        <ShowHeader
-          show={viewModel.show}
-          userRole="department_representative" // TODO: Get from auth context
-          canEdit={viewModel.canEdit}
-          canDelete={viewModel.canDelete}
-          isDeleting={isDeleting}
-          isUpdating={isUpdating}
-          onDelete={deleteShow}
-          onStatusUpdate={updateShowStatus}
-        />
+        {viewModel.show && (
+          <ShowHeader
+            show={viewModel.show}
+            userRole={userRole as "department_representative" | "secretary"}
+            canEdit={viewModel.canEdit}
+            canDelete={viewModel.canDelete}
+            isDeleting={isDeleting}
+            isUpdating={isUpdating}
+            onDelete={deleteShow}
+            onStatusUpdate={updateShowStatus}
+          />
+        )}
 
         <div className="mt-8">
-          <ShowStats stats={viewModel.stats} />
+          <ShowStats stats={viewModel.stats} userRole={userRole} />
         </div>
 
         <div className="mt-8">
           <RegistrationFilters
             onFiltersChange={handleFiltersChange}
             currentFilters={viewModel.filters}
+            userRole={userRole}
           />
         </div>
 
@@ -309,6 +316,7 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({ showId }) => {
               onDeleteDog={handleDeleteDog}
               canEdit={viewModel.canEdit}
               canDelete={viewModel.canEdit}
+              userRole={userRole}
             />
           )}
         </div>

@@ -1,8 +1,9 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import NextShowCard from "../components/shows/NextShowCard.tsx";
 
 // TODO: Get user role from authentication
-const userRole = "department_representative";
+const userRole = "secretary";
 ---
 
 <Layout title="Dashboard - 10x Dog Show">
@@ -27,6 +28,13 @@ const userRole = "department_representative";
             <div class="text-2xl mb-2">👥</div>
             <div class="font-medium">Członkowie</div>
             <div class="text-sm opacity-90">Właściciele i psy</div>
+          </a>
+        )}
+        {userRole === "secretary" && (
+          <a href="/descriptions" class="bg-green-600 hover:bg-green-700 text-white p-4 rounded-lg text-center transition-colors">
+            <div class="text-2xl mb-2">📝</div>
+            <div class="font-medium">Opisy</div>
+            <div class="text-sm opacity-90">Zarządzaj opisami</div>
           </a>
         )}
         <a href="/judges" class="bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-lg text-center transition-colors">
@@ -56,6 +64,32 @@ const userRole = "department_representative";
             <div class="text-2xl mb-2">📊</div>
             <div class="font-medium text-gray-600">Statystyki</div>
             <div class="text-sm text-gray-500">Wkrótce dostępne</div>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {userRole === "secretary" && (
+      <div class="bg-white shadow rounded-lg p-6">
+        <NextShowCard client:load userRole={userRole} />
+      </div>
+    )}
+
+    {userRole === "department_representative" && (
+      <div class="bg-white shadow rounded-lg p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Statystyki systemu</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="text-center p-4 bg-blue-50 rounded-lg">
+            <div class="text-2xl font-bold text-blue-600 mb-1">12</div>
+            <div class="text-sm text-gray-600">Aktywne wystawy</div>
+          </div>
+          <div class="text-center p-4 bg-green-50 rounded-lg">
+            <div class="text-2xl font-bold text-green-600 mb-1">1,247</div>
+            <div class="text-sm text-gray-600">Zarejestrowane psy</div>
+          </div>
+          <div class="text-center p-4 bg-purple-50 rounded-lg">
+            <div class="text-2xl font-bold text-purple-600 mb-1">89</div>
+            <div class="text-sm text-gray-600">Członkowie ZKwP</div>
           </div>
         </div>
       </div>

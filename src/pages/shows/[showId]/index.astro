@@ -29,7 +29,7 @@ if (!showId) {
 
     <!-- Show Details -->
     <div class="bg-white shadow rounded-lg">
-      <ShowDetailsView showId={showId} client:load />
+      <ShowDetailsView showId={showId} userRole={userRole} client:load />
     </div>
   </div>
 </Layout>

@@ -16,7 +16,6 @@ interface ShowsListViewModel {
   error: string | null;
   filters: ShowFilters;
   pagination: PaginationState;
-  canCreateShow: boolean;
 }
 
 interface ShowFilters {
@@ -47,7 +46,6 @@ const ShowsListView: React.FC<ShowsListViewProps> = ({ userRole }) => {
       total: 0,
       pages: 0,
     },
-    canCreateShow: userRole === "department_representative",
   });
 
   const { shows, pagination, isLoading, error, loadShows } = useShowsList();
@@ -97,11 +95,6 @@ const ShowsListView: React.FC<ShowsListViewProps> = ({ userRole }) => {
     loadShows(viewModel.filters, { ...viewModel.pagination, page: newPage });
   };
 
-  const handleCreateShow = () => {
-    // Navigate to show creation page
-    window.location.href = "/shows/new";
-  };
-
   if (isLoading) {
     return <LoadingSpinner />;
   }
@@ -116,7 +109,7 @@ const ShowsListView: React.FC<ShowsListViewProps> = ({ userRole }) => {
         title="Brak wystaw"
         description="Nie znaleziono żadnych wystaw spełniających kryteria wyszukiwania."
         actionLabel="Utwórz pierwszą wystawę"
-        onAction={handleCreateShow}
+        onAction={() => (window.location.href = "/shows/new")}
       />
     );
   }
@@ -125,18 +118,10 @@ const ShowsListView: React.FC<ShowsListViewProps> = ({ userRole }) => {
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-8">
-        <div className="flex justify-between items-center mb-6">
+        <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900">
             Zarządzanie wystawami
           </h1>
-          {viewModel.canCreateShow && (
-            <button
-              onClick={handleCreateShow}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
-            >
-              Nowa wystawa
-            </button>
-          )}
         </div>
 
         {/* Filters */}

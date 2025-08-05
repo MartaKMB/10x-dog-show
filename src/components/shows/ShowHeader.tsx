@@ -143,6 +143,7 @@ const ShowHeader: React.FC<ShowHeaderProps> = ({
         {/* Actions */}
         {userRole === "department_representative" && (
           <div className="flex flex-col gap-2">
+            {/* Temporarily disabled - edit show functionality
             {canEdit && (
               <button
                 onClick={() =>
@@ -154,6 +155,7 @@ const ShowHeader: React.FC<ShowHeaderProps> = ({
                 Edytuj wystawę
               </button>
             )}
+            */}
 
             {/* Status Management */}
             {canEdit && show.status === "draft" && (

@@ -12,9 +12,9 @@ const MOCK_DATA = {
   shows: [
     {
       id: "550e8400-e29b-41d4-a716-446655440001",
-      status: "in_progress",
-      name: "National Dog Show Warsaw 2024",
-      show_date: "2024-03-15",
+      status: "open_for_registration",
+      name: "National Dog Show Warsaw 2025",
+      show_date: "2025-08-05",
       show_type: "national" as const,
     },
   ],

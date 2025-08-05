@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Search, User, Dog, Mail, Phone, Filter, Plus } from "lucide-react";
+import { Search, User, Dog, Mail, Phone, Filter } from "lucide-react";
 
 interface Dog {
   id: string;
@@ -60,6 +60,19 @@ const MembersList: React.FC<MembersListProps> = ({
 
   useEffect(() => {
     fetchMembers();
+  }, []);
+
+  useEffect(() => {
+    // Add event listener for the header button
+    const addMemberBtn = document.getElementById("add-member-btn");
+    if (addMemberBtn) {
+      const handleAddMemberClick = () => setShowAddModal(true);
+      addMemberBtn.addEventListener("click", handleAddMemberClick);
+
+      return () => {
+        addMemberBtn.removeEventListener("click", handleAddMemberClick);
+      };
+    }
   }, []);
 
   useEffect(() => {
@@ -164,25 +177,14 @@ const MembersList: React.FC<MembersListProps> = ({
 
   return (
     <div className="p-6 space-y-4">
-      {/* Header with Add Button */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-semibold text-gray-900">
-            Lista członków ZKwP
-          </h2>
-          <p className="text-sm text-gray-600">
-            Znaleziono {filteredOwners.length} członków z {getTotalDogs()} psami
-          </p>
-        </div>
-        {userRole === "department_representative" && (
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            Dodaj członka
-          </button>
-        )}
+      {/* Header */}
+      <div>
+        <h2 className="text-lg font-semibold text-gray-900">
+          Lista członków ZKwP
+        </h2>
+        <p className="text-sm text-gray-600">
+          Znaleziono {filteredOwners.length} członków z {getTotalDogs()} psami
+        </p>
       </div>
 
       {/* Search and Filters */}

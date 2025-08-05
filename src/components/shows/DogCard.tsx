@@ -60,7 +60,12 @@ const DogCard: React.FC<DogCardProps> = ({ dog, onAction, userRole }) => {
   };
 
   const handleAction = (action: string) => {
-    onAction(action, dog.dog.id);
+    if (action === "view") {
+      // Toggle expanded view for details
+      toggleExpanded();
+    } else {
+      onAction(action, dog.dog.id);
+    }
   };
 
   const toggleExpanded = () => {
@@ -84,7 +89,13 @@ const DogCard: React.FC<DogCardProps> = ({ dog, onAction, userRole }) => {
               <span className="text-lg">{getGenderIcon(dog.dog.gender)}</span>
               <StatusBadge
                 status={dog.descriptionStatus}
-                onClick={() => handleAction("view_description")}
+                onClick={() => {
+                  if (dog.descriptionStatus.status === "none") {
+                    handleAction("create_description");
+                  } else {
+                    handleAction("view_description");
+                  }
+                }}
               />
             </div>
 
@@ -147,21 +158,12 @@ const DogCard: React.FC<DogCardProps> = ({ dog, onAction, userRole }) => {
             <QuickActionMenu
               actions={[
                 {
-                  id: "view",
-                  label: "Szczegóły",
-                  icon: "👁️",
-                  action: "view",
-                },
-                {
                   id: "edit",
                   label: "Edytuj",
                   icon: "✏️",
                   action: "edit",
                   disabled: !dog.canEdit,
-                  requiresPermission: [
-                    "secretary",
-                    "department_representative",
-                  ],
+                  requiresPermission: ["department_representative"],
                 },
                 {
                   id: "delete",
