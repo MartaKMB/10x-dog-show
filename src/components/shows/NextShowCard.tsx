@@ -7,6 +7,12 @@ interface NextShowCardProps {
 
 const NextShowCard: React.FC<NextShowCardProps> = ({ userRole }) => {
   const { nextShow, isLoading, error } = useNextShow(userRole);
+
+  // Explicitly check if user is a secretary - if not, don't render anything
+  if (userRole !== "secretary") {
+    return null;
+  }
+
   if (isLoading) {
     return (
       <div className="bg-white shadow rounded-lg p-6">
@@ -114,10 +120,10 @@ const NextShowCard: React.FC<NextShowCardProps> = ({ userRole }) => {
       <div className="flex items-start justify-between mb-4">
         <div>
           <h3 className="text-lg font-semibold text-gray-900 mb-1">
-            Najbliższa wystawa
+            Wystawa do opisów
           </h3>
           <p className="text-sm text-gray-600">
-            Następna wystawa do której jesteś przypisany
+            Najbliższa lub aktualna wystawa podczas której dodajesz opisy
           </p>
         </div>
         <span

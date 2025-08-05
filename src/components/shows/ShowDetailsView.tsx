@@ -170,18 +170,24 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
 
   const canUserEditShow = useCallback(
     (show: ShowDetailResponseDto): boolean => {
-      // TODO: Implement user role check
+      // Sekretarze nie mogą edytować wystaw - tylko przedstawiciele oddziałów
+      if (userRole === "secretary") {
+        return false;
+      }
       return show.status === "draft" || show.status === "open_for_registration";
     },
-    [],
+    [userRole],
   );
 
   const canUserDeleteShow = useCallback(
     (show: ShowDetailResponseDto): boolean => {
-      // TODO: Implement user role check
+      // Sekretarze nie mogą usuwać wystaw - tylko przedstawiciele oddziałów
+      if (userRole === "secretary") {
+        return false;
+      }
       return show.status === "draft";
     },
-    [],
+    [userRole],
   );
 
   const handleFiltersChange = (newFilters: FilterState) => {
