@@ -1,171 +1,192 @@
 # 10x Dog Show
 
-A modern web application for digitizing and streamlining dog show documentation processes. This application replaces the traditional manual paper-based system with a digital solution that improves accuracy, speed, and efficiency in dog show evaluations.
+A modern web application for managing and archiving dog show results, specifically designed for the Hovawart Club. Built with Astro, React, and Supabase to provide a comprehensive solution for show organizers, judges, and dog owners.
 
-## Project Description
+## 📋 Table of Contents
 
-10x Dog Show addresses the critical inefficiencies in traditional dog show documentation where ring secretaries manually transcribe judges' evaluations on paper forms. The current process suffers from:
+- [Project Description](#project-description)
+- [Tech Stack](#tech-stack)
+- [Getting Started Locally](#getting-started-locally)
+- [Available Scripts](#available-scripts)
+- [Project Scope](#project-scope)
+- [Project Status](#project-status)
+- [License](#license)
 
-- **Poor readability** of handwritten notes
-- **Inaccuracy** in transcriptions
-- **Slow documentation** process
-- **Paper waste** and environmental impact
-- **Difficulties** in archiving and searching historical data
+## 🎯 Project Description
 
-### Key Features
+10x Dog Show is a web application designed to centralize and manage dog show results for the Hovawart Club. The system provides a comprehensive platform for archiving historical show data, managing evaluations, and generating statistics for club management.
 
-- **Digital Dog Show Management**: Create, edit, and manage show templates with configurable dates, locations, and participants
-- **Real-time Documentation**: Create, edit, and review dog descriptions with time-based editing restrictions
-- **User Role Management**: Multi-level access control with different permissions for representatives, secretaries, and judges
-- **Automated Communication**: Automatic PDF generation and email delivery of dog descriptions to owners
-- **Configurable Evaluation System**: Customizable sets of evaluations, titles, and placements for different dog classes
-- **GDPR Compliance**: Built-in consent management and automatic data deletion after 3 years
-- **Real-time Updates**: Live notifications and data synchronization during shows
+### Key Features (MVP)
+
+- **Show Management**: Create, edit, and manage club shows with dates, locations, and judges
+- **Dog Registration**: Complete CRUD operations for dogs and their owners
+- **Evaluation System**: Standard FCI evaluations with Polish language support
+- **User Management**: Secure authentication system for club management
+- **Statistics & Reports**: Basic show statistics and performance analytics
+- **Responsive Design**: Full functionality on desktop and mobile devices
 
 ### Target Users
 
-- **Ring Secretaries**: Streamlined documentation process with digital forms
-- **Judges**: Clear, readable evaluation records and easy review capabilities
-- **Show Organizers**: Comprehensive show management and participant tracking
-- **Dog Owners**: Professional PDF documentation delivered automatically
-- **Kennel Clubs**: Centralized data management and historical archiving
+- **Club Management**: Full access to all show data and administrative functions
+- **Show Organizers**: Tools for entering and managing show results
+- **Dog Owners & Breeders**: Access to historical results and performance data
 
-## Tech Stack
+## 🛠 Tech Stack
 
 ### Frontend
+- **Astro 5** - Static site generator with SSR capabilities
+- **React 19** - Interactive UI components
+- **TypeScript 5** - Type-safe development
+- **Tailwind CSS 4** - Utility-first styling
+- **Shadcn/ui** - Accessible React components
 
-- **[Astro 5.5.5](https://astro.build/)** - Modern web framework for fast, content-focused websites with server-side rendering
-- **[React 19.0.0](https://react.dev/)** - UI library for building interactive components
-- **[TypeScript 5](https://www.typescriptlang.org/)** - Type-safe JavaScript for better development experience
-- **[Tailwind CSS 4.0.17](https://tailwindcss.com/)** - Utility-first CSS framework for rapid UI development
-- **[Shadcn/ui](https://ui.shadcn.com/)** - Accessible and customizable React components
-
-### Backend & Services
-
-- **[Supabase](https://supabase.com/)** - Backend-as-a-Service with PostgreSQL database, authentication, and real-time subscriptions
-- **[Resend](https://resend.com/)** - High-deliverability email service for automated communications
-- **[React-PDF](https://react-pdf.org/)** - Client-side PDF generation for dog descriptions
-
-### DevOps & Infrastructure
-
-- **[GitHub Actions](https://github.com/features/actions)** - CI/CD automation and deployment
-- **[Docker](https://www.docker.com/)** - Containerization for consistent development and deployment
-- **[DigitalOcean](https://www.digitalocean.com/)** - Cloud hosting platform
+### Backend & Database
+- **Supabase** - Backend-as-a-Service platform
+  - PostgreSQL database
+  - Built-in authentication
+  - Row Level Security (RLS)
+  - Real-time subscriptions
+  - File storage
 
 ### Development Tools
+- **ESLint + Prettier** - Code quality and formatting
+- **Husky + lint-staged** - Git hooks for code quality
+- **TypeScript ESLint** - TypeScript-specific linting rules
 
-- **[ESLint](https://eslint.org/)** - Code linting and quality assurance
-- **[Prettier](https://prettier.io/)** - Code formatting for consistency
-- **[Husky](https://typicode.github.io/husky/)** - Git hooks for pre-commit checks
+### External Services
+- **Resend** - Email delivery service
+- **React-PDF** - PDF generation
+- **DigitalOcean** - Application hosting
 
-## Getting Started Locally
+## 🚀 Getting Started Locally
 
 ### Prerequisites
 
-- **Node.js** v22.14.0 or higher
-- **npm** (comes with Node.js)
-- **Git** for version control
+- Node.js (Latest LTS version recommended)
+- npm or yarn package manager
+- Supabase account and project
 
 ### Installation
 
-1. **Clone the repository:**
-
+1. **Clone the repository**
    ```bash
-   git clone https://github.com/przeprogramowani/10x-dog-show.git
+   git clone <repository-url>
    cd 10x-dog-show
    ```
 
-2. **Install dependencies:**
-
+2. **Install dependencies**
    ```bash
    npm install
    ```
 
-3. **Set up environment variables:**
-   Create a `.env` file in the project root with your Supabase and Resend credentials:
-
+3. **Set up environment variables**
+   Create a `.env` file in the root directory with your Supabase credentials:
    ```env
-   SUPABASE_URL=your_supabase_url
-   SUPABASE_ANON_KEY=your_supabase_anon_key
-   RESEND_API_KEY=your_resend_api_key
+   PUBLIC_SUPABASE_URL=your_supabase_url
+   PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
    ```
 
-4. **Start the development server:**
+4. **Set up Supabase**
+   - Create a new Supabase project
+   - Run the database migrations from `supabase/migrations/`
+   - Configure Row Level Security policies
 
+5. **Start the development server**
    ```bash
    npm run dev
    ```
 
-5. **Open your browser:**
-   Navigate to `http://localhost:3000` to view the application
+6. **Open your browser**
+   Navigate to `http://localhost:4321` to view the application
 
-## Available Scripts
+## 📜 Available Scripts
 
-| Script             | Description                                  |
-| ------------------ | -------------------------------------------- |
-| `npm run dev`      | Start the development server with hot reload |
-| `npm run build`    | Build the application for production         |
-| `npm run preview`  | Preview the production build locally         |
-| `npm run lint`     | Run ESLint to check code quality             |
-| `npm run lint:fix` | Automatically fix ESLint issues              |
-| `npm run format`   | Format code using Prettier                   |
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Start the development server |
+| `npm run build` | Build the application for production |
+| `npm run preview` | Preview the production build locally |
+| `npm run lint` | Run ESLint to check code quality |
+| `npm run lint:fix` | Fix ESLint errors automatically |
+| `npm run format` | Format code with Prettier |
+| `npm run astro` | Run Astro CLI commands |
 
-## Project Scope
+## 🎯 Project Scope
 
-### MVP Features (Current Phase)
+### MVP Features (Phase 1)
 
-- ✅ **User Authentication**: Registration, login, and role-based access control
-- ✅ **Show Management**: Create, edit, and delete dog shows with templates
-- ✅ **Dog Registration**: Add, edit, and manage dog and owner information
-- ✅ **Digital Documentation**: Create and edit dog descriptions with time restrictions
-- ✅ **Evaluation System**: Configurable sets of evaluations, titles, and placements
-- ✅ **PDF Generation**: Automatic creation of professional dog descriptions
-- ✅ **Email Delivery**: Automated sending of PDFs to dog owners
-- ✅ **GDPR Compliance**: Consent management and data retention policies
+#### Show Management
+- Create, edit, and delete club shows
+- Configure show dates, locations, and judges
+- Manage show status (planned, in progress, completed)
 
-### Future Enhancements
+#### Dog & Owner Management
+- Complete dog profiles with identification data
+- Owner information management
+- Show participation history
 
-- 🔄 **Voice-to-Text Integration**: Speech recognition for hands-free documentation
-- 🔄 **Mobile Application**: Native mobile app for on-the-go access
-- 🔄 **Offline Mode**: Local data storage for unreliable internet connections
-- 🔄 **Advanced Analytics**: Comprehensive reporting and statistics
-- 🔄 **External Integrations**: API connections with kennel club systems
-- 🔄 **Real-time Collaboration**: Multi-user simultaneous documentation
+#### Evaluation System
+- Standard FCI evaluations in Polish:
+  - Doskonała (Excellent)
+  - Bardzo dobra (Very Good)
+  - Dobra (Good)
+  - Zadowalająca (Satisfactory)
+  - Zdyskwalifikowana (Disqualified)
+  - Nieobecna (Absent)
+- Age classes and club titles
+- Placement tracking (1st, 2nd, 3rd, 4th)
 
-## Project Status
+#### User System
+- Single role: Club management with full permissions
+- Secure authentication and session management
+- User account administration
 
-**Current Version**: 0.0.1  
-**Development Phase**: MVP Development  
-**Status**: Active Development
+#### Statistics & Reporting
+- Show participation statistics
+- Evaluation distribution analysis
+- Club title statistics
+- Individual dog performance history
 
-### Development Timeline
+### Future Enhancements (Phase 2 & 3)
+- Dog descriptions and detailed profiles
+- Advanced reporting and data export
+- Integration with external systems
+- Membership management
+- Pedigree tracking
+- Competition management
 
-- **Phase 1**: Core MVP functionality (In Progress)
-- **Phase 2**: Advanced features and optimization
-- **Phase 3**: Scaling and performance improvements
+## 📊 Project Status
+
+**Current Phase**: MVP Development (Phase 1)
+
+### Development Progress
+- ✅ Project setup and configuration
+- ✅ Database schema design
+- ✅ Basic authentication system
+- ✅ Core CRUD operations
+- 🔄 Show management interface
+- 🔄 Evaluation system implementation
+- 🔄 Statistics and reporting
+- ⏳ User testing and refinement
 
 ### Success Metrics
+- **Data Accuracy**: 0% errors in show data
+- **Data Entry Time**: <30 minutes per show
+- **User Satisfaction**: >90% satisfaction rate
+- **System Performance**: <2 seconds response time
+- **Uptime**: 99.9% availability
 
-- **10% faster** documentation creation by ring secretaries
-- **2 pages saved** per dog per show (paper reduction)
-- **100% elimination** of readability errors
-- **Full GDPR compliance** with zero violations
-- **High adoption rate** among ring secretaries
-
-## License
+## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## Contributing
+## 🤝 Contributing
 
-We welcome contributions! Please read our contributing guidelines and ensure your code follows the project's coding standards and AI development practices.
+This project is specifically designed for the Hovawart Club. For contributions or questions, please contact the project maintainers.
 
-## Support
+## 📞 Support
 
-For support, questions, or feature requests, please open an issue in the GitHub repository or contact the development team.
-
-## Acknowledgments
-
-Special thanks to the dog show community for providing valuable insights and feedback during the development process.
+For technical support or feature requests, please create an issue in the project repository or contact the development team.
