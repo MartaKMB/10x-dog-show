@@ -6,27 +6,25 @@ const uuidSchema = z.string().uuid("Invalid UUID format");
 // Date validation schema
 const dateSchema = z.string().datetime("Invalid date format");
 
-// Main schema for creating shows
+// Main schema for creating shows (uproszczony dla klubu hovawartów)
 export const createShowSchema = z
   .object({
     name: z
       .string()
       .min(1, "Name is required")
       .max(200, "Name cannot exceed 200 characters"),
-    show_type: z.enum(["national", "international"], {
-      errorMap: () => ({
-        message: "Show type must be 'national' or 'international'",
-      }),
-    }),
     show_date: dateSchema,
     registration_deadline: dateSchema,
-    branch_id: uuidSchema,
-    language: z.enum(["pl", "en"], {
-      errorMap: () => ({ message: "Language must be 'pl' or 'en'" }),
-    }),
-    max_participants: z.number().int().positive().optional(),
-    entry_fee: z.number().positive().optional(),
+    location: z
+      .string()
+      .min(1, "Location is required")
+      .max(500, "Location cannot exceed 500 characters"),
+    judge_name: z
+      .string()
+      .min(1, "Judge name is required")
+      .max(200, "Judge name cannot exceed 200 characters"),
     description: z.string().optional(),
+    max_participants: z.number().int().positive().optional(),
   })
   .refine(
     (data) => {
@@ -46,8 +44,9 @@ export const updateShowSchema = z
     name: z.string().min(1).max(200).optional(),
     show_date: dateSchema.optional(),
     registration_deadline: dateSchema.optional(),
+    location: z.string().min(1).max(500).optional(),
+    judge_name: z.string().min(1).max(200).optional(),
     max_participants: z.number().int().positive().optional(),
-    entry_fee: z.number().positive().optional(),
     description: z.string().optional(),
   })
   .refine(
@@ -65,7 +64,7 @@ export const updateShowSchema = z
     },
   );
 
-// Schema for show query parameters
+// Schema for show query parameters (uproszczony)
 export const showQuerySchema = z.object({
   status: z
     .enum([
@@ -77,11 +76,8 @@ export const showQuerySchema = z.object({
       "cancelled",
     ])
     .optional(),
-  show_type: z.enum(["national", "international"]).optional(),
   from_date: z.string().datetime().optional(),
   to_date: z.string().datetime().optional(),
-  organizer_id: z.string().uuid().optional(),
-  branch_id: z.string().uuid().optional(),
   page: z.number().min(1).default(1),
   limit: z.number().min(1).max(100).default(20),
 });
@@ -98,7 +94,7 @@ export const updateShowStatusSchema = z.object({
   ]),
 });
 
-// Schema for creating registrations
+// Schema for creating registrations (uproszczony)
 export const createRegistrationSchema = z.object({
   dog_id: uuidSchema,
   dog_class: z.enum([
@@ -111,7 +107,6 @@ export const createRegistrationSchema = z.object({
     "champion",
     "veteran",
   ]),
-  registration_fee: z.number().positive().optional(),
 });
 
 // Schema for updating registrations
@@ -128,14 +123,6 @@ export const updateRegistrationSchema = z.object({
       "veteran",
     ])
     .optional(),
-  is_paid: z.boolean().optional(),
-});
-
-// Schema for updating payment status
-export const updatePaymentStatusSchema = z.object({
-  is_paid: z.boolean(),
-  payment_date: z.string().datetime().optional(),
-  payment_method: z.string().max(50).optional(),
 });
 
 // Schema for registration query parameters
@@ -152,22 +139,15 @@ export const registrationQuerySchema = z.object({
       "veteran",
     ])
     .optional(),
-  is_paid: z.boolean().optional(),
-  breed_id: z.string().uuid().optional(),
-  gender: z.enum(["male", "female"]).optional(),
-  search: z.string().max(100).optional(),
   page: z.number().min(1).default(1),
   limit: z.number().min(1).max(100).default(20),
 });
 
-// Type inference for validated data
+// Type exports
 export type CreateShowInput = z.infer<typeof createShowSchema>;
 export type UpdateShowInput = z.infer<typeof updateShowSchema>;
 export type ShowQueryInput = z.infer<typeof showQuerySchema>;
 export type UpdateShowStatusInput = z.infer<typeof updateShowStatusSchema>;
 export type CreateRegistrationInput = z.infer<typeof createRegistrationSchema>;
 export type UpdateRegistrationInput = z.infer<typeof updateRegistrationSchema>;
-export type UpdatePaymentStatusInput = z.infer<
-  typeof updatePaymentStatusSchema
->;
 export type RegistrationQueryInput = z.infer<typeof registrationQuerySchema>;

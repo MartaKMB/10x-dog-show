@@ -1,31 +1,57 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { ShowService } from "../../lib/services/showService";
+import { ShowService } from "../../../../../lib/services/showService";
 import {
-  createShowSchema,
-  showQuerySchema,
-} from "../../lib/validation/showSchemas";
-import { supabaseClient } from "../../db/supabase.client";
-import type { ErrorResponseDto } from "../../types";
+  createRegistrationSchema,
+  registrationQuerySchema,
+} from "../../../../../lib/validation/showSchemas";
+import { supabaseClient } from "../../../../../db/supabase.client";
+import type { ErrorResponseDto } from "../../../../../types";
 
-export const POST: APIRoute = async ({ request }) => {
+export const GET: APIRoute = async ({ params, request }) => {
   try {
-    // Parse request body
-    const body = await request.json();
+    const { showId } = params;
 
-    // Validate input data
-    const validatedData = createShowSchema.parse(body);
+    if (!showId) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            code: "VALIDATION_ERROR",
+            message: "Show ID is required",
+          },
+          timestamp: new Date().toISOString(),
+          request_id: crypto.randomUUID(),
+        } as ErrorResponseDto),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
 
-    // Create show using service with existing supabase client
+    const url = new URL(request.url);
+    const queryParams = Object.fromEntries(url.searchParams.entries());
+
+    // Parse and validate query parameters
+    const validatedParams = registrationQuerySchema.parse({
+      ...queryParams,
+      page: queryParams.page ? parseInt(queryParams.page) : undefined,
+      limit: queryParams.limit ? parseInt(queryParams.limit) : undefined,
+    });
+
+    // Get registrations using service
     const showService = new ShowService(supabaseClient);
-    const show = await showService.create(validatedData);
+    const registrations = await showService.getRegistrations(
+      showId,
+      validatedParams,
+    );
 
-    return new Response(JSON.stringify(show), {
-      status: 201,
+    return new Response(JSON.stringify(registrations), {
+      status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error creating show:", error);
+    console.error("Error fetching registrations:", error);
 
     // Handle validation errors
     if (error instanceof z.ZodError) {
@@ -33,7 +59,7 @@ export const POST: APIRoute = async ({ request }) => {
         JSON.stringify({
           error: {
             code: "VALIDATION_ERROR",
-            message: "The provided data is invalid",
+            message: "Invalid query parameters",
             details: error.errors.map((err) => ({
               field: err.path.join("."),
               message: err.message,
@@ -51,15 +77,13 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Handle business logic errors
     if (error instanceof Error) {
-      const statusCode = error.message.includes("AUTHORIZATION_ERROR")
-        ? 403
-        : error.message.includes("NOT_FOUND")
-          ? 404
-          : error.message.includes("CONFLICT")
-            ? 409
-            : error.message.includes("BUSINESS_RULE_ERROR")
-              ? 422
-              : 500;
+      const statusCode = error.message.includes("NOT_FOUND")
+        ? 404
+        : error.message.includes("AUTHORIZATION_ERROR")
+          ? 403
+          : error.message.includes("BUSINESS_RULE_ERROR")
+            ? 422
+            : 500;
 
       return new Response(
         JSON.stringify({
@@ -96,28 +120,46 @@ export const POST: APIRoute = async ({ request }) => {
   }
 };
 
-export const GET: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ params, request }) => {
   try {
-    const url = new URL(request.url);
-    const params = Object.fromEntries(url.searchParams.entries());
+    const { showId } = params;
 
-    // Parse and validate query parameters
-    const validatedParams = showQuerySchema.parse({
-      ...params,
-      page: params.page ? parseInt(params.page) : undefined,
-      limit: params.limit ? parseInt(params.limit) : undefined,
-    });
+    if (!showId) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            code: "VALIDATION_ERROR",
+            message: "Show ID is required",
+          },
+          timestamp: new Date().toISOString(),
+          request_id: crypto.randomUUID(),
+        } as ErrorResponseDto),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
 
-    // Get shows using service
+    // Parse request body
+    const body = await request.json();
+
+    // Validate input data
+    const validatedData = createRegistrationSchema.parse(body);
+
+    // Create registration using service
     const showService = new ShowService(supabaseClient);
-    const shows = await showService.getShows(validatedParams);
+    const registration = await showService.createRegistration(
+      showId,
+      validatedData,
+    );
 
-    return new Response(JSON.stringify(shows), {
-      status: 200,
+    return new Response(JSON.stringify(registration), {
+      status: 201,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error fetching shows:", error);
+    console.error("Error creating registration:", error);
 
     // Handle validation errors
     if (error instanceof z.ZodError) {
@@ -125,7 +167,7 @@ export const GET: APIRoute = async ({ request }) => {
         JSON.stringify({
           error: {
             code: "VALIDATION_ERROR",
-            message: "Invalid query parameters",
+            message: "The provided data is invalid",
             details: error.errors.map((err) => ({
               field: err.path.join("."),
               message: err.message,
@@ -143,14 +185,14 @@ export const GET: APIRoute = async ({ request }) => {
 
     // Handle business logic errors
     if (error instanceof Error) {
-      const statusCode = error.message.includes("AUTHORIZATION_ERROR")
-        ? 403
-        : error.message.includes("NOT_FOUND")
-          ? 404
-          : error.message.includes("CONFLICT")
-            ? 409
-            : error.message.includes("BUSINESS_RULE_ERROR")
-              ? 422
+      const statusCode = error.message.includes("NOT_FOUND")
+        ? 404
+        : error.message.includes("AUTHORIZATION_ERROR")
+          ? 403
+          : error.message.includes("BUSINESS_RULE_ERROR")
+            ? 422
+            : error.message.includes("CONFLICT")
+              ? 409
               : 500;
 
       return new Response(

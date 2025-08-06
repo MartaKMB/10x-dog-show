@@ -27,8 +27,6 @@ export type Owner = Tables<"owners">;
 export type DogOwner = Tables<"dog_owners">;
 export type ShowRegistration = Tables<"show_registrations">;
 export type Evaluation = Tables<"evaluations">;
-export type Breed = Tables<"breeds">;
-export type Branch = Tables<"branches">;
 
 // =============================================================================
 // ENUM TYPES - From Database Schema
@@ -413,10 +411,6 @@ export interface EvaluationCreateRequest {
   baby_puppy_grade?: BabyPuppyGrade;
   club_title?: ClubTitle;
   placement?: Placement;
-  title?: TitleType;
-  points?: number;
-  is_best_in_group?: boolean;
-  is_best_in_show?: boolean;
 }
 
 export interface EvaluationUpdateRequest {
@@ -424,10 +418,6 @@ export interface EvaluationUpdateRequest {
   baby_puppy_grade?: BabyPuppyGrade;
   club_title?: ClubTitle;
   placement?: Placement;
-  title?: TitleType;
-  points?: number;
-  is_best_in_group?: boolean;
-  is_best_in_show?: boolean;
 }
 
 export interface EvaluationResponse {
@@ -443,10 +433,6 @@ export interface EvaluationResponse {
   baby_puppy_grade: BabyPuppyGrade | null;
   club_title: ClubTitle | null;
   placement: Placement | null;
-  title: TitleType | null;
-  points: number | null;
-  is_best_in_group: boolean;
-  is_best_in_show: boolean;
   created_at: string;
 }
 
@@ -625,7 +611,7 @@ export interface ShowStatsResponse {
 // DICTIONARY DTOs (Legacy support)
 // =============================================================================
 
-export type BreedResponseDto = Breed;
+// Breed type removed - not needed for Hovawart Club MVP
 
 export interface Judge {
   id: string;
@@ -966,7 +952,7 @@ export interface HierarchyNode {
   children: HierarchyNode[];
   isExpanded: boolean;
   count: number;
-  data?: DogResponseDto | Breed | FCIGroup | DogClass;
+  data?: DogResponseDto | FCIGroup | DogClass;
 }
 
 export interface DogsFilterState {

@@ -1,31 +1,35 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { ShowService } from "../../lib/services/showService";
+import { DogService } from "../../../lib/services/dogService";
 import {
-  createShowSchema,
-  showQuerySchema,
-} from "../../lib/validation/showSchemas";
-import { supabaseClient } from "../../db/supabase.client";
-import type { ErrorResponseDto } from "../../types";
+  createDogSchema,
+  dogQuerySchema,
+} from "../../../lib/validation/dogSchemas";
+import { supabaseClient } from "../../../db/supabase.client";
+import type { ErrorResponseDto } from "../../../types";
 
-export const POST: APIRoute = async ({ request }) => {
+export const GET: APIRoute = async ({ request }) => {
   try {
-    // Parse request body
-    const body = await request.json();
+    const url = new URL(request.url);
+    const params = Object.fromEntries(url.searchParams.entries());
 
-    // Validate input data
-    const validatedData = createShowSchema.parse(body);
+    // Parse and validate query parameters
+    const validatedParams = dogQuerySchema.parse({
+      ...params,
+      page: params.page ? parseInt(params.page) : undefined,
+      limit: params.limit ? parseInt(params.limit) : undefined,
+    });
 
-    // Create show using service with existing supabase client
-    const showService = new ShowService(supabaseClient);
-    const show = await showService.create(validatedData);
+    // Get dogs using service
+    const dogService = new DogService(supabaseClient);
+    const dogs = await dogService.getDogs(validatedParams);
 
-    return new Response(JSON.stringify(show), {
-      status: 201,
+    return new Response(JSON.stringify(dogs), {
+      status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error creating show:", error);
+    console.error("Error fetching dogs:", error);
 
     // Handle validation errors
     if (error instanceof z.ZodError) {
@@ -33,7 +37,7 @@ export const POST: APIRoute = async ({ request }) => {
         JSON.stringify({
           error: {
             code: "VALIDATION_ERROR",
-            message: "The provided data is invalid",
+            message: "Invalid query parameters",
             details: error.errors.map((err) => ({
               field: err.path.join("."),
               message: err.message,
@@ -55,11 +59,9 @@ export const POST: APIRoute = async ({ request }) => {
         ? 403
         : error.message.includes("NOT_FOUND")
           ? 404
-          : error.message.includes("CONFLICT")
-            ? 409
-            : error.message.includes("BUSINESS_RULE_ERROR")
-              ? 422
-              : 500;
+          : error.message.includes("BUSINESS_RULE_ERROR")
+            ? 422
+            : 500;
 
       return new Response(
         JSON.stringify({
@@ -96,28 +98,24 @@ export const POST: APIRoute = async ({ request }) => {
   }
 };
 
-export const GET: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request }) => {
   try {
-    const url = new URL(request.url);
-    const params = Object.fromEntries(url.searchParams.entries());
+    // Parse request body
+    const body = await request.json();
 
-    // Parse and validate query parameters
-    const validatedParams = showQuerySchema.parse({
-      ...params,
-      page: params.page ? parseInt(params.page) : undefined,
-      limit: params.limit ? parseInt(params.limit) : undefined,
-    });
+    // Validate input data
+    const validatedData = createDogSchema.parse(body);
 
-    // Get shows using service
-    const showService = new ShowService(supabaseClient);
-    const shows = await showService.getShows(validatedParams);
+    // Create dog using service
+    const dogService = new DogService(supabaseClient);
+    const dog = await dogService.create(validatedData);
 
-    return new Response(JSON.stringify(shows), {
-      status: 200,
+    return new Response(JSON.stringify(dog), {
+      status: 201,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error fetching shows:", error);
+    console.error("Error creating dog:", error);
 
     // Handle validation errors
     if (error instanceof z.ZodError) {
@@ -125,7 +123,7 @@ export const GET: APIRoute = async ({ request }) => {
         JSON.stringify({
           error: {
             code: "VALIDATION_ERROR",
-            message: "Invalid query parameters",
+            message: "The provided data is invalid",
             details: error.errors.map((err) => ({
               field: err.path.join("."),
               message: err.message,
@@ -147,10 +145,10 @@ export const GET: APIRoute = async ({ request }) => {
         ? 403
         : error.message.includes("NOT_FOUND")
           ? 404
-          : error.message.includes("CONFLICT")
-            ? 409
-            : error.message.includes("BUSINESS_RULE_ERROR")
-              ? 422
+          : error.message.includes("BUSINESS_RULE_ERROR")
+            ? 422
+            : error.message.includes("CONFLICT")
+              ? 409
               : 500;
 
       return new Response(

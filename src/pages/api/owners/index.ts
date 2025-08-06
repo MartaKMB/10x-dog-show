@@ -1,38 +1,35 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { EvaluationService } from "../../../../lib/services/evaluationService";
+import { OwnerService } from "../../../lib/services/ownerService";
 import {
-  createEvaluationSchema,
-  updateEvaluationSchema,
-} from "../../../../lib/validation/evaluationSchemas";
-import { supabaseClient } from "../../../../db/supabase.client";
-import type { ErrorResponseDto } from "../../../../types";
+  createOwnerSchema,
+  ownerQuerySchema,
+} from "../../../lib/validation/ownerSchemas";
+import { supabaseClient } from "../../../db/supabase.client";
+import type { ErrorResponseDto } from "../../../types";
 
-// Schema for description ID validation
-const descriptionIdSchema = z.string().uuid("Invalid description ID format");
-
-export const POST: APIRoute = async ({ params, request }) => {
+export const GET: APIRoute = async ({ request }) => {
   try {
-    // Validate description ID
-    const validatedId = descriptionIdSchema.parse(params.id);
+    const url = new URL(request.url);
+    const params = Object.fromEntries(url.searchParams.entries());
 
-    // Parse and validate request body
-    const body = await request.json();
-    const validatedData = createEvaluationSchema.parse(body);
+    // Parse and validate query parameters
+    const validatedParams = ownerQuerySchema.parse({
+      ...params,
+      page: params.page ? parseInt(params.page) : undefined,
+      limit: params.limit ? parseInt(params.limit) : undefined,
+    });
 
-    // Create evaluation using service
-    const evaluationService = new EvaluationService(supabaseClient);
-    const evaluation = await evaluationService.create(
-      validatedId,
-      validatedData,
-    );
+    // Get owners using service
+    const ownerService = new OwnerService(supabaseClient);
+    const owners = await ownerService.getMany(validatedParams);
 
-    return new Response(JSON.stringify(evaluation), {
-      status: 201,
+    return new Response(JSON.stringify(owners), {
+      status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error creating evaluation:", error);
+    console.error("Error fetching owners:", error);
 
     // Handle validation errors
     if (error instanceof z.ZodError) {
@@ -40,7 +37,7 @@ export const POST: APIRoute = async ({ params, request }) => {
         JSON.stringify({
           error: {
             code: "VALIDATION_ERROR",
-            message: "The provided data is invalid",
+            message: "Invalid query parameters",
             details: error.errors.map((err) => ({
               field: err.path.join("."),
               message: err.message,
@@ -58,10 +55,10 @@ export const POST: APIRoute = async ({ params, request }) => {
 
     // Handle business logic errors
     if (error instanceof Error) {
-      const statusCode = error.message.includes("NOT_FOUND")
-        ? 404
-        : error.message.includes("AUTHORIZATION_ERROR")
-          ? 403
+      const statusCode = error.message.includes("AUTHORIZATION_ERROR")
+        ? 403
+        : error.message.includes("NOT_FOUND")
+          ? 404
           : error.message.includes("BUSINESS_RULE_ERROR")
             ? 422
             : error.message.includes("CONFLICT")
@@ -103,28 +100,24 @@ export const POST: APIRoute = async ({ params, request }) => {
   }
 };
 
-export const PUT: APIRoute = async ({ params, request }) => {
+export const POST: APIRoute = async ({ request }) => {
   try {
-    // Validate description ID
-    const validatedId = descriptionIdSchema.parse(params.id);
-
-    // Parse and validate request body
+    // Parse request body
     const body = await request.json();
-    const validatedData = updateEvaluationSchema.parse(body);
 
-    // Update evaluation using service
-    const evaluationService = new EvaluationService(supabaseClient);
-    const evaluation = await evaluationService.update(
-      validatedId,
-      validatedData,
-    );
+    // Validate input data
+    const validatedData = createOwnerSchema.parse(body);
 
-    return new Response(JSON.stringify(evaluation), {
-      status: 200,
+    // Create owner using service
+    const ownerService = new OwnerService(supabaseClient);
+    const owner = await ownerService.create(validatedData);
+
+    return new Response(JSON.stringify(owner), {
+      status: 201,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error updating evaluation:", error);
+    console.error("Error creating owner:", error);
 
     // Handle validation errors
     if (error instanceof z.ZodError) {
@@ -150,13 +143,15 @@ export const PUT: APIRoute = async ({ params, request }) => {
 
     // Handle business logic errors
     if (error instanceof Error) {
-      const statusCode = error.message.includes("NOT_FOUND")
-        ? 404
-        : error.message.includes("AUTHORIZATION_ERROR")
-          ? 403
+      const statusCode = error.message.includes("AUTHORIZATION_ERROR")
+        ? 403
+        : error.message.includes("NOT_FOUND")
+          ? 404
           : error.message.includes("BUSINESS_RULE_ERROR")
             ? 422
-            : 500;
+            : error.message.includes("CONFLICT")
+              ? 409
+              : 500;
 
       return new Response(
         JSON.stringify({

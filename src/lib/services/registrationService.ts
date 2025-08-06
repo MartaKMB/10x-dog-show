@@ -35,31 +35,18 @@ interface ShowRegistrationRow {
 interface DogRow {
   id: string;
   name: string;
-  breed_id: string;
   gender: DogGender;
   birth_date: string;
   microchip_number: string | null;
-  kennel_club_number: string | null;
   kennel_name: string | null;
   father_name: string | null;
   mother_name: string | null;
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
-  scheduled_for_deletion: boolean;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-interface BreedRow {
-  id: string;
-  name_pl: string;
-  name_en: string;
-  fci_group: FCIGroup;
-  fci_number: number | null;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
+// Breed interface removed - not needed for Hovawart Club MVP
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface ShowRow {
@@ -114,12 +101,7 @@ export class RegistrationService {
             id,
             name,
             gender,
-            birth_date,
-            breed: breeds (
-              name_pl,
-              name_en,
-              fci_group
-            )
+            birth_date
           )
         `,
         )
@@ -138,15 +120,9 @@ export class RegistrationService {
         query = query.eq("dog.gender", params.gender);
       }
 
-      if (params?.breed_id) {
-        query = query.eq("dog.breed_id", params.breed_id);
-      }
-
       if (params?.search) {
         const searchTerm = params.search.toLowerCase();
-        query = query.or(
-          `dog.name.ilike.%${searchTerm}%,dog.breed.name_pl.ilike.%${searchTerm}%,dog.breed.name_en.ilike.%${searchTerm}%`,
-        );
+        query = query.or(`dog.name.ilike.%${searchTerm}%`);
       }
 
       // Paginacja
@@ -267,12 +243,7 @@ export class RegistrationService {
             id,
             name,
             gender,
-            birth_date,
-            breed: breeds (
-              name_pl,
-              name_en,
-              fci_group
-            )
+            birth_date
           )
         `,
         )
@@ -282,7 +253,7 @@ export class RegistrationService {
         throw new Error(`Database error: ${createError.message}`);
       }
 
-      return registration;
+      return this.formatRegistrationResponse(registration);
     } catch (error) {
       throw new Error(
         error instanceof Error ? error.message : "Unknown error occurred",
@@ -352,12 +323,7 @@ export class RegistrationService {
             id,
             name,
             gender,
-            birth_date,
-            breed: breeds (
-              name_pl,
-              name_en,
-              fci_group
-            )
+            birth_date
           )
         `,
         )
@@ -367,7 +333,7 @@ export class RegistrationService {
         throw new Error(`Database error: ${updateError.message}`);
       }
 
-      return registration;
+      return this.formatRegistrationResponse(registration);
     } catch (error) {
       throw new Error(
         error instanceof Error ? error.message : "Unknown error occurred",
@@ -467,12 +433,7 @@ export class RegistrationService {
             id,
             name,
             gender,
-            birth_date,
-            breed: breeds (
-              name_pl,
-              name_en,
-              fci_group
-            )
+            birth_date
           )
         `,
           )
@@ -482,7 +443,7 @@ export class RegistrationService {
         throw new Error(`Database error: ${updateError.message}`);
       }
 
-      return updatedRegistration;
+      return this.formatRegistrationResponse(updatedRegistration);
     } catch (error) {
       throw new Error(
         error instanceof Error ? error.message : "Unknown error occurred",
@@ -516,9 +477,7 @@ export class RegistrationService {
           registration_fee,
           dog: dogs (
             gender,
-            breed: breeds (
-              fci_group
-            )
+
           )
         `,
         )
@@ -603,6 +562,22 @@ export class RegistrationService {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, prettier/prettier
+  private formatRegistrationResponse(registration: any): RegistrationResponseDto {
+    return {
+      id: registration.id,
+      dog: {
+        id: registration.dog.id,
+        name: registration.dog.name,
+        gender: registration.dog.gender,
+        birth_date: registration.dog.birth_date,
+      },
+      dog_class: registration.dog_class,
+      catalog_number: registration.catalog_number,
+      registered_at: registration.registered_at,
+    };
+  }
+
   private calculateRegistrationStats(
     registrations: {
       dog_class: DogClass;
@@ -610,14 +585,11 @@ export class RegistrationService {
       registration_fee: number | null;
       dog?: {
         gender?: DogGender;
-        breed?: {
-          fci_group?: FCIGroup;
-        };
       };
     }[],
   ): RegistrationStatsDto {
     const stats: RegistrationStatsDto = {
-      total: registrations.length,
+      total_registrations: registrations.length,
       paid: 0,
       unpaid: 0,
       by_class: {} as Record<DogClass, number>,
@@ -649,12 +621,12 @@ export class RegistrationService {
         stats.by_gender[gender] = (stats.by_gender[gender] || 0) + 1;
       }
 
-      // Grupa FCI
-      const fciGroup = reg.dog?.breed?.fci_group;
-      if (fciGroup) {
-        stats.by_breed_group[fciGroup] =
-          (stats.by_breed_group[fciGroup] || 0) + 1;
-      }
+      // Grupa FCI - removed for Hovawart Club MVP (only Hovawarts)
+      // const fciGroup = reg.dog?.breed?.fci_group;
+      // if (fciGroup) {
+      //   stats.by_breed_group[fciGroup] =
+      //     (stats.by_breed_group[fciGroup] || 0) + 1;
+      // }
 
       // Całkowity przychód
       stats.revenue.total += reg.registration_fee || 0;

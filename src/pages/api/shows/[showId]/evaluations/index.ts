@@ -1,31 +1,59 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { ShowService } from "../../lib/services/showService";
+import { EvaluationService } from "../../../../../lib/services/evaluationService";
 import {
-  createShowSchema,
-  showQuerySchema,
-} from "../../lib/validation/showSchemas";
-import { supabaseClient } from "../../db/supabase.client";
-import type { ErrorResponseDto } from "../../types";
+  createEvaluationSchema,
+  evaluationQuerySchema,
+} from "../../../../../lib/validation/evaluationSchemas";
+import { supabaseClient } from "../../../../../db/supabase.client";
+import type { ErrorResponseDto } from "../../../../../types";
 
-export const POST: APIRoute = async ({ request }) => {
+export const GET: APIRoute = async ({ params, request }) => {
   try {
-    // Parse request body
-    const body = await request.json();
+    const { showId } = params;
+    if (!showId) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            code: "VALIDATION_ERROR",
+            message: "Show ID is required",
+          },
+          timestamp: new Date().toISOString(),
+          request_id: crypto.randomUUID(),
+        } as ErrorResponseDto),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
 
-    // Validate input data
-    const validatedData = createShowSchema.parse(body);
+    // Parse query parameters
+    const url = new URL(request.url);
+    const queryParams = {
+      dog_class: url.searchParams.get("dog_class"),
+      grade: url.searchParams.get("grade"),
+      club_title: url.searchParams.get("club_title"),
+      page: parseInt(url.searchParams.get("page") || "1"),
+      limit: parseInt(url.searchParams.get("limit") || "20"),
+    };
 
-    // Create show using service with existing supabase client
-    const showService = new ShowService(supabaseClient);
-    const show = await showService.create(validatedData);
+    // Validate query parameters
+    const validatedParams = evaluationQuerySchema.parse(queryParams);
 
-    return new Response(JSON.stringify(show), {
-      status: 201,
+    // Get evaluations using service
+    const evaluationService = new EvaluationService(supabaseClient);
+    const evaluations = await evaluationService.getEvaluations(
+      showId,
+      validatedParams,
+    );
+
+    return new Response(JSON.stringify(evaluations), {
+      status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error creating show:", error);
+    console.error("Error getting evaluations:", error);
 
     // Handle validation errors
     if (error instanceof z.ZodError) {
@@ -33,7 +61,7 @@ export const POST: APIRoute = async ({ request }) => {
         JSON.stringify({
           error: {
             code: "VALIDATION_ERROR",
-            message: "The provided data is invalid",
+            message: "The provided query parameters are invalid",
             details: error.errors.map((err) => ({
               field: err.path.join("."),
               message: err.message,
@@ -96,28 +124,42 @@ export const POST: APIRoute = async ({ request }) => {
   }
 };
 
-export const GET: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ params, request }) => {
   try {
-    const url = new URL(request.url);
-    const params = Object.fromEntries(url.searchParams.entries());
+    const { showId } = params;
+    if (!showId) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            code: "VALIDATION_ERROR",
+            message: "Show ID is required",
+          },
+          timestamp: new Date().toISOString(),
+          request_id: crypto.randomUUID(),
+        } as ErrorResponseDto),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
 
-    // Parse and validate query parameters
-    const validatedParams = showQuerySchema.parse({
-      ...params,
-      page: params.page ? parseInt(params.page) : undefined,
-      limit: params.limit ? parseInt(params.limit) : undefined,
-    });
+    // Parse request body
+    const body = await request.json();
 
-    // Get shows using service
-    const showService = new ShowService(supabaseClient);
-    const shows = await showService.getShows(validatedParams);
+    // Validate input data
+    const validatedData = createEvaluationSchema.parse(body);
 
-    return new Response(JSON.stringify(shows), {
-      status: 200,
+    // Create evaluation using service
+    const evaluationService = new EvaluationService(supabaseClient);
+    const evaluation = await evaluationService.create(showId, validatedData);
+
+    return new Response(JSON.stringify(evaluation), {
+      status: 201,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error fetching shows:", error);
+    console.error("Error creating evaluation:", error);
 
     // Handle validation errors
     if (error instanceof z.ZodError) {
@@ -125,7 +167,7 @@ export const GET: APIRoute = async ({ request }) => {
         JSON.stringify({
           error: {
             code: "VALIDATION_ERROR",
-            message: "Invalid query parameters",
+            message: "The provided data is invalid",
             details: error.errors.map((err) => ({
               field: err.path.join("."),
               message: err.message,

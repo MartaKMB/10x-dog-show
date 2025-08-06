@@ -15,7 +15,7 @@ export class OwnerService {
   async create(data: CreateOwnerInput): Promise<OwnerResponseDto> {
     // Check if email already exists
     const { data: existingOwner } = await this.supabase
-      .from("dog_shows.owners")
+      .from("owners")
       .select("id")
       .eq("email", data.email)
       .is("deleted_at", null)
@@ -27,7 +27,7 @@ export class OwnerService {
 
     // Create owner with GDPR consent tracking
     const { data: owner, error: createError } = await this.supabase
-      .from("dog_shows.owners")
+      .from("owners")
       .insert({
         first_name: data.first_name,
         last_name: data.last_name,
@@ -36,9 +36,7 @@ export class OwnerService {
         address: data.address,
         city: data.city,
         postal_code: data.postal_code,
-        country: data.country,
         kennel_name: data.kennel_name,
-        language: data.language,
         gdpr_consent: data.gdpr_consent,
         gdpr_consent_date: data.gdpr_consent ? new Date().toISOString() : null,
       })
@@ -64,7 +62,7 @@ export class OwnerService {
     const offset = (page - 1) * limit;
 
     let queryBuilder = this.supabase
-      .from("dog_shows.owners")
+      .from("owners")
       .select("*")
       .is("deleted_at", null);
 
@@ -74,9 +72,6 @@ export class OwnerService {
     }
     if (filters.city) {
       queryBuilder = queryBuilder.eq("city", filters.city);
-    }
-    if (filters.country) {
-      queryBuilder = queryBuilder.eq("country", filters.country);
     }
     if (filters.gdpr_consent !== undefined) {
       queryBuilder = queryBuilder.eq("gdpr_consent", filters.gdpr_consent);
@@ -118,7 +113,7 @@ export class OwnerService {
    */
   async getById(id: string): Promise<OwnerResponseDto> {
     const { data: owner, error } = await this.supabase
-      .from("dog_shows.owners")
+      .from("owners")
       .select("*")
       .eq("id", id)
       .is("deleted_at", null)
@@ -137,7 +132,7 @@ export class OwnerService {
   async update(id: string, data: UpdateOwnerInput): Promise<OwnerResponseDto> {
     // Check if owner exists
     const { data: existingOwner, error: checkError } = await this.supabase
-      .from("dog_shows.owners")
+      .from("owners")
       .select("id")
       .eq("id", id)
       .is("deleted_at", null)
@@ -149,7 +144,7 @@ export class OwnerService {
 
     // Update owner
     const { data: owner, error: updateError } = await this.supabase
-      .from("dog_shows.owners")
+      .from("owners")
       .update({
         ...data,
         updated_at: new Date().toISOString(),
@@ -173,7 +168,7 @@ export class OwnerService {
   async delete(id: string): Promise<void> {
     // Check if owner exists
     const { data: existingOwner, error: checkError } = await this.supabase
-      .from("dog_shows.owners")
+      .from("owners")
       .select("id")
       .eq("id", id)
       .is("deleted_at", null)
@@ -185,7 +180,7 @@ export class OwnerService {
 
     // Check if owner has assigned dogs
     const { data: assignedDogs, error: dogsError } = await this.supabase
-      .from("dog_shows.dog_owners")
+      .from("dog_owners")
       .select("dog_id")
       .eq("owner_id", id);
 
@@ -203,10 +198,9 @@ export class OwnerService {
 
     // Soft delete
     const { error: deleteError } = await this.supabase
-      .from("dog_shows.owners")
+      .from("owners")
       .update({
         deleted_at: new Date().toISOString(),
-        scheduled_for_deletion: true,
         updated_at: new Date().toISOString(),
       })
       .eq("id", id);

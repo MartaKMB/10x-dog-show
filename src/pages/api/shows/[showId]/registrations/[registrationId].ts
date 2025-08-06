@@ -1,31 +1,51 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { ShowService } from "../../lib/services/showService";
-import {
-  createShowSchema,
-  showQuerySchema,
-} from "../../lib/validation/showSchemas";
-import { supabaseClient } from "../../db/supabase.client";
-import type { ErrorResponseDto } from "../../types";
+import { ShowService } from "../../../../../lib/services/showService";
+import { updateRegistrationSchema } from "../../../../../lib/validation/showSchemas";
+import { supabaseClient } from "../../../../../db/supabase.client";
+import type { ErrorResponseDto } from "../../../../../types";
 
-export const POST: APIRoute = async ({ request }) => {
+export const PUT: APIRoute = async ({ params, request }) => {
   try {
+    const { showId, registrationId } = params;
+
+    if (!showId || !registrationId) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            code: "VALIDATION_ERROR",
+            message: "Show ID and Registration ID are required",
+          },
+          timestamp: new Date().toISOString(),
+          request_id: crypto.randomUUID(),
+        } as ErrorResponseDto),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
+
     // Parse request body
     const body = await request.json();
 
     // Validate input data
-    const validatedData = createShowSchema.parse(body);
+    const validatedData = updateRegistrationSchema.parse(body);
 
-    // Create show using service with existing supabase client
+    // Update registration using service
     const showService = new ShowService(supabaseClient);
-    const show = await showService.create(validatedData);
+    const registration = await showService.updateRegistration(
+      showId,
+      registrationId,
+      validatedData,
+    );
 
-    return new Response(JSON.stringify(show), {
-      status: 201,
+    return new Response(JSON.stringify(registration), {
+      status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error creating show:", error);
+    console.error("Error updating registration:", error);
 
     // Handle validation errors
     if (error instanceof z.ZodError) {
@@ -51,15 +71,13 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Handle business logic errors
     if (error instanceof Error) {
-      const statusCode = error.message.includes("AUTHORIZATION_ERROR")
-        ? 403
-        : error.message.includes("NOT_FOUND")
-          ? 404
-          : error.message.includes("CONFLICT")
-            ? 409
-            : error.message.includes("BUSINESS_RULE_ERROR")
-              ? 422
-              : 500;
+      const statusCode = error.message.includes("NOT_FOUND")
+        ? 404
+        : error.message.includes("AUTHORIZATION_ERROR")
+          ? 403
+          : error.message.includes("BUSINESS_RULE_ERROR")
+            ? 422
+            : 500;
 
       return new Response(
         JSON.stringify({
@@ -96,40 +114,16 @@ export const POST: APIRoute = async ({ request }) => {
   }
 };
 
-export const GET: APIRoute = async ({ request }) => {
+export const DELETE: APIRoute = async ({ params }) => {
   try {
-    const url = new URL(request.url);
-    const params = Object.fromEntries(url.searchParams.entries());
+    const { showId, registrationId } = params;
 
-    // Parse and validate query parameters
-    const validatedParams = showQuerySchema.parse({
-      ...params,
-      page: params.page ? parseInt(params.page) : undefined,
-      limit: params.limit ? parseInt(params.limit) : undefined,
-    });
-
-    // Get shows using service
-    const showService = new ShowService(supabaseClient);
-    const shows = await showService.getShows(validatedParams);
-
-    return new Response(JSON.stringify(shows), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
-  } catch (error) {
-    console.error("Error fetching shows:", error);
-
-    // Handle validation errors
-    if (error instanceof z.ZodError) {
+    if (!showId || !registrationId) {
       return new Response(
         JSON.stringify({
           error: {
             code: "VALIDATION_ERROR",
-            message: "Invalid query parameters",
-            details: error.errors.map((err) => ({
-              field: err.path.join("."),
-              message: err.message,
-            })),
+            message: "Show ID and Registration ID are required",
           },
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
@@ -141,17 +135,33 @@ export const GET: APIRoute = async ({ request }) => {
       );
     }
 
+    // Delete registration using service
+    const showService = new ShowService(supabaseClient);
+    await showService.deleteRegistration(showId, registrationId);
+
+    return new Response(
+      JSON.stringify({
+        message: "Registration cancelled successfully",
+        timestamp: new Date().toISOString(),
+        request_id: crypto.randomUUID(),
+      }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+  } catch (error) {
+    console.error("Error deleting registration:", error);
+
     // Handle business logic errors
     if (error instanceof Error) {
-      const statusCode = error.message.includes("AUTHORIZATION_ERROR")
-        ? 403
-        : error.message.includes("NOT_FOUND")
-          ? 404
-          : error.message.includes("CONFLICT")
-            ? 409
-            : error.message.includes("BUSINESS_RULE_ERROR")
-              ? 422
-              : 500;
+      const statusCode = error.message.includes("NOT_FOUND")
+        ? 404
+        : error.message.includes("AUTHORIZATION_ERROR")
+          ? 403
+          : error.message.includes("BUSINESS_RULE_ERROR")
+            ? 422
+            : 500;
 
       return new Response(
         JSON.stringify({

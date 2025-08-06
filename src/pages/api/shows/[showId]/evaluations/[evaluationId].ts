@@ -1,20 +1,19 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { DogService } from "../../../lib/services/dogService";
-import { updateDogSchema } from "../../../lib/validation/dogSchemas";
-import { supabaseClient } from "../../../db/supabase.client";
-import type { ErrorResponseDto } from "../../../types";
+import { EvaluationService } from "../../../../../lib/services/evaluationService";
+import { updateEvaluationSchema } from "../../../../../lib/validation/evaluationSchemas";
+import { supabaseClient } from "../../../../../db/supabase.client";
+import type { ErrorResponseDto } from "../../../../../types";
 
 export const GET: APIRoute = async ({ params }) => {
   try {
-    const { id } = params;
-
-    if (!id) {
+    const { showId, evaluationId } = params;
+    if (!showId || !evaluationId) {
       return new Response(
         JSON.stringify({
           error: {
             code: "VALIDATION_ERROR",
-            message: "Dog ID is required",
+            message: "Show ID and Evaluation ID are required",
           },
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
@@ -26,24 +25,49 @@ export const GET: APIRoute = async ({ params }) => {
       );
     }
 
-    // Get dog by ID using service
-    const dogService = new DogService(supabaseClient);
-    const dog = await dogService.getDogById(id);
+    // Get evaluation using service
+    const evaluationService = new EvaluationService(supabaseClient);
+    const evaluations = await evaluationService.getEvaluations(showId, {
+      page: 1,
+      limit: 1000, // Get all to find the specific one
+    });
 
-    return new Response(JSON.stringify(dog), {
+    const evaluation = evaluations.data.find((e) => e.id === evaluationId);
+    if (!evaluation) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            code: "NOT_FOUND",
+            message: "Evaluation not found",
+          },
+          timestamp: new Date().toISOString(),
+          request_id: crypto.randomUUID(),
+        } as ErrorResponseDto),
+        {
+          status: 404,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
+
+    return new Response(JSON.stringify(evaluation), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error fetching dog:", error);
+    console.error("Error getting evaluation:", error);
 
     // Handle business logic errors
     if (error instanceof Error) {
-      const statusCode = error.message.includes("NOT_FOUND")
-        ? 404
-        : error.message.includes("AUTHORIZATION_ERROR")
-          ? 403
-          : 500;
+      const statusCode = error.message.includes("AUTHORIZATION_ERROR")
+        ? 403
+        : error.message.includes("NOT_FOUND")
+          ? 404
+          : error.message.includes("CONFLICT")
+            ? 409
+            : error.message.includes("BUSINESS_RULE_ERROR")
+              ? 422
+              : 500;
 
       return new Response(
         JSON.stringify({
@@ -82,14 +106,13 @@ export const GET: APIRoute = async ({ params }) => {
 
 export const PUT: APIRoute = async ({ params, request }) => {
   try {
-    const { id } = params;
-
-    if (!id) {
+    const { showId, evaluationId } = params;
+    if (!showId || !evaluationId) {
       return new Response(
         JSON.stringify({
           error: {
             code: "VALIDATION_ERROR",
-            message: "Dog ID is required",
+            message: "Show ID and Evaluation ID are required",
           },
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
@@ -105,18 +128,22 @@ export const PUT: APIRoute = async ({ params, request }) => {
     const body = await request.json();
 
     // Validate input data
-    const validatedData = updateDogSchema.parse(body);
+    const validatedData = updateEvaluationSchema.parse(body);
 
-    // Update dog using service
-    const dogService = new DogService(supabaseClient);
-    const dog = await dogService.update(id, validatedData);
+    // Update evaluation using service
+    const evaluationService = new EvaluationService(supabaseClient);
+    const evaluation = await evaluationService.update(
+      showId,
+      evaluationId,
+      validatedData,
+    );
 
-    return new Response(JSON.stringify(dog), {
+    return new Response(JSON.stringify(evaluation), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error updating dog:", error);
+    console.error("Error updating evaluation:", error);
 
     // Handle validation errors
     if (error instanceof z.ZodError) {
@@ -142,13 +169,15 @@ export const PUT: APIRoute = async ({ params, request }) => {
 
     // Handle business logic errors
     if (error instanceof Error) {
-      const statusCode = error.message.includes("NOT_FOUND")
-        ? 404
-        : error.message.includes("AUTHORIZATION_ERROR")
-          ? 403
-          : error.message.includes("BUSINESS_RULE_ERROR")
-            ? 422
-            : 500;
+      const statusCode = error.message.includes("AUTHORIZATION_ERROR")
+        ? 403
+        : error.message.includes("NOT_FOUND")
+          ? 404
+          : error.message.includes("CONFLICT")
+            ? 409
+            : error.message.includes("BUSINESS_RULE_ERROR")
+              ? 422
+              : 500;
 
       return new Response(
         JSON.stringify({
@@ -187,14 +216,13 @@ export const PUT: APIRoute = async ({ params, request }) => {
 
 export const DELETE: APIRoute = async ({ params }) => {
   try {
-    const { id } = params;
-
-    if (!id) {
+    const { showId, evaluationId } = params;
+    if (!showId || !evaluationId) {
       return new Response(
         JSON.stringify({
           error: {
             code: "VALIDATION_ERROR",
-            message: "Dog ID is required",
+            message: "Show ID and Evaluation ID are required",
           },
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
@@ -206,15 +234,14 @@ export const DELETE: APIRoute = async ({ params }) => {
       );
     }
 
-    // Delete dog using service
-    const dogService = new DogService(supabaseClient);
-    await dogService.delete(id);
+    // Delete evaluation using service
+    const evaluationService = new EvaluationService(supabaseClient);
+    await evaluationService.delete(showId, evaluationId);
 
     return new Response(
       JSON.stringify({
-        message: "Dog deleted successfully",
+        message: "Evaluation deleted successfully",
         timestamp: new Date().toISOString(),
-        request_id: crypto.randomUUID(),
       }),
       {
         status: 200,
@@ -222,17 +249,19 @@ export const DELETE: APIRoute = async ({ params }) => {
       },
     );
   } catch (error) {
-    console.error("Error deleting dog:", error);
+    console.error("Error deleting evaluation:", error);
 
     // Handle business logic errors
     if (error instanceof Error) {
-      const statusCode = error.message.includes("NOT_FOUND")
-        ? 404
-        : error.message.includes("AUTHORIZATION_ERROR")
-          ? 403
-          : error.message.includes("BUSINESS_RULE_ERROR")
-            ? 422
-            : 500;
+      const statusCode = error.message.includes("AUTHORIZATION_ERROR")
+        ? 403
+        : error.message.includes("NOT_FOUND")
+          ? 404
+          : error.message.includes("CONFLICT")
+            ? 409
+            : error.message.includes("BUSINESS_RULE_ERROR")
+              ? 422
+              : 500;
 
       return new Response(
         JSON.stringify({
