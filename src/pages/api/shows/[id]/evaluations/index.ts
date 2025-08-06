@@ -1,19 +1,22 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
 import { EvaluationService } from "../../../../../lib/services/evaluationService";
-import { updateEvaluationSchema } from "../../../../../lib/validation/evaluationSchemas";
+import {
+  createEvaluationSchema,
+  evaluationQuerySchema,
+} from "../../../../../lib/validation/evaluationSchemas";
 import { supabaseClient } from "../../../../../db/supabase.client";
 import type { ErrorResponseDto } from "../../../../../types";
 
-export const GET: APIRoute = async ({ params }) => {
+export const GET: APIRoute = async ({ params, request }) => {
   try {
-    const { showId, evaluationId } = params;
-    if (!showId || !evaluationId) {
+    const { id: showId } = params;
+    if (!showId) {
       return new Response(
         JSON.stringify({
           error: {
             code: "VALIDATION_ERROR",
-            message: "Show ID and Evaluation ID are required",
+            message: "Show ID is required",
           },
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
@@ -25,125 +28,32 @@ export const GET: APIRoute = async ({ params }) => {
       );
     }
 
-    // Get evaluation using service
+    // Parse query parameters
+    const url = new URL(request.url);
+    const queryParams = {
+      dog_class: url.searchParams.get("dog_class"),
+      grade: url.searchParams.get("grade"),
+      club_title: url.searchParams.get("club_title"),
+      page: parseInt(url.searchParams.get("page") || "1"),
+      limit: parseInt(url.searchParams.get("limit") || "20"),
+    };
+
+    // Validate query parameters
+    const validatedParams = evaluationQuerySchema.parse(queryParams);
+
+    // Get evaluations using service
     const evaluationService = new EvaluationService(supabaseClient);
-    const evaluations = await evaluationService.getEvaluations(showId, {
-      page: 1,
-      limit: 1000, // Get all to find the specific one
-    });
-
-    const evaluation = evaluations.data.find((e) => e.id === evaluationId);
-    if (!evaluation) {
-      return new Response(
-        JSON.stringify({
-          error: {
-            code: "NOT_FOUND",
-            message: "Evaluation not found",
-          },
-          timestamp: new Date().toISOString(),
-          request_id: crypto.randomUUID(),
-        } as ErrorResponseDto),
-        {
-          status: 404,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
-    }
-
-    return new Response(JSON.stringify(evaluation), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
-  } catch (error) {
-    console.error("Error getting evaluation:", error);
-
-    // Handle business logic errors
-    if (error instanceof Error) {
-      const statusCode = error.message.includes("AUTHORIZATION_ERROR")
-        ? 403
-        : error.message.includes("NOT_FOUND")
-          ? 404
-          : error.message.includes("CONFLICT")
-            ? 409
-            : error.message.includes("BUSINESS_RULE_ERROR")
-              ? 422
-              : 500;
-
-      return new Response(
-        JSON.stringify({
-          error: {
-            code: error.message.split(":")[0] || "INTERNAL_ERROR",
-            message:
-              error.message.split(":")[1]?.trim() || "Internal server error",
-          },
-          timestamp: new Date().toISOString(),
-          request_id: crypto.randomUUID(),
-        } as ErrorResponseDto),
-        {
-          status: statusCode,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
-    }
-
-    // Generic error handler
-    return new Response(
-      JSON.stringify({
-        error: {
-          code: "INTERNAL_ERROR",
-          message: "Internal server error",
-        },
-        timestamp: new Date().toISOString(),
-        request_id: crypto.randomUUID(),
-      } as ErrorResponseDto),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      },
-    );
-  }
-};
-
-export const PUT: APIRoute = async ({ params, request }) => {
-  try {
-    const { showId, evaluationId } = params;
-    if (!showId || !evaluationId) {
-      return new Response(
-        JSON.stringify({
-          error: {
-            code: "VALIDATION_ERROR",
-            message: "Show ID and Evaluation ID are required",
-          },
-          timestamp: new Date().toISOString(),
-          request_id: crypto.randomUUID(),
-        } as ErrorResponseDto),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
-    }
-
-    // Parse request body
-    const body = await request.json();
-
-    // Validate input data
-    const validatedData = updateEvaluationSchema.parse(body);
-
-    // Update evaluation using service
-    const evaluationService = new EvaluationService(supabaseClient);
-    const evaluation = await evaluationService.update(
+    const evaluations = await evaluationService.getEvaluations(
       showId,
-      evaluationId,
-      validatedData,
+      validatedParams,
     );
 
-    return new Response(JSON.stringify(evaluation), {
+    return new Response(JSON.stringify(evaluations), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error updating evaluation:", error);
+    console.error("Error getting evaluations:", error);
 
     // Handle validation errors
     if (error instanceof z.ZodError) {
@@ -151,7 +61,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
         JSON.stringify({
           error: {
             code: "VALIDATION_ERROR",
-            message: "The provided data is invalid",
+            message: "The provided query parameters are invalid",
             details: error.errors.map((err) => ({
               field: err.path.join("."),
               message: err.message,
@@ -214,15 +124,15 @@ export const PUT: APIRoute = async ({ params, request }) => {
   }
 };
 
-export const DELETE: APIRoute = async ({ params }) => {
+export const POST: APIRoute = async ({ params, request }) => {
   try {
-    const { showId, evaluationId } = params;
-    if (!showId || !evaluationId) {
+    const { id: showId } = params;
+    if (!showId) {
       return new Response(
         JSON.stringify({
           error: {
             code: "VALIDATION_ERROR",
-            message: "Show ID and Evaluation ID are required",
+            message: "Show ID is required",
           },
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
@@ -234,22 +144,44 @@ export const DELETE: APIRoute = async ({ params }) => {
       );
     }
 
-    // Delete evaluation using service
-    const evaluationService = new EvaluationService(supabaseClient);
-    await evaluationService.delete(showId, evaluationId);
+    // Parse request body
+    const body = await request.json();
 
-    return new Response(
-      JSON.stringify({
-        message: "Evaluation deleted successfully",
-        timestamp: new Date().toISOString(),
-      }),
-      {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      },
-    );
+    // Validate input data
+    const validatedData = createEvaluationSchema.parse(body);
+
+    // Create evaluation using service
+    const evaluationService = new EvaluationService(supabaseClient);
+    const evaluation = await evaluationService.create(showId, validatedData);
+
+    return new Response(JSON.stringify(evaluation), {
+      status: 201,
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (error) {
-    console.error("Error deleting evaluation:", error);
+    console.error("Error creating evaluation:", error);
+
+    // Handle validation errors
+    if (error instanceof z.ZodError) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            code: "VALIDATION_ERROR",
+            message: "The provided data is invalid",
+            details: error.errors.map((err) => ({
+              field: err.path.join("."),
+              message: err.message,
+            })),
+          },
+          timestamp: new Date().toISOString(),
+          request_id: crypto.randomUUID(),
+        } as ErrorResponseDto),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
 
     // Handle business logic errors
     if (error instanceof Error) {

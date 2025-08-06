@@ -1,46 +1,19 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { DescriptionService } from "../../../lib/services/descriptionService";
-import { updateDescriptionSchema } from "../../../lib/validation/descriptionSchemas";
-import { supabaseClient } from "../../../db/supabase.client";
-import type { ErrorResponseDto } from "../../../types";
-
-// Mock DEFAULT_USER dla testów
-const DEFAULT_USER = {
-  id: "00000000-0000-0000-0000-000000000001",
-  role: "secretary" as const,
-};
-
-// Schema for description ID validation
-const descriptionIdSchema = z.string().uuid("Invalid description ID format");
+import { EvaluationService } from "../../../../../lib/services/evaluationService";
+import { updateEvaluationSchema } from "../../../../../lib/validation/evaluationSchemas";
+import { supabaseClient } from "../../../../../db/supabase.client";
+import type { ErrorResponseDto } from "../../../../../types";
 
 export const GET: APIRoute = async ({ params }) => {
   try {
-    // Validate description ID
-    const validatedId = descriptionIdSchema.parse(params.id);
-
-    // Get description using service
-    const descriptionService = new DescriptionService(supabaseClient);
-    const description = await descriptionService.getById(validatedId);
-
-    return new Response(JSON.stringify(description), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
-  } catch (error) {
-    console.error("Error fetching description:", error);
-
-    // Handle validation errors
-    if (error instanceof z.ZodError) {
+    const { id: showId, evaluationId } = params;
+    if (!showId || !evaluationId) {
       return new Response(
         JSON.stringify({
           error: {
             code: "VALIDATION_ERROR",
-            message: "Invalid description ID format",
-            details: error.errors.map((err) => ({
-              field: err.path.join("."),
-              message: err.message,
-            })),
+            message: "Show ID and Evaluation ID are required",
           },
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
@@ -52,13 +25,20 @@ export const GET: APIRoute = async ({ params }) => {
       );
     }
 
-    // Handle not found errors
-    if (error instanceof Error && error.message.includes("NOT_FOUND")) {
+    // Get evaluation using service
+    const evaluationService = new EvaluationService(supabaseClient);
+    const evaluations = await evaluationService.getEvaluations(showId, {
+      page: 1,
+      limit: 1000, // Get all to find the specific one
+    });
+
+    const evaluation = evaluations.data.find((e) => e.id === evaluationId);
+    if (!evaluation) {
       return new Response(
         JSON.stringify({
           error: {
             code: "NOT_FOUND",
-            message: "Description not found",
+            message: "Evaluation not found",
           },
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
@@ -70,7 +50,43 @@ export const GET: APIRoute = async ({ params }) => {
       );
     }
 
-    // Handle other errors
+    return new Response(JSON.stringify(evaluation), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.error("Error getting evaluation:", error);
+
+    // Handle business logic errors
+    if (error instanceof Error) {
+      const statusCode = error.message.includes("AUTHORIZATION_ERROR")
+        ? 403
+        : error.message.includes("NOT_FOUND")
+          ? 404
+          : error.message.includes("CONFLICT")
+            ? 409
+            : error.message.includes("BUSINESS_RULE_ERROR")
+              ? 422
+              : 500;
+
+      return new Response(
+        JSON.stringify({
+          error: {
+            code: error.message.split(":")[0] || "INTERNAL_ERROR",
+            message:
+              error.message.split(":")[1]?.trim() || "Internal server error",
+          },
+          timestamp: new Date().toISOString(),
+          request_id: crypto.randomUUID(),
+        } as ErrorResponseDto),
+        {
+          status: statusCode,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
+
+    // Generic error handler
     return new Response(
       JSON.stringify({
         error: {
@@ -90,30 +106,44 @@ export const GET: APIRoute = async ({ params }) => {
 
 export const PUT: APIRoute = async ({ params, request }) => {
   try {
-    // Validate description ID
-    const validatedId = descriptionIdSchema.parse(params.id);
+    const { id: showId, evaluationId } = params;
+    if (!showId || !evaluationId) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            code: "VALIDATION_ERROR",
+            message: "Show ID and Evaluation ID are required",
+          },
+          timestamp: new Date().toISOString(),
+          request_id: crypto.randomUUID(),
+        } as ErrorResponseDto),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
 
-    // Parse and validate request body
+    // Parse request body
     const body = await request.json();
-    const validatedData = updateDescriptionSchema.parse(body);
 
-    // Use DEFAULT_USER instead of real auth for now
-    const currentUserId = DEFAULT_USER.id;
+    // Validate input data
+    const validatedData = updateEvaluationSchema.parse(body);
 
-    // Update description using service
-    const descriptionService = new DescriptionService(supabaseClient);
-    const description = await descriptionService.update(
-      validatedId,
+    // Update evaluation using service
+    const evaluationService = new EvaluationService(supabaseClient);
+    const evaluation = await evaluationService.update(
+      showId,
+      evaluationId,
       validatedData,
-      currentUserId,
     );
 
-    return new Response(JSON.stringify(description), {
+    return new Response(JSON.stringify(evaluation), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error updating description:", error);
+    console.error("Error updating evaluation:", error);
 
     // Handle validation errors
     if (error instanceof z.ZodError) {
@@ -139,13 +169,15 @@ export const PUT: APIRoute = async ({ params, request }) => {
 
     // Handle business logic errors
     if (error instanceof Error) {
-      const statusCode = error.message.includes("NOT_FOUND")
-        ? 404
-        : error.message.includes("AUTHORIZATION_ERROR")
-          ? 403
-          : error.message.includes("BUSINESS_RULE_ERROR")
-            ? 422
-            : 500;
+      const statusCode = error.message.includes("AUTHORIZATION_ERROR")
+        ? 403
+        : error.message.includes("NOT_FOUND")
+          ? 404
+          : error.message.includes("CONFLICT")
+            ? 409
+            : error.message.includes("BUSINESS_RULE_ERROR")
+              ? 422
+              : 500;
 
       return new Response(
         JSON.stringify({
@@ -184,39 +216,13 @@ export const PUT: APIRoute = async ({ params, request }) => {
 
 export const DELETE: APIRoute = async ({ params }) => {
   try {
-    // Validate description ID
-    const validatedId = descriptionIdSchema.parse(params.id);
-
-    // Use DEFAULT_USER instead of real auth for now
-    const currentUserId = DEFAULT_USER.id;
-
-    // Delete description using service
-    const descriptionService = new DescriptionService(supabaseClient);
-    await descriptionService.delete(validatedId, currentUserId);
-
-    return new Response(
-      JSON.stringify({
-        message: "Description deleted successfully",
-      }),
-      {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      },
-    );
-  } catch (error) {
-    console.error("Error deleting description:", error);
-
-    // Handle validation errors
-    if (error instanceof z.ZodError) {
+    const { id: showId, evaluationId } = params;
+    if (!showId || !evaluationId) {
       return new Response(
         JSON.stringify({
           error: {
             code: "VALIDATION_ERROR",
-            message: "Invalid description ID format",
-            details: error.errors.map((err) => ({
-              field: err.path.join("."),
-              message: err.message,
-            })),
+            message: "Show ID and Evaluation ID are required",
           },
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
@@ -228,15 +234,34 @@ export const DELETE: APIRoute = async ({ params }) => {
       );
     }
 
+    // Delete evaluation using service
+    const evaluationService = new EvaluationService(supabaseClient);
+    await evaluationService.delete(showId, evaluationId);
+
+    return new Response(
+      JSON.stringify({
+        message: "Evaluation deleted successfully",
+        timestamp: new Date().toISOString(),
+      }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+  } catch (error) {
+    console.error("Error deleting evaluation:", error);
+
     // Handle business logic errors
     if (error instanceof Error) {
-      const statusCode = error.message.includes("NOT_FOUND")
-        ? 404
-        : error.message.includes("AUTHORIZATION_ERROR")
-          ? 403
-          : error.message.includes("BUSINESS_RULE_ERROR")
-            ? 422
-            : 500;
+      const statusCode = error.message.includes("AUTHORIZATION_ERROR")
+        ? 403
+        : error.message.includes("NOT_FOUND")
+          ? 404
+          : error.message.includes("CONFLICT")
+            ? 409
+            : error.message.includes("BUSINESS_RULE_ERROR")
+              ? 422
+              : 500;
 
       return new Response(
         JSON.stringify({
