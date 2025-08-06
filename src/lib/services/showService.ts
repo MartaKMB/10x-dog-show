@@ -89,7 +89,8 @@ const MOCK_DATA = {
       branch_id: "550e8400-e29b-41d4-a716-446655440202",
       organizer_id: "00000000-0000-0000-0000-000000000003",
       max_participants: 300,
-      description: "Międzynarodowa wystawa psów rasowych w Katowicach - w trakcie",
+      description:
+        "Międzynarodowa wystawa psów rasowych w Katowicach - w trakcie",
       entry_fee: 200.0,
       language: "pl",
       created_at: "2024-11-01T00:00:00Z",
@@ -360,7 +361,10 @@ export class ShowService {
       throw new Error("NOT_FOUND: Organizer not found");
     }
 
-    if (organizer.role !== "department_representative" && organizer.role !== "admin") {
+    if (
+      organizer.role !== "department_representative" &&
+      organizer.role !== "admin"
+    ) {
       throw new Error(
         "AUTHORIZATION_ERROR: Only department representatives and administrators can create shows",
       );
