@@ -7,6 +7,7 @@ System ocen został dostosowany do nowych wytycznych dla klubu hovawarta:
 ### ✅ Zmiany zrealizowane:
 
 1. **Oceny w języku polskim**:
+
    - `doskonała` (zamiast `excellent`)
    - `bardzo_dobra` (zamiast `very_good`)
    - `dobra` (zamiast `good`)
@@ -15,11 +16,13 @@ System ocen został dostosowany do nowych wytycznych dla klubu hovawarta:
    - `nieobecna` (zamiast `absent`)
 
 2. **Oceny dla szczeniąt w języku polskim**:
+
    - `bardzo_obiecujący` (zamiast `very_promising`)
    - `obiecujący` (zamiast `promising`)
    - `dość_obiecujący` (zamiast `quite_promising`)
 
 3. **Tytuły klubowe hovawartów**:
+
    - `młodzieżowy_zwycięzca_klubu`
    - `zwycięzca_klubu`
    - `zwycięzca_klubu_weteranów`
@@ -33,6 +36,7 @@ System ocen został dostosowany do nowych wytycznych dla klubu hovawarta:
    - `najlepszy_weteran`
 
 4. **Bezpośrednie powiązanie z wystawami**:
+
    - Oceny są teraz bezpośrednio powiązane z wystawami, nie z opisami
    - Endpointy: `/shows/{showId}/evaluations`
 
@@ -45,9 +49,11 @@ System ocen został dostosowany do nowych wytycznych dla klubu hovawarta:
 ## Endpointy API
 
 ### GET /shows/{showId}/evaluations
+
 Pobiera listę ocen dla konkretnej wystawy.
 
 **Query parameters:**
+
 - `dog_class` - filtr według klasy psa
 - `grade` - filtr według oceny
 - `club_title` - filtr według tytułu klubowego
@@ -55,6 +61,7 @@ Pobiera listę ocen dla konkretnej wystawy.
 - `limit` - liczba elementów na stronę (domyślnie 20)
 
 **Przykład odpowiedzi:**
+
 ```json
 {
   "evaluations": [
@@ -84,9 +91,11 @@ Pobiera listę ocen dla konkretnej wystawy.
 ```
 
 ### POST /shows/{showId}/evaluations
+
 Tworzy nową ocenę dla psa na konkretnej wystawie.
 
 **Request body:**
+
 ```json
 {
   "dog_id": "uuid",
@@ -98,6 +107,7 @@ Tworzy nową ocenę dla psa na konkretnej wystawie.
 ```
 
 **Dla szczeniąt (baby/puppy):**
+
 ```json
 {
   "dog_id": "uuid",
@@ -107,9 +117,11 @@ Tworzy nową ocenę dla psa na konkretnej wystawie.
 ```
 
 ### PUT /shows/{showId}/evaluations/{evaluationId}
+
 Aktualizuje istniejącą ocenę.
 
 **Request body:**
+
 ```json
 {
   "grade": "bardzo_dobra",
@@ -118,28 +130,34 @@ Aktualizuje istniejącą ocenę.
 ```
 
 ### DELETE /shows/{showId}/evaluations/{evaluationId}
+
 Usuwa ocenę.
 
 ## Walidacja biznesowa
 
 ### 1. Zgodność klasy z oceną
+
 - **Baby/Puppy klasy** (baby, puppy): muszą używać `baby_puppy_grade`, nie mogą używać `grade`
 - **Pozostałe klasy** (junior, intermediate, open, working, champion, veteran): muszą używać `grade`, nie mogą używać `baby_puppy_grade`
 
 ### 2. Rejestracja psa
+
 - Pies musi być zarejestrowany na wystawę przed wprowadzeniem oceny
 - Klasa w ocenie musi odpowiadać klasie w rejestracji
 
 ### 3. Status wystawy
+
 - Oceny można wprowadzać tylko dla wystaw w statusie `in_progress` lub `completed`
 - Oceny można edytować tylko dla wystaw, które nie są `completed`
 
 ### 4. Unikalność tytułów klubowych
+
 - Każdy tytuł klubowy może być przyznany tylko jednemu psu na wystawę
 
 ## Przykłady testowe
 
 ### Test 1: Tworzenie oceny dla psa dorosłego
+
 ```bash
 curl -X POST http://localhost:4321/api/shows/show-uuid/evaluations \
   -H "Content-Type: application/json" \
@@ -153,6 +171,7 @@ curl -X POST http://localhost:4321/api/shows/show-uuid/evaluations \
 ```
 
 ### Test 2: Tworzenie oceny dla szczenięcia
+
 ```bash
 curl -X POST http://localhost:4321/api/shows/show-uuid/evaluations \
   -H "Content-Type: application/json" \
@@ -164,6 +183,7 @@ curl -X POST http://localhost:4321/api/shows/show-uuid/evaluations \
 ```
 
 ### Test 3: Błędna kombinacja (baby + grade)
+
 ```bash
 curl -X POST http://localhost:4321/api/shows/show-uuid/evaluations \
   -H "Content-Type: application/json" \
@@ -173,9 +193,11 @@ curl -X POST http://localhost:4321/api/shows/show-uuid/evaluations \
     "grade": "doskonała"
   }'
 ```
+
 **Oczekiwany błąd:** "Baby/puppy classes use baby_puppy_grade, other classes use grade"
 
 ### Test 4: Pobieranie ocen z filtrami
+
 ```bash
 curl "http://localhost:4321/api/shows/show-uuid/evaluations?dog_class=open&grade=doskonała&page=1&limit=10"
 ```
@@ -195,4 +217,4 @@ curl "http://localhost:4321/api/shows/show-uuid/evaluations?dog_class=open&grade
 1. **Testy integracyjne** - sprawdzenie działania endpointów
 2. **Aktualizacja frontendu** - dostosowanie komponentów do nowych typów
 3. **Dokumentacja API** - aktualizacja dokumentacji
-4. **Migracja danych** - jeśli istnieją stare dane do przeniesienia 
+4. **Migracja danych** - jeśli istnieją stare dane do przeniesienia

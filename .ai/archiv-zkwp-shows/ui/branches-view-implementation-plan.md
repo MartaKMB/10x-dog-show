@@ -36,6 +36,7 @@ BranchesListView (Astro page)
 ## 4. Szczegóły komponentów
 
 ### BranchesListView
+
 - **Opis komponentu:** Główny widok strony zarządzania oddziałami, koordynujący wszystkie podkomponenty i zarządzający globalnym stanem
 - **Główne elementy:** Container z header, filtrami, tabelą i paginacją
 - **Obsługiwane interakcje:** Inicjalizacja danych, obsługa błędów, zarządzanie stanem globalnym
@@ -44,6 +45,7 @@ BranchesListView (Astro page)
 - **Props:** Brak (komponent główny)
 
 ### BranchesHeader
+
 - **Opis komponentu:** Nagłówek strony z tytułem, kontrolkami prywatności i akcjami szybkiego dostępu
 - **Główne elementy:** Tytuł strony, przełącznik prywatności, przyciski akcji
 - **Obsługiwane interakcje:** Przełączanie trybu prywatności, nawigacja do tworzenia nowego oddziału
@@ -52,6 +54,7 @@ BranchesListView (Astro page)
 - **Props:** userRole, canCreate, onPrivacyToggle, onCreateNew
 
 ### BranchesFilters
+
 - **Opis komponentu:** Panel filtrów umożliwiający filtrowanie listy oddziałów po różnych kryteriach
 - **Główne elementy:** Filtry regionu, statusu aktywności, wyszukiwanie tekstowe, przycisk resetowania
 - **Obsługiwane interakcje:** Zmiana filtrów, resetowanie filtrów, wyszukiwanie
@@ -60,6 +63,7 @@ BranchesListView (Astro page)
 - **Props:** filters, onFiltersChange, onReset
 
 ### RegionFilter
+
 - **Opis komponentu:** Filtr dropdown dla wyboru regionu oddziału
 - **Główne elementy:** Select dropdown z listą regionów
 - **Obsługiwane interakcje:** Wybór regionu, czyszczenie filtra
@@ -68,6 +72,7 @@ BranchesListView (Astro page)
 - **Props:** value, onChange, regions
 
 ### ActiveStatusFilter
+
 - **Opis komponentu:** Filtr checkbox dla statusu aktywności oddziałów
 - **Główne elementy:** Checkbox z etykietą
 - **Obsługiwane interakcje:** Przełączanie statusu aktywnego/nieaktywnego
@@ -76,6 +81,7 @@ BranchesListView (Astro page)
 - **Props:** value, onChange, label
 
 ### SearchFilter
+
 - **Opis komponentu:** Pole wyszukiwania tekstowego w nazwach oddziałów
 - **Główne elementy:** Input text z ikoną wyszukiwania
 - **Obsługiwane interakcje:** Wprowadzanie tekstu wyszukiwania, czyszczenie pola
@@ -84,6 +90,7 @@ BranchesListView (Astro page)
 - **Props:** value, onChange, placeholder, maxLength
 
 ### BranchesTable
+
 - **Opis komponentu:** Tabela wyświetlająca listę oddziałów z możliwością sortowania
 - **Główne elementy:** Nagłówek tabeli, wiersze danych, stan pusty
 - **Obsługiwane interakcje:** Sortowanie kolumn, wybór wierszy, nawigacja do szczegółów
@@ -92,6 +99,7 @@ BranchesListView (Astro page)
 - **Props:** branches, isLoading, onSort, onRowClick, canEdit, canDelete
 
 ### BranchesTableHeader
+
 - **Opis komponentu:** Nagłówek tabeli z kolumnami i kontrolkami sortowania
 - **Główne elementy:** Nagłówki kolumn z ikonami sortowania
 - **Obsługiwane interakcje:** Kliknięcie w nagłówek dla sortowania
@@ -100,6 +108,7 @@ BranchesListView (Astro page)
 - **Props:** sortField, sortDirection, onSort
 
 ### BranchesTableRow
+
 - **Opis komponentu:** Pojedynczy wiersz tabeli z danymi oddziału
 - **Główne elementy:** Komórki z danymi oddziału, status aktywności, akcje
 - **Obsługiwane interakcje:** Kliknięcie w wiersz, akcje edycji/usuwania
@@ -108,6 +117,7 @@ BranchesListView (Astro page)
 - **Props:** branch, isSelected, canEdit, canDelete, onEdit, onDelete, onSelect
 
 ### Pagination
+
 - **Opis komponentu:** Komponent nawigacji po stronach wyników
 - **Główne elementy:** Przyciski nawigacji, informacje o stronie, wybór liczby elementów
 - **Obsługiwane interakcje:** Zmiana strony, zmiana liczby elementów na stronę
@@ -116,6 +126,7 @@ BranchesListView (Astro page)
 - **Props:** pagination, onPageChange, onLimitChange, pageSizeOptions
 
 ### LoadingSpinner
+
 - **Opis komponentu:** Wskaźnik ładowania podczas pobierania danych
 - **Główne elementy:** Spinner z komunikatem
 - **Obsługiwane interakcje:** Brak
@@ -124,6 +135,7 @@ BranchesListView (Astro page)
 - **Props:** message, size
 
 ### ErrorDisplay
+
 - **Opis komponentu:** Wyświetlanie błędów z możliwością ponowienia akcji
 - **Główne elementy:** Komunikat błędu, przycisk ponowienia
 - **Obsługiwane interakcje:** Ponowienie żądania, zamknięcie błędu
@@ -134,6 +146,7 @@ BranchesListView (Astro page)
 ## 5. Typy
 
 ### BranchesListViewModel
+
 ```typescript
 interface BranchesListViewModel {
   branches: BranchResponseDto[];
@@ -150,6 +163,7 @@ interface BranchesListViewModel {
 ```
 
 ### BranchFiltersState
+
 ```typescript
 interface BranchFiltersState {
   region?: string;
@@ -161,6 +175,7 @@ interface BranchFiltersState {
 ```
 
 ### BranchTableRowViewModel
+
 ```typescript
 interface BranchTableRowViewModel {
   branch: BranchResponseDto;
@@ -172,16 +187,19 @@ interface BranchTableRowViewModel {
 ```
 
 ### SortField
+
 ```typescript
-type SortField = 'name' | 'region' | 'city' | 'is_active' | 'created_at';
+type SortField = "name" | "region" | "city" | "is_active" | "created_at";
 ```
 
 ### SortDirection
+
 ```typescript
-type SortDirection = 'asc' | 'desc';
+type SortDirection = "asc" | "desc";
 ```
 
 ### QuickAction
+
 ```typescript
 interface QuickAction {
   id: string;
@@ -198,44 +216,52 @@ interface QuickAction {
 Widok wykorzystuje kombinację React Context i custom hooks dla zarządzania stanem:
 
 ### useBranchesList Hook
+
 ```typescript
 const useBranchesList = () => {
   const [state, setState] = useState<BranchesListViewModel>(initialState);
   const [filters, setFilters] = useState<BranchFiltersState>(defaultFilters);
-  
+
   const fetchBranches = useCallback(async (params: BranchQueryParams) => {
     // Implementacja pobierania danych
   }, []);
-  
-  const updateFilters = useCallback((newFilters: Partial<BranchFiltersState>) => {
-    // Implementacja aktualizacji filtrów
-  }, []);
-  
+
+  const updateFilters = useCallback(
+    (newFilters: Partial<BranchFiltersState>) => {
+      // Implementacja aktualizacji filtrów
+    },
+    [],
+  );
+
   return {
     state,
     filters,
     fetchBranches,
     updateFilters,
     resetFilters,
-    setSorting
+    setSorting,
   };
 };
 ```
 
 ### useBranchFilters Hook
+
 ```typescript
 const useBranchFilters = () => {
   const [filters, setFilters] = useState<BranchFiltersState>(defaultFilters);
-  
-  const applyFilters = useCallback((newFilters: Partial<BranchFiltersState>) => {
-    // Implementacja aplikowania filtrów
-  }, []);
-  
+
+  const applyFilters = useCallback(
+    (newFilters: Partial<BranchFiltersState>) => {
+      // Implementacja aplikowania filtrów
+    },
+    [],
+  );
+
   return {
     filters,
     applyFilters,
     resetFilters,
-    hasActiveFilters
+    hasActiveFilters,
   };
 };
 ```
@@ -243,25 +269,29 @@ const useBranchFilters = () => {
 ## 7. Integracja API
 
 ### Główne wywołanie API
+
 ```typescript
 // GET /api/branches
-const fetchBranches = async (params: BranchQueryParams): Promise<BranchesListResponseDto> => {
+const fetchBranches = async (
+  params: BranchQueryParams,
+): Promise<BranchesListResponseDto> => {
   const response = await fetch(`/api/branches?${new URLSearchParams(params)}`, {
     headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    }
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
   });
-  
+
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
-  
+
   return response.json();
 };
 ```
 
 ### Typy żądania i odpowiedzi
+
 - **Żądanie:** BranchQueryParams (region?, is_active?, page?, limit?)
 - **Odpowiedź:** BranchesListResponseDto (branches: BranchResponseDto[], pagination: PaginationDto)
 - **Błędy:** ErrorResponseDto (401, 400, 500)
@@ -269,19 +299,23 @@ const fetchBranches = async (params: BranchQueryParams): Promise<BranchesListRes
 ## 8. Interakcje użytkownika
 
 ### Filtrowanie
+
 1. **Filtr regionu:** Użytkownik wybiera region z dropdown → aktualizacja filtrów → ponowne pobranie danych
 2. **Filtr statusu:** Użytkownik przełącza checkbox → filtrowanie po statusie aktywności
 3. **Wyszukiwanie:** Użytkownik wpisuje tekst → debounced search → filtrowanie po nazwie
 
 ### Sortowanie
+
 1. **Kliknięcie nagłówka kolumny:** Zmiana kierunku sortowania → ponowne pobranie danych
 2. **Wielokrotne kliknięcie:** Przełączanie między asc/desc
 
 ### Paginacja
+
 1. **Zmiana strony:** Kliknięcie numeru strony → aktualizacja page w filtrach
 2. **Zmiana liczby elementów:** Wybór z dropdown → aktualizacja limit w filtrach
 
 ### Akcje na wierszach
+
 1. **Kliknięcie wiersza:** Nawigacja do szczegółów oddziału
 2. **Akcje edycji:** Sprawdzenie uprawnień → otwarcie modalu edycji
 3. **Akcje usuwania:** Potwierdzenie → wywołanie API usuwania
@@ -289,6 +323,7 @@ const fetchBranches = async (params: BranchQueryParams): Promise<BranchesListRes
 ## 9. Warunki i walidacja
 
 ### Walidacja filtrów
+
 - **Region:** Maksymalna długość 100 znaków, opcjonalny
 - **Status aktywności:** Boolean, opcjonalny
 - **Wyszukiwanie:** Maksymalna długość 200 znaków, minimum 2 znaki dla aktywacji
@@ -296,12 +331,14 @@ const fetchBranches = async (params: BranchQueryParams): Promise<BranchesListRes
 - **Limit:** Liczba całkowita 1-100, domyślnie 20
 
 ### Walidacja uprawnień
+
 - **Odczyt:** Wszyscy uwierzytelnieni użytkownicy
 - **Edycja:** Tylko department_representative
 - **Usuwanie:** Tylko department_representative
 - **Tworzenie:** Tylko department_representative
 
 ### Walidacja stanu
+
 - **Ładowanie:** Blokowanie interakcji podczas fetch
 - **Błędy:** Wyświetlanie komunikatów błędów z możliwością ponowienia
 - **Puste wyniki:** Wyświetlanie stanu pustego z sugestiami
@@ -309,6 +346,7 @@ const fetchBranches = async (params: BranchQueryParams): Promise<BranchesListRes
 ## 10. Obsługa błędów
 
 ### Typy błędów
+
 1. **401 Unauthorized:** Przekierowanie do logowania
 2. **400 Bad Request:** Wyświetlanie szczegółów walidacji
 3. **500 Internal Server Error:** Komunikat o błędzie serwera z możliwością ponowienia
@@ -316,6 +354,7 @@ const fetchBranches = async (params: BranchQueryParams): Promise<BranchesListRes
 5. **Empty Results:** Informacja o braku wyników z sugestiami
 
 ### Strategie obsługi
+
 - **Retry mechanism:** Automatyczne ponowienie przy błędach sieciowych
 - **Fallback UI:** Wyświetlanie stanu offline z cached data
 - **User feedback:** Toast notifications dla akcji użytkownika
@@ -324,51 +363,61 @@ const fetchBranches = async (params: BranchQueryParams): Promise<BranchesListRes
 ## 11. Kroki implementacji
 
 1. **Przygotowanie struktury plików**
+
    - Utworzenie `src/pages/branches/index.astro`
    - Utworzenie `src/components/branches/` katalogu
    - Dodanie typów do `src/types.ts`
 
 2. **Implementacja głównego widoku**
+
    - Stworzenie `BranchesListView` komponentu
    - Implementacja layoutu z header, filtrami i tabelą
    - Dodanie podstawowej nawigacji
 
 3. **Implementacja filtrów**
+
    - Stworzenie `BranchesFilters` komponentu
    - Implementacja `RegionFilter`, `ActiveStatusFilter`, `SearchFilter`
    - Dodanie logiki resetowania filtrów
 
 4. **Implementacja tabeli**
+
    - Stworzenie `BranchesTable` komponentu
    - Implementacja `BranchesTableHeader` i `BranchesTableRow`
    - Dodanie sortowania kolumn
 
 5. **Implementacja paginacji**
+
    - Stworzenie `Pagination` komponentu
    - Dodanie nawigacji po stronach
    - Implementacja wyboru liczby elementów
 
 6. **Implementacja custom hooks**
+
    - Stworzenie `useBranchesList` hook
    - Implementacja `useBranchFilters` hook
    - Dodanie zarządzania stanem
 
 7. **Integracja z API**
+
    - Implementacja wywołania `GET /api/branches`
    - Dodanie obsługi parametrów zapytania
    - Implementacja error handling
 
 8. **Dodanie komponentów pomocniczych**
+
    - Implementacja `LoadingSpinner`
    - Stworzenie `ErrorDisplay`
    - Dodanie `EmptyState`
 
 9. **Implementacja accessibility**
+
    - Dodanie ARIA labels
    - Implementacja keyboard navigation
    - Dodanie screen reader support
 
 10. **Testowanie i optymalizacja**
+
     - Testowanie responsywności
     - Optymalizacja performance
     - Testowanie różnych scenariuszy błędów
@@ -376,4 +425,4 @@ const fetchBranches = async (params: BranchQueryParams): Promise<BranchesListRes
 11. **Dokumentacja i finalizacja**
     - Dodanie komentarzy do kodu
     - Aktualizacja dokumentacji
-    - Code review i refactoring 
+    - Code review i refactoring

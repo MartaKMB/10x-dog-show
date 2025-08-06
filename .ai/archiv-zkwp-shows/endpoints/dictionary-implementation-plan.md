@@ -383,7 +383,9 @@ class DictionaryService {
   }
 
   // Branches Management
-  async getBranches(params: BranchQueryParams): Promise<BranchesListResponseDto> {
+  async getBranches(
+    params: BranchQueryParams,
+  ): Promise<BranchesListResponseDto> {
     // Implementacja listy oddziałów
   }
 
@@ -569,7 +571,7 @@ const judgeQuerySchema = z.object({
 
 // Walidacja parametrów obiektów
 const branchQuerySchema = z.object({
-      region: z.string().min(1).max(100).optional(),
+  region: z.string().min(1).max(100).optional(),
   is_active: z.boolean().optional(),
   search: z.string().min(1).max(100).optional(),
   page: z.number().min(1).max(1000).optional(),

@@ -15,14 +15,16 @@ const userRole = "department_representative";
           <h1 class="text-2xl font-bold text-gray-900 mb-2">Wystawy psów rasowych</h1>
           <p class="text-gray-600">Zarządzanie wystawami i rejestracjami</p>
         </div>
-        {userRole === "department_representative" && (
-          <a
-            href="/shows/new"
-            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
-          >
-            + Nowa wystawa
-          </a>
-        )}
+        {
+          userRole === "department_representative" && (
+            <a
+              href="/shows/new"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+            >
+              + Nowa wystawa
+            </a>
+          )
+        }
       </div>
     </div>
 

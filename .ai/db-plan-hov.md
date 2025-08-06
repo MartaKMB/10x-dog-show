@@ -60,7 +60,7 @@ CREATE TABLE public.users (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     deleted_at TIMESTAMP WITH TIME ZONE NULL,
-    
+
     CONSTRAINT valid_email CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
 );
 
@@ -84,7 +84,7 @@ CREATE TABLE public.shows (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     deleted_at TIMESTAMP WITH TIME ZONE NULL,
-    
+
     CONSTRAINT valid_dates CHECK (registration_deadline <= show_date),
     CONSTRAINT valid_show_date CHECK (show_date >= CURRENT_DATE - INTERVAL '10 years')
 );
@@ -111,7 +111,7 @@ CREATE TABLE public.owners (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     deleted_at TIMESTAMP WITH TIME ZONE NULL,
-    
+
     CONSTRAINT valid_email CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
 );
 
@@ -134,7 +134,7 @@ CREATE TABLE public.dogs (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     deleted_at TIMESTAMP WITH TIME ZONE NULL,
-    
+
     CONSTRAINT valid_birth_date CHECK (birth_date <= CURRENT_DATE),
     CONSTRAINT valid_microchip CHECK (microchip_number ~ '^[0-9]{15}$' OR microchip_number IS NULL)
 );
@@ -153,7 +153,7 @@ CREATE TABLE public.show_registrations (
     dog_class public.dog_class NOT NULL,
     catalog_number INTEGER,
     registered_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    
+
     UNIQUE(show_id, dog_id),
     UNIQUE(show_id, catalog_number)
 );
@@ -176,7 +176,7 @@ CREATE TABLE public.evaluations (
     placement public.placement,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    
+
     UNIQUE(show_id, dog_id),
     CONSTRAINT valid_grade_by_class CHECK (
         (dog_class IN ('baby', 'puppy') AND baby_puppy_grade IS NOT NULL AND grade IS NULL) OR
@@ -277,17 +277,17 @@ CREATE OR REPLACE FUNCTION public.schedule_data_deletion()
 RETURNS VOID AS $$
 BEGIN
     -- Oznacz wystawy starsze niż 3 lata do usunięcia
-    UPDATE public.shows 
+    UPDATE public.shows
     SET deleted_at = NOW()
     WHERE deleted_at IS NULL
     AND show_date < CURRENT_DATE - INTERVAL '3 years';
-    
+
     -- Oznacz oceny z wystaw starszych niż 3 lata do usunięcia
-    UPDATE public.evaluations 
+    UPDATE public.evaluations
     SET deleted_at = NOW()
     WHERE deleted_at IS NULL
     AND show_id IN (
-        SELECT id FROM public.shows 
+        SELECT id FROM public.shows
         WHERE show_date < CURRENT_DATE - INTERVAL '3 years'
     );
 END;
@@ -492,6 +492,7 @@ INSERT INTO public.shows (name, status, show_date, registration_deadline, locati
 ## 10. Relacje między tabelami
 
 ### Relacje jeden-do-wielu:
+
 - `users` → `shows` (organizator wystawy)
 - `shows` → `show_registrations` (rejestracje na wystawę)
 - `shows` → `evaluations` (oceny z wystawy)
@@ -500,39 +501,46 @@ INSERT INTO public.shows (name, status, show_date, registration_deadline, locati
 - `owners` → `dog_owners` (własność psów)
 
 ### Relacje wiele-do-wielu:
+
 - `dogs` ↔ `owners` (przez tabelę `dog_owners`)
 
 ### Relacje jeden-do-jednego:
+
 - `show_registrations` → `evaluations` (jedna ocena na rejestrację)
 
 ## 11. Uwagi projektowe
 
 ### Bezpieczeństwo:
+
 - Wszystkie klucze główne to UUID dla zwiększenia bezpieczeństwa
 - Implementacja RLS zapewnia dostęp tylko dla zarządu klubu
 - Soft delete z automatycznym usuwaniem po 3 latach zgodnie z RODO
 - Walidacja danych na poziomie bazy danych
 
 ### Wydajność:
+
 - Indeksy zoptymalizowane pod częste zapytania (wystawy, psy, oceny)
 - Kompozytowe indeksy dla złożonych filtrów
 - Widoki dla często używanych zapytań
 
 ### Skalowalność:
+
 - Schemat pozwala na łatwe dodawanie nowych funkcjonalności
 - Struktura wspiera rozszerzenie o opisy psów w przyszłości
 - Możliwość dodania nowych tytułów klubowych
 
 ### Zgodność z RODO:
+
 - Mechanizm automatycznego usuwania danych po 3 latach
 - Śledzenie zgód GDPR
 - Soft delete z możliwością odzyskania danych
 
 ### Uproszczenia dla MVP:
+
 - Usunięto system FCI grup (tylko hovawarty)
 - Usunięto wielojęzyczność (tylko polski)
 - Usunięto opisy psów (będą dodane w fazie 2)
 - Usunięto system sekretarzy (jedna rola - zarząd)
 - Usunięto oddziały (wszystkie wystawy klubowe)
 
-Ten schemat zapewnia solidną podstawę dla MVP aplikacji Klub Hovawarta Show, spełniając wszystkie wymagania funkcjonalne określone w PRD przy zachowaniu prostoty i możliwości rozbudowy w przyszłości. 
+Ten schemat zapewnia solidną podstawę dla MVP aplikacji Klub Hovawarta Show, spełniając wszystkie wymagania funkcjonalne określone w PRD przy zachowaniu prostoty i możliwości rozbudowy w przyszłości.

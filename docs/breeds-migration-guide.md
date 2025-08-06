@@ -44,6 +44,7 @@ node scripts/test-breeds-migration.js
 ```
 
 Expected output:
+
 ```
 🐕 Testing Breeds Data Migration...
 
@@ -79,6 +80,7 @@ curl "http://localhost:4321/api/breeds?limit=10"
 ```
 
 Expected response:
+
 ```json
 {
   "data": [
@@ -114,14 +116,14 @@ supabase db reset
 SELECT COUNT(*) FROM dictionary.breeds WHERE is_active = true;
 
 -- Check breeds by group
-SELECT fci_group, COUNT(*) 
-FROM dictionary.breeds 
-WHERE is_active = true 
-GROUP BY fci_group 
+SELECT fci_group, COUNT(*)
+FROM dictionary.breeds
+WHERE is_active = true
+GROUP BY fci_group
 ORDER BY fci_group;
 
 -- Check specific breed
-SELECT * FROM dictionary.breeds 
+SELECT * FROM dictionary.breeds
 WHERE fci_number = 122; -- Labrador Retriever
 ```
 
@@ -159,6 +161,7 @@ The migration includes the following performance indexes:
 ### Common Issues
 
 1. **Migration fails with duplicate key error**
+
    ```bash
    # Check for existing data
    supabase db reset
@@ -166,6 +169,7 @@ The migration includes the following performance indexes:
    ```
 
 2. **Test script fails to connect**
+
    ```bash
    # Check environment variables
    cat .env.local
@@ -173,6 +177,7 @@ The migration includes the following performance indexes:
    ```
 
 3. **API returns empty results**
+
    ```bash
    # Check if data was inserted
    supabase db reset
@@ -250,4 +255,4 @@ If you encounter issues:
 - **Records added**: 150+ dog breeds
 - **Performance**: Optimized with indexes
 - **Testing**: Automated verification script
-- **Rollback**: Available if needed 
+- **Rollback**: Available if needed

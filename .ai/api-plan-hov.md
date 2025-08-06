@@ -4,14 +4,14 @@
 
 The API is organized around the following main resources, each corresponding to key database entities:
 
-| Resource          | Database Table                 | Description                                                    |
-| ----------------- | ------------------------------ | -------------------------------------------------------------- |
-| **Users**         | `public.users`                 | System users with club_board role                             |
-| **Shows**         | `public.shows`                 | Hovawart club shows with schedules and configurations         |
-| **Dogs**          | `public.dogs`                  | Individual hovawart dogs with identification data             |
-| **Owners**        | `public.owners`                | Dog owners with contact information and GDPR consent          |
-| **Registrations** | `public.show_registrations`    | Dog registrations for specific shows                          |
-| **Evaluations**   | `public.evaluations`           | Grades, club titles, and placements for dogs                  |
+| Resource          | Database Table              | Description                                           |
+| ----------------- | --------------------------- | ----------------------------------------------------- |
+| **Users**         | `public.users`              | System users with club_board role                     |
+| **Shows**         | `public.shows`              | Hovawart club shows with schedules and configurations |
+| **Dogs**          | `public.dogs`               | Individual hovawart dogs with identification data     |
+| **Owners**        | `public.owners`             | Dog owners with contact information and GDPR consent  |
+| **Registrations** | `public.show_registrations` | Dog registrations for specific shows                  |
+| **Evaluations**   | `public.evaluations`        | Grades, club titles, and placements for dogs          |
 
 ## 2. Endpoints
 
@@ -1123,4 +1123,4 @@ Each audit entry includes:
 - Entity type and ID
 - Old and new values (for updates)
 - IP address and user agent
-- Timestamp and metadata 
+- Timestamp and metadata

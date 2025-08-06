@@ -356,6 +356,7 @@ Projekt 10x Dog Show ma **bardzo solidne fundamenty** z zaimplementowanymi:
 ## 7. Szczegółowa analiza techniczna
 
 ### 7.1 Tech Stack
+
 - **Frontend:** Astro + React + TypeScript + Tailwind CSS
 - **Backend:** Astro API Routes + Supabase
 - **Database:** PostgreSQL z RLS i audit trail
@@ -363,6 +364,7 @@ Projekt 10x Dog Show ma **bardzo solidne fundamenty** z zaimplementowanymi:
 - **UI Components:** Radix UI + Lucide React
 
 ### 7.2 Architektura
+
 - **API Routes:** RESTful endpoints w `/src/pages/api/`
 - **Services:** Logika biznesowa w `/src/lib/services/`
 - **Components:** React komponenty z TypeScript
@@ -370,6 +372,7 @@ Projekt 10x Dog Show ma **bardzo solidne fundamenty** z zaimplementowanymi:
 - **Database:** Supabase z migracjami i seed data
 
 ### 7.3 Bezpieczeństwo
+
 - **RLS:** Row Level Security włączone
 - **Audit Trail:** Pełne logowanie zmian
 - **Validation:** Walidacja po stronie serwera

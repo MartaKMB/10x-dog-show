@@ -7,6 +7,7 @@ System Klub Hovawarta Show to aplikacja webowa do zarządzania wystawami klubowy
 ## 2. Routing widoków
 
 ### Główne ścieżki aplikacji:
+
 - `/auth/login` - Logowanie użytkownika
 - `/` - Dashboard główny
 - `/shows` - Lista wystaw
@@ -29,6 +30,7 @@ System Klub Hovawarta Show to aplikacja webowa do zarządzania wystawami klubowy
 ## 3. Struktura komponentów
 
 ### Hierarchia głównych komponentów:
+
 ```
 App
 ├── AuthGuard
@@ -55,6 +57,7 @@ App
 ## 4. Szczegóły komponentów
 
 ### LoginForm
+
 - **Opis**: Formularz logowania z walidacją email i hasła
 - **Główne elementy**: Input email, input password, submit button, error messages
 - **Obsługiwane zdarzenia**: onSubmit, onChange, onBlur
@@ -63,6 +66,7 @@ App
 - **Propsy**: onSubmit, isLoading, error
 
 ### AuthGuard
+
 - **Opis**: Komponent ochrony tras wymagających uwierzytelnienia
 - **Główne elementy**: Redirect logic, loading state
 - **Obsługiwane zdarzenia**: Authentication check, redirect
@@ -71,6 +75,7 @@ App
 - **Propsy**: children, requiredRole
 
 ### Sidebar/TopNavigation
+
 - **Opis**: Nawigacja główna aplikacji (desktop/mobile)
 - **Główne elementy**: Navigation links, user menu, logout button
 - **Obsługiwane zdarzenia**: onClick navigation, logout
@@ -79,6 +84,7 @@ App
 - **Propsy**: user, currentRoute, onLogout
 
 ### Dashboard
+
 - **Opis**: Główny panel z statystykami i szybkimi akcjami
 - **Główne elementy**: StatsCards, RecentShows, QuickActions, Notifications
 - **Obsługiwane zdarzenia**: Quick action clicks, show navigation
@@ -87,6 +93,7 @@ App
 - **Propsy**: stats, recentShows, quickActions
 
 ### ShowsList
+
 - **Opis**: Lista wszystkich wystaw z filtrami i paginacją
 - **Główne elementy**: ShowsTable, ShowFilters, Pagination, SearchInput
 - **Obsługiwane zdarzenia**: Filter changes, pagination, search, row clicks
@@ -95,6 +102,7 @@ App
 - **Propsy**: shows, pagination, filters, onFilterChange, onPageChange
 
 ### ShowDetails
+
 - **Opis**: Szczegółowy widok wystawy z rejestracjami i ocenami
 - **Główne elementy**: ShowHeader, ShowStats, RegistrationsList, EvaluationsList
 - **Obsługiwane zdarzenia**: Status changes, navigation to registrations/evaluations
@@ -103,6 +111,7 @@ App
 - **Propsy**: show, registrations, evaluations, onStatusChange
 
 ### ShowForm
+
 - **Opis**: Formularz tworzenia/edycji wystawy
 - **Główne elementy**: Form fields, validation messages, submit/cancel buttons
 - **Obsługiwane zdarzenia**: Form submission, field changes, validation
@@ -111,6 +120,7 @@ App
 - **Propsy**: initialData, onSubmit, onCancel, isLoading
 
 ### DogsList
+
 - **Opis**: Lista psów z wyszukiwaniem i filtrami
 - **Główne elementy**: DogsTable, DogFilters, SearchInput, Pagination
 - **Obsługiwane zdarzenia**: Search, filter changes, row clicks, pagination
@@ -119,6 +129,7 @@ App
 - **Propsy**: dogs, pagination, filters, onSearch, onFilterChange
 
 ### DogDetails
+
 - **Opis**: Szczegółowy widok psa z historią wystaw
 - **Główne elementy**: DogHeader, DogInfo, DogHistory, DogStats
 - **Obsługiwane zdarzenia**: Navigation to shows, edit dog
@@ -127,6 +138,7 @@ App
 - **Propsy**: dog, history, onEdit
 
 ### DogForm
+
 - **Opis**: Formularz dodawania/edycji psa
 - **Główne elementy**: Form fields, owner selector, validation messages
 - **Obsługiwane zdarzenia**: Form submission, owner selection, validation
@@ -135,6 +147,7 @@ App
 - **Propsy**: initialData, owners, onSubmit, onCancel
 
 ### OwnersList
+
 - **Opis**: Lista właścicieli z filtrami GDPR
 - **Główne elementy**: OwnersTable, OwnerFilters, GDPRStatusBadge, Pagination
 - **Obsługiwane zdarzenia**: Filter changes, GDPR consent management
@@ -143,6 +156,7 @@ App
 - **Propsy**: owners, pagination, filters, onFilterChange
 
 ### OwnerDetails
+
 - **Opis**: Szczegółowy widok właściciela z listą psów
 - **Główne elementy**: OwnerHeader, OwnerInfo, OwnerDogs, GDPRHistory
 - **Obsługiwane zdarzenia**: GDPR consent changes, navigation to dogs
@@ -151,6 +165,7 @@ App
 - **Propsy**: owner, dogs, onGDPRChange
 
 ### OwnerForm
+
 - **Opis**: Formularz dodawania/edycji właściciela
 - **Główne elementy**: Form fields, GDPR consent checkbox, validation
 - **Obsługiwane zdarzenia**: Form submission, GDPR consent
@@ -159,6 +174,7 @@ App
 - **Propsy**: initialData, onSubmit, onCancel
 
 ### RegistrationsList
+
 - **Opis**: Lista rejestracji na wystawę
 - **Główne elementy**: RegistrationsTable, RegistrationFilters, CatalogNumbers
 - **Obsługiwane zdarzenia**: Filter changes, registration actions
@@ -167,6 +183,7 @@ App
 - **Propsy**: registrations, show, onFilterChange, onRegistrationAction
 
 ### EvaluationsList
+
 - **Opis**: Lista ocen na wystawie
 - **Główne elementy**: EvaluationsTable, EvaluationFilters, GradeBadge, TitleBadge
 - **Obsługiwane zdarzenia**: Filter changes, evaluation actions
@@ -175,6 +192,7 @@ App
 - **Propsy**: evaluations, show, onFilterChange, onEvaluationAction
 
 ### EvaluationForm
+
 - **Opis**: Formularz wprowadzania/edycji oceny
 - **Główne elementy**: Grade selector, title selector, placement selector
 - **Obsługiwane zdarzenia**: Form submission, validation
@@ -183,6 +201,7 @@ App
 - **Propsy**: dog, show, initialData, onSubmit, onCancel
 
 ### UsersList
+
 - **Opis**: Lista użytkowników systemu (tylko admin)
 - **Główne elementy**: UsersTable, UserStatusBadge, UserActions
 - **Obsługiwane zdarzenia**: User management actions
@@ -191,6 +210,7 @@ App
 - **Propsy**: users, onUserAction
 
 ### Common Components
+
 - **LoadingSpinner**: Wskaźnik ładowania
 - **ErrorBoundary**: Obsługa błędów aplikacji
 - **EmptyState**: Stan pustej listy
@@ -203,6 +223,7 @@ App
 ## 5. Typy
 
 ### Authentication Types
+
 ```typescript
 interface LoginRequest {
   email: string;
@@ -227,6 +248,7 @@ interface UserProfile {
 ```
 
 ### Shows Types
+
 ```typescript
 interface ShowListResponse {
   shows: ShowResponse[];
@@ -259,6 +281,7 @@ interface ShowResponse {
 ```
 
 ### Dogs Types
+
 ```typescript
 interface DogListResponse {
   dogs: DogResponse[];
@@ -294,6 +317,7 @@ interface DogResponse {
 ```
 
 ### Evaluations Types
+
 ```typescript
 interface EvaluationListResponse {
   evaluations: EvaluationResponse[];
@@ -327,6 +351,7 @@ interface EvaluationResponse {
 ```
 
 ### ViewModel Types
+
 ```typescript
 interface ShowsListViewModel {
   shows: ShowResponse[];
@@ -366,6 +391,7 @@ interface DogsListViewModel {
 ## 6. Zarządzanie stanem
 
 ### Custom Hooks
+
 ```typescript
 // useAuth - zarządzanie uwierzytelnieniem
 const useAuth = () => {
@@ -373,38 +399,66 @@ const useAuth = () => {
     user: null,
     isAuthenticated: false,
     isLoading: true,
-    error: null
+    error: null,
   });
-  
-  const login = async (email: string, password: string) => { /* ... */ };
-  const logout = async () => { /* ... */ };
-  const checkAuth = async () => { /* ... */ };
-  
+
+  const login = async (email: string, password: string) => {
+    /* ... */
+  };
+  const logout = async () => {
+    /* ... */
+  };
+  const checkAuth = async () => {
+    /* ... */
+  };
+
   return { ...state, login, logout, checkAuth };
 };
 
 // useShows - zarządzanie wystawami
 const useShows = () => {
-  const [state, setState] = useState<ShowsState>({ /* ... */ });
-  
-  const fetchShows = async (params?: ShowQueryParams) => { /* ... */ };
-  const createShow = async (data: ShowCreateRequest) => { /* ... */ };
-  const updateShow = async (id: string, data: ShowUpdateRequest) => { /* ... */ };
-  const deleteShow = async (id: string) => { /* ... */ };
-  
+  const [state, setState] = useState<ShowsState>({
+    /* ... */
+  });
+
+  const fetchShows = async (params?: ShowQueryParams) => {
+    /* ... */
+  };
+  const createShow = async (data: ShowCreateRequest) => {
+    /* ... */
+  };
+  const updateShow = async (id: string, data: ShowUpdateRequest) => {
+    /* ... */
+  };
+  const deleteShow = async (id: string) => {
+    /* ... */
+  };
+
   return { ...state, fetchShows, createShow, updateShow, deleteShow };
 };
 
 // useDogs - zarządzanie psami
 const useDogs = () => {
-  const [state, setState] = useState<DogsState>({ /* ... */ });
-  
-  const fetchDogs = async (params?: DogQueryParams) => { /* ... */ };
-  const createDog = async (data: DogCreateRequest) => { /* ... */ };
-  const updateDog = async (id: string, data: DogUpdateRequest) => { /* ... */ };
-  const deleteDog = async (id: string) => { /* ... */ };
-  const searchDogs = async (query: string) => { /* ... */ };
-  
+  const [state, setState] = useState<DogsState>({
+    /* ... */
+  });
+
+  const fetchDogs = async (params?: DogQueryParams) => {
+    /* ... */
+  };
+  const createDog = async (data: DogCreateRequest) => {
+    /* ... */
+  };
+  const updateDog = async (id: string, data: DogUpdateRequest) => {
+    /* ... */
+  };
+  const deleteDog = async (id: string) => {
+    /* ... */
+  };
+  const searchDogs = async (query: string) => {
+    /* ... */
+  };
+
   return { ...state, fetchDogs, createDog, updateDog, deleteDog, searchDogs };
 };
 ```
@@ -412,71 +466,83 @@ const useDogs = () => {
 ## 7. Integracja API
 
 ### Authentication API
+
 ```typescript
 // POST /auth/login
-const login = async (email: string, password: string): Promise<LoginResponse> => {
-  const response = await fetch('/api/auth/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
+const login = async (
+  email: string,
+  password: string,
+): Promise<LoginResponse> => {
+  const response = await fetch("/api/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
   });
   return response.json();
 };
 
 // GET /auth/me
 const getCurrentUser = async (): Promise<UserProfile> => {
-  const response = await fetch('/api/auth/me', {
-    headers: { 'Authorization': `Bearer ${token}` }
+  const response = await fetch("/api/auth/me", {
+    headers: { Authorization: `Bearer ${token}` },
   });
   return response.json();
 };
 ```
 
 ### Shows API
+
 ```typescript
 // GET /shows
-const getShows = async (params?: ShowQueryParams): Promise<ShowListResponse> => {
-  const queryString = new URLSearchParams(params as Record<string, string>).toString();
+const getShows = async (
+  params?: ShowQueryParams,
+): Promise<ShowListResponse> => {
+  const queryString = new URLSearchParams(
+    params as Record<string, string>,
+  ).toString();
   const response = await fetch(`/api/shows?${queryString}`, {
-    headers: { 'Authorization': `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` },
   });
   return response.json();
 };
 
 // POST /shows
 const createShow = async (data: ShowCreateRequest): Promise<ShowResponse> => {
-  const response = await fetch('/api/shows', {
-    method: 'POST',
-    headers: { 
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+  const response = await fetch("/api/shows", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   });
   return response.json();
 };
 ```
 
 ### Dogs API
+
 ```typescript
 // GET /dogs
 const getDogs = async (params?: DogQueryParams): Promise<DogListResponse> => {
-  const queryString = new URLSearchParams(params as Record<string, string>).toString();
+  const queryString = new URLSearchParams(
+    params as Record<string, string>,
+  ).toString();
   const response = await fetch(`/api/dogs?${queryString}`, {
-    headers: { 'Authorization': `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` },
   });
   return response.json();
 };
 
 // POST /dogs
 const createDog = async (data: DogCreateRequest): Promise<DogResponse> => {
-  const response = await fetch('/api/dogs', {
-    method: 'POST',
-    headers: { 
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+  const response = await fetch("/api/dogs", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   });
   return response.json();
 };
@@ -485,23 +551,27 @@ const createDog = async (data: DogCreateRequest): Promise<DogResponse> => {
 ## 8. Interakcje użytkownika
 
 ### Authentication Interactions
+
 1. **Logowanie**: Wprowadzenie email/hasła → Walidacja → Przekierowanie do dashboardu
 2. **Wylogowanie**: Kliknięcie "Wyloguj" → Potwierdzenie → Przekierowanie do logowania
 3. **Brak uprawnień**: Próba dostępu → Przekierowanie do logowania
 
 ### Shows Interactions
+
 1. **Tworzenie wystawy**: Kliknięcie "Dodaj" → Formularz → Walidacja → Zapisywanie
 2. **Edycja wystawy**: Kliknięcie "Edytuj" → Formularz → Walidacja → Aktualizacja
 3. **Usuwanie wystawy**: Kliknięcie "Usuń" → Potwierdzenie → Usunięcie
 4. **Zmiana statusu**: Wybór statusu → Walidacja → Aktualizacja
 
 ### Dogs Interactions
+
 1. **Dodawanie psa**: Kliknięcie "Dodaj psa" → Formularz → Walidacja → Zapisywanie
 2. **Wyszukiwanie psów**: Wprowadzenie tekstu → Debounced search → Filtrowanie
 3. **Filtrowanie psów**: Wybór filtrów → Aktualizacja listy
 4. **Edycja psa**: Kliknięcie "Edytuj" → Formularz → Walidacja → Aktualizacja
 
 ### Evaluations Interactions
+
 1. **Wprowadzanie oceny**: Wybór oceny → Walidacja → Zapisywanie
 2. **Przypisywanie tytułu**: Wybór tytułu → Walidacja → Zapisywanie
 3. **Przypisywanie lokaty**: Wybór lokaty → Walidacja → Zapisywanie
@@ -509,24 +579,28 @@ const createDog = async (data: DogCreateRequest): Promise<DogResponse> => {
 ## 9. Warunki i walidacja
 
 ### Authentication Validation
+
 - **Email format**: Regex walidacja w LoginForm
 - **Password length**: Minimum 8 znaków w LoginForm
 - **Token expiration**: Sprawdzanie w AuthGuard
 - **Role permissions**: Sprawdzanie w komponentach
 
 ### Shows Validation
+
 - **Unique show name**: Walidacja w ShowForm
 - **Date validation**: Registration deadline < show date
 - **Status transitions**: Walidacja w ShowActions
 - **Required fields**: Walidacja w ShowForm
 
 ### Dogs Validation
+
 - **Unique microchip**: Walidacja w DogForm
 - **Valid birth date**: Walidacja wieku w DogForm
 - **Required owners**: Minimum 1 właściciel w DogForm
 - **Valid microchip format**: 15 cyfr w DogForm
 
 ### Evaluations Validation
+
 - **Dog registered for show**: Sprawdzanie w EvaluationForm
 - **Valid grade for class**: Baby/puppy vs regular grades
 - **Unique titles**: Sprawdzanie w EvaluationForm
@@ -535,21 +609,25 @@ const createDog = async (data: DogCreateRequest): Promise<DogResponse> => {
 ## 10. Obsługa błędów
 
 ### Network Errors
+
 - **Brak połączenia**: Wyświetlenie komunikatu z retry button
 - **Timeout**: Wyświetlenie komunikatu z retry button
 - **Server error**: Wyświetlenie komunikatu o kontakcie z adminem
 
 ### Validation Errors
+
 - **Form validation**: Wyświetlenie błędów pod polami formularza
 - **API validation**: Wyświetlenie błędów w toast notification
 - **Business logic errors**: Wyświetlenie komunikatów w modal
 
 ### Authentication Errors
+
 - **Invalid credentials**: Wyświetlenie błędu w formularzu logowania
 - **Token expired**: Przekierowanie do logowania
 - **Insufficient permissions**: Wyświetlenie komunikatu o braku uprawnień
 
 ### Data Errors
+
 - **Missing data**: Wyświetlenie EmptyState komponentu
 - **Corrupted data**: Wyświetlenie komunikatu o błędzie danych
 - **Inconsistent data**: Walidacja i ostrzeżenia dla użytkownika
@@ -557,29 +635,34 @@ const createDog = async (data: DogCreateRequest): Promise<DogResponse> => {
 ## 11. Kroki implementacji
 
 ### Faza 1: Podstawowa infrastruktura
+
 1. **Setup projektu**: Konfiguracja Astro + React + TypeScript
 2. **Authentication**: Implementacja LoginForm, AuthGuard, useAuth hook
 3. **Layout**: Implementacja Sidebar, TopNavigation, Breadcrumbs
 4. **Common components**: LoadingSpinner, ErrorBoundary, EmptyState
 
 ### Faza 2: Zarządzanie danymi
+
 1. **Shows management**: ShowsList, ShowDetails, ShowForm, useShows hook
 2. **Dogs management**: DogsList, DogDetails, DogForm, useDogs hook
 3. **Owners management**: OwnersList, OwnerDetails, OwnerForm, useOwners hook
 
 ### Faza 3: System ocen
+
 1. **Registrations**: RegistrationsList, RegistrationForm
 2. **Evaluations**: EvaluationsList, EvaluationForm
 3. **Statistics**: ShowStats, StatsCharts, StatsTables
 
 ### Faza 4: Finalizacja
+
 1. **Users management**: UsersList, UserForm (tylko admin)
 2. **Search i filtry**: SearchInput, FilterPanel dla wszystkich list
 3. **Responsywność**: Mobile-first design dla wszystkich komponentów
 4. **Testowanie**: Unit tests, integration tests, E2E tests
 
 ### Faza 5: Optymalizacja
+
 1. **Performance**: Lazy loading, code splitting, caching
 2. **Accessibility**: ARIA labels, keyboard navigation, screen reader support
 3. **Error handling**: Comprehensive error boundaries i fallbacks
-4. **Documentation**: Component documentation, API documentation 
+4. **Documentation**: Component documentation, API documentation

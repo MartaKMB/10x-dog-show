@@ -24,12 +24,12 @@ Endpoint `GET /branches` służy do pobierania listy oddziałów organizujących
 
 ```typescript
 // Referencje do istniejących typów
-import type { 
-  BaseEntity, 
-  PaginationDto, 
+import type {
+  BaseEntity,
+  PaginationDto,
   PaginatedResponseDto,
-  ErrorResponseDto 
-} from '@types';
+  ErrorResponseDto,
+} from "@types";
 
 // Nowe typy dla endpointu branches
 interface Branch extends BaseEntity {
@@ -69,7 +69,7 @@ interface BranchQueryParams {
 ### 3.2 Zod Schemas
 
 ```typescript
-import { z } from 'zod';
+import { z } from "zod";
 
 const branchQuerySchema = z.object({
   region: z.string().optional(),
@@ -163,16 +163,16 @@ const branchesListResponseSchema = z.object({
 ```typescript
 // Struktura zapytania SQL
 const query = supabase
-  .from('dictionary.branches')
-  .select('*', { count: 'exact' });
+  .from("dictionary.branches")
+  .select("*", { count: "exact" });
 
 // Dodanie filtrów
 if (params.region) {
-  query.ilike('region', `%${params.region}%`);
+  query.ilike("region", `%${params.region}%`);
 }
 
 if (params.is_active !== undefined) {
-  query.eq('is_active', params.is_active);
+  query.eq("is_active", params.is_active);
 }
 
 // Paginacja
@@ -180,7 +180,7 @@ const offset = (params.page - 1) * params.limit;
 query.range(offset, offset + params.limit - 1);
 
 // Sortowanie
-query.order('name', { ascending: true });
+query.order("name", { ascending: true });
 ```
 
 ## 6. Względy bezpieczeństwa
@@ -297,4 +297,4 @@ query.order('name', { ascending: true });
 1. **Dodanie logowania** dla endpointu
 2. **Monitoring wydajności** i błędów
 3. **Optymalizacja zapytań** na podstawie metryk
-4. **Aktualizacja cache strategy** jeśli potrzebne 
+4. **Aktualizacja cache strategy** jeśli potrzebne

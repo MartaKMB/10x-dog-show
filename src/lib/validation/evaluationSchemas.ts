@@ -6,7 +6,7 @@ const uuidSchema = z.string().uuid("Invalid UUID format");
 // Enums for evaluation - dostosowane do klubu hovawarta
 const dogClassSchema = z.enum([
   "baby",
-  "puppy", 
+  "puppy",
   "junior",
   "intermediate",
   "open",

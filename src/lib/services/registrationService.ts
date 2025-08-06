@@ -562,8 +562,10 @@ export class RegistrationService {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, prettier/prettier
-  private formatRegistrationResponse(registration: any): RegistrationResponseDto {
+  private formatRegistrationResponse(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    registration: any,
+  ): RegistrationResponseDto {
     return {
       id: registration.id,
       dog: {

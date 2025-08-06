@@ -34,6 +34,7 @@ A modern web application for managing and archiving dog show results, specifical
 ## 🛠 Tech Stack
 
 ### Frontend
+
 - **Astro 5** - Static site generator with SSR capabilities
 - **React 19** - Interactive UI components
 - **TypeScript 5** - Type-safe development
@@ -41,6 +42,7 @@ A modern web application for managing and archiving dog show results, specifical
 - **Shadcn/ui** - Accessible React components
 
 ### Backend & Database
+
 - **Supabase** - Backend-as-a-Service platform
   - PostgreSQL database
   - Built-in authentication
@@ -49,11 +51,13 @@ A modern web application for managing and archiving dog show results, specifical
   - File storage
 
 ### Development Tools
+
 - **ESLint + Prettier** - Code quality and formatting
 - **Husky + lint-staged** - Git hooks for code quality
 - **TypeScript ESLint** - TypeScript-specific linting rules
 
 ### External Services
+
 - **Resend** - Email delivery service
 - **React-PDF** - PDF generation
 - **DigitalOcean** - Application hosting
@@ -69,18 +73,21 @@ A modern web application for managing and archiving dog show results, specifical
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone <repository-url>
    cd 10x-dog-show
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Set up environment variables**
    Create a `.env` file in the root directory with your Supabase credentials:
+
    ```env
    PUBLIC_SUPABASE_URL=your_supabase_url
    PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
@@ -88,11 +95,13 @@ A modern web application for managing and archiving dog show results, specifical
    ```
 
 4. **Set up Supabase**
+
    - Create a new Supabase project
    - Run the database migrations from `supabase/migrations/`
    - Configure Row Level Security policies
 
 5. **Start the development server**
+
    ```bash
    npm run dev
    ```
@@ -102,31 +111,34 @@ A modern web application for managing and archiving dog show results, specifical
 
 ## 📜 Available Scripts
 
-| Script | Description |
-|--------|-------------|
-| `npm run dev` | Start the development server |
-| `npm run build` | Build the application for production |
-| `npm run preview` | Preview the production build locally |
-| `npm run lint` | Run ESLint to check code quality |
-| `npm run lint:fix` | Fix ESLint errors automatically |
-| `npm run format` | Format code with Prettier |
-| `npm run astro` | Run Astro CLI commands |
+| Script             | Description                          |
+| ------------------ | ------------------------------------ |
+| `npm run dev`      | Start the development server         |
+| `npm run build`    | Build the application for production |
+| `npm run preview`  | Preview the production build locally |
+| `npm run lint`     | Run ESLint to check code quality     |
+| `npm run lint:fix` | Fix ESLint errors automatically      |
+| `npm run format`   | Format code with Prettier            |
+| `npm run astro`    | Run Astro CLI commands               |
 
 ## 🎯 Project Scope
 
 ### MVP Features (Phase 1)
 
 #### Show Management
+
 - Create, edit, and delete club shows
 - Configure show dates, locations, and judges
 - Manage show status (planned, in progress, completed)
 
 #### Dog & Owner Management
+
 - Complete dog profiles with identification data
 - Owner information management
 - Show participation history
 
 #### Evaluation System
+
 - Standard FCI evaluations in Polish:
   - Doskonała (Excellent)
   - Bardzo dobra (Very Good)
@@ -138,17 +150,20 @@ A modern web application for managing and archiving dog show results, specifical
 - Placement tracking (1st, 2nd, 3rd, 4th)
 
 #### User System
+
 - Single role: Club management with full permissions
 - Secure authentication and session management
 - User account administration
 
 #### Statistics & Reporting
+
 - Show participation statistics
 - Evaluation distribution analysis
 - Club title statistics
 - Individual dog performance history
 
 ### Future Enhancements (Phase 2 & 3)
+
 - Dog descriptions and detailed profiles
 - Advanced reporting and data export
 - Integration with external systems
@@ -161,6 +176,7 @@ A modern web application for managing and archiving dog show results, specifical
 **Current Phase**: MVP Development (Phase 1)
 
 ### Development Progress
+
 - ✅ Project setup and configuration
 - ✅ Database schema design
 - ✅ Basic authentication system
@@ -171,6 +187,7 @@ A modern web application for managing and archiving dog show results, specifical
 - ⏳ User testing and refinement
 
 ### Success Metrics
+
 - **Data Accuracy**: 0% errors in show data
 - **Data Entry Time**: <30 minutes per show
 - **User Satisfaction**: >90% satisfaction rate

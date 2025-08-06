@@ -14,7 +14,7 @@ The API is organized around the following main resources, each corresponding to 
 | **Evaluations**   | `dog_shows.evaluations`        | Grades, titles, and placements for dogs                        |
 | **Registrations** | `dog_shows.show_registrations` | Dog registrations for specific shows                           |
 | **Breeds**        | `dictionary.breeds`            | FCI breed classifications and groups                           |
-| **Judges**        | `dictionary.judges`            | Certified judges with specializations (CRUD)                  |
+| **Judges**        | `dictionary.judges`            | Certified judges with specializations (CRUD)                   |
 | **Branches**      | `dictionary.branches`          | Show organizing branches (dictionary)                          |
 
 ## 2. Endpoints

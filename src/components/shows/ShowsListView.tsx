@@ -34,7 +34,7 @@ interface PaginationState {
   pages: number;
 }
 
-const ShowsListView: React.FC<ShowsListViewProps> = ({ userRole }) => {
+const ShowsListView: React.FC<ShowsListViewProps> = () => {
   const [viewModel, setViewModel] = useState<ShowsListViewModel>({
     shows: [],
     isLoading: true,

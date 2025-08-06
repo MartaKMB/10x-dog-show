@@ -1,0 +1,151 @@
+import React from "react";
+import type { ShowResponse } from "../../types";
+
+interface RecentShowsProps {
+  shows: ShowResponse[];
+  isLoading?: boolean;
+  onShowClick?: (showId: string) => void;
+}
+
+const RecentShows: React.FC<RecentShowsProps> = ({
+  shows,
+  isLoading = false,
+  onShowClick,
+}) => {
+  const formatDate = (dateString: string): string => {
+    return new Date(dateString).toLocaleDateString("pl-PL", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  const getStatusColor = (status: string): string => {
+    switch (status) {
+      case "draft":
+        return "bg-gray-100 text-gray-800";
+      case "open_for_registration":
+        return "bg-green-100 text-green-800";
+      case "registration_closed":
+        return "bg-yellow-100 text-yellow-800";
+      case "in_progress":
+        return "bg-blue-100 text-blue-800";
+      case "completed":
+        return "bg-purple-100 text-purple-800";
+      case "cancelled":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const getStatusLabel = (status: string): string => {
+    switch (status) {
+      case "draft":
+        return "Szkic";
+      case "open_for_registration":
+        return "Otwarta rejestracja";
+      case "registration_closed":
+        return "Zamknięta rejestracja";
+      case "in_progress":
+        return "W trakcie";
+      case "completed":
+        return "Zakończona";
+      case "cancelled":
+        return "Anulowana";
+      default:
+        return status;
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="bg-white shadow rounded-lg p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          Ostatnie wystawy
+        </h2>
+        <div className="space-y-4">
+          {[...Array(3)].map((_, index) => (
+            <div key={index} className="animate-pulse">
+              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+              <div className="h-3 bg-gray-200 rounded w-1/2 mb-2"></div>
+              <div className="h-3 bg-gray-200 rounded w-1/4"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (shows.length === 0) {
+    return (
+      <div className="bg-white shadow rounded-lg p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          Ostatnie wystawy
+        </h2>
+        <div className="text-center py-8">
+          <div className="text-4xl mb-4">📋</div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            Brak wystaw
+          </h3>
+          <p className="text-gray-600">
+            Nie ma jeszcze żadnych wystaw w systemie.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white shadow rounded-lg p-6">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold text-gray-900">
+          Ostatnie wystawy
+        </h2>
+        <a
+          href="/shows"
+          className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+        >
+          Zobacz wszystkie →
+        </a>
+      </div>
+
+      <div className="space-y-4">
+        {shows.slice(0, 5).map((show) => (
+          <button
+            key={show.id}
+            className="w-full text-left border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+            onClick={() => onShowClick?.(show.id)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                onShowClick?.(show.id);
+              }
+            }}
+          >
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <h3 className="font-medium text-gray-900 mb-1">{show.name}</h3>
+                <p className="text-sm text-gray-600 mb-2">
+                  {formatDate(show.show_date)} • {show.location}
+                </p>
+                <div className="flex items-center space-x-4 text-xs text-gray-500">
+                  <span>Sędzia: {show.judge_name}</span>
+                  <span>Psy: {show.registered_dogs}</span>
+                </div>
+              </div>
+              <span
+                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
+                  show.status,
+                )}`}
+              >
+                {getStatusLabel(show.status)}
+              </span>
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default RecentShows;

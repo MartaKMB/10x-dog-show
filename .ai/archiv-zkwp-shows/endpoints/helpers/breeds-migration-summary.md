@@ -7,6 +7,7 @@ Przygotowano kompletny plan i implementację migracji danych ras psów FCI z lis
 ## Analiza obecnej implementacji
 
 ### Stan przed migracją:
+
 - ✅ **Endpoint API** (`/api/breeds`) - w pełni zaimplementowany
 - ✅ **Walidacja** - schematy Zod dla parametrów query
 - ✅ **Obsługa błędów** - kompletna obsługa błędów i logowanie
@@ -15,6 +16,7 @@ Przygotowano kompletny plan i implementację migracji danych ras psów FCI z lis
 - ❌ **Wydajność** - brak indeksów dla optymalizacji
 
 ### Problemy do rozwiązania:
+
 1. **Mock data** - zastąpienie rzeczywistymi danymi z bazy
 2. **Brak danych** - dodanie wszystkich ras FCI
 3. **Wydajność** - dodanie indeksów dla szybkich zapytań
@@ -25,12 +27,14 @@ Przygotowano kompletny plan i implementację migracji danych ras psów FCI z lis
 ### 1. Pliki migracji bazy danych
 
 #### `supabase/migrations/20241221000000_populate_breeds_data.sql`
+
 - **Zawartość**: 150+ ras psów FCI z wszystkich grup G1-G10
 - **Dane**: Nazwy polskie/angielskie, numery FCI, grupy FCI
 - **Walidacja**: ON CONFLICT dla unikalności numerów FCI
 - **Struktura**: INSERT statements z obsługą duplikatów
 
 #### `supabase/migrations/20241221000001_add_breeds_indexes.sql`
+
 - **Indeksy wydajnościowe**: 8 indeksów dla różnych scenariuszy użycia
 - **Full-text search**: GIN indeksy dla wyszukiwania w nazwach
 - **Filtrowanie**: Indeksy dla grup FCI i statusu aktywności
@@ -41,6 +45,7 @@ Przygotowano kompletny plan i implementację migracji danych ras psów FCI z lis
 ### 2. Aktualizacja BreedService
 
 #### Zmiany w `src/lib/services/breedService.ts`:
+
 - **Usunięto**: Mock data (MOCK_BREEDS)
 - **Dodano**: Implementacja zapytań SQL z Supabase
 - **Metody**: `getMany()`, `getById()`, `getByFciGroup()`, `searchByName()`
@@ -48,6 +53,7 @@ Przygotowano kompletny plan i implementację migracji danych ras psów FCI z lis
 - **Obsługa błędów**: Kompletna obsługa błędów bazy danych
 
 #### Przykład implementacji:
+
 ```typescript
 async getMany(query: BreedQueryInput): Promise<PaginatedResponseDto<BreedResponseDto>> {
   let queryBuilder = this.supabase
@@ -80,6 +86,7 @@ async getMany(query: BreedQueryInput): Promise<PaginatedResponseDto<BreedRespons
 ### 3. Skrypt testowania
 
 #### `scripts/test-breeds-migration.js`
+
 - **Weryfikacja danych**: Sprawdzenie liczby ras i grup FCI
 - **Testy funkcjonalności**: Wyszukiwanie, paginacja, filtrowanie
 - **Testy wydajności**: Pomiar czasu odpowiedzi zapytań
@@ -89,6 +96,7 @@ async getMany(query: BreedQueryInput): Promise<PaginatedResponseDto<BreedRespons
 ### 4. Dokumentacja
 
 #### `docs/breeds-migration-guide.md`
+
 - **Instrukcje krok po kroku**: Jak wykonać migrację
 - **Troubleshooting**: Rozwiązywanie problemów
 - **Weryfikacja**: Jak sprawdzić poprawność migracji
@@ -97,6 +105,7 @@ async getMany(query: BreedQueryInput): Promise<PaginatedResponseDto<BreedRespons
 ## Struktura danych
 
 ### Tabela `dictionary.breeds`:
+
 ```sql
 CREATE TABLE dictionary.breeds (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -111,6 +120,7 @@ CREATE TABLE dictionary.breeds (
 ```
 
 ### Indeksy wydajnościowe:
+
 - `idx_breeds_fci_group` - Filtrowanie po grupie FCI
 - `idx_breeds_active_group` - Indeks złożony (is_active + fci_group)
 - `idx_breeds_name_pl_search` - Full-text search (polski)
@@ -123,6 +133,7 @@ CREATE TABLE dictionary.breeds (
 ## Kryteria akceptacji
 
 ### Funkcjonalne:
+
 - ✅ **Dane**: 150+ ras psów FCI w bazie danych
 - ✅ **API**: Endpoint `/api/breeds` zwraca dane z bazy
 - ✅ **Filtrowanie**: Po grupach FCI działa poprawnie
@@ -130,11 +141,13 @@ CREATE TABLE dictionary.breeds (
 - ✅ **Paginacja**: Działa z rzeczywistymi danymi
 
 ### Wydajnościowe:
+
 - ✅ **Response time**: < 200ms dla standardowych zapytań
 - ✅ **Indeksy**: Zoptymalizowane zapytania SQL
 - ✅ **Wyszukiwanie**: Full-text search z indeksami GIN
 
 ### Jakościowe:
+
 - ✅ **Nazwy**: Poprawne polskie i angielskie nazwy
 - ✅ **Numery FCI**: Unikalne i poprawne
 - ✅ **Grupy FCI**: Wszystkie 10 grup (G1-G10)
@@ -143,21 +156,25 @@ CREATE TABLE dictionary.breeds (
 ## Harmonogram realizacji
 
 ### Dzień 1: ✅ Przygotowanie danych
+
 - ✅ Przetworzenie listy ras z breeds-list
 - ✅ Utworzenie pliku SQL z danymi
 - ✅ Walidacja kompletności danych
 
 ### Dzień 2: ✅ Migracja bazy danych
+
 - ✅ Utworzenie migracji z indeksami
 - ✅ Przygotowanie skryptu testowania
 - ✅ Dokumentacja procesu
 
 ### Dzień 3: ✅ Aktualizacja kodu
+
 - ✅ Modyfikacja BreedService
 - ✅ Usunięcie mock data
 - ✅ Implementacja zapytań SQL
 
 ### Dzień 4: ✅ Testy i dokumentacja
+
 - ✅ Skrypt testowania
 - ✅ Instrukcje migracji
 - ✅ Plan rollback
@@ -165,16 +182,19 @@ CREATE TABLE dictionary.breeds (
 ## Następne kroki
 
 ### Krótkoterminowe:
+
 1. **Wykonanie migracji** na środowisku deweloperskim
 2. **Testowanie endpointu** z rzeczywistymi danymi
 3. **Weryfikacja wydajności** z pełnym zestawem danych
 
 ### Średnioterminowe:
+
 1. **Aktualizacja frontend** - komponenty używające ras
 2. **Testy integracyjne** - wszystkie funkcjonalności związane z rasami
 3. **Monitoring** - wydajność w produkcji
 
 ### Długoterminowe:
+
 1. **Dodanie obrazów ras** - zdjęcia psów
 2. **Rozszerzone wyszukiwanie** - sugestie i autouzupełnianie
 3. **Cache** - Redis dla często używanych zapytań
@@ -182,14 +202,17 @@ CREATE TABLE dictionary.breeds (
 ## Ryzyka i mitgacje
 
 ### Ryzyko 1: Problemy z migracją
+
 - **Mitgacja**: Plan rollback i testy przed wdrożeniem
 - **Plan B**: Stopniowe dodawanie danych w partiach
 
 ### Ryzyko 2: Problemy z wydajnością
+
 - **Mitgacja**: Indeksy i optymalizacja zapytań
 - **Plan B**: Cache Redis dla często używanych danych
 
 ### Ryzyko 3: Problemy z kodowaniem
+
 - **Mitgacja**: Testowanie z polskimi znakami
 - **Plan B**: Konwersja kodowania w migracji
 
@@ -203,4 +226,4 @@ Migracja danych ras psów FCI została w pełni przygotowana i jest gotowa do wd
 - **Dokumentację** i instrukcje migracji
 - **Plan rollback** w przypadku problemów
 
-Migracja zastąpi mock data rzeczywistymi danymi z bazy, zapewniając lepszą wydajność, większą funkcjonalność i poprawne dane referencyjne dla systemu 10x Dog Show. 
+Migracja zastąpi mock data rzeczywistymi danymi z bazy, zapewniając lepszą wydajność, większą funkcjonalność i poprawne dane referencyjne dla systemu 10x Dog Show.

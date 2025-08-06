@@ -82,4 +82,4 @@ export const branchesListResponseSchema = z.object({
 });
 
 // Type exports
-export type BranchQueryInput = z.infer<typeof branchQuerySchema>; 
+export type BranchQueryInput = z.infer<typeof branchQuerySchema>;

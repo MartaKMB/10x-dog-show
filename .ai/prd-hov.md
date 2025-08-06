@@ -120,6 +120,7 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 **Tytuł:** Jako członek zarządu klubu chcę się zalogować do systemu, aby uzyskać dostęp do danych wystaw
 **Opis:** Użytkownik wprowadza email i hasło w formularzu logowania
 **Kryteria akceptacji:**
+
 - Formularz zawiera pola: email, hasło
 - System weryfikuje poprawność danych logowania
 - Po udanym logowaniu użytkownik jest przekierowany do dashboardu
@@ -130,6 +131,7 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 **Tytuł:** Jako członek zarządu chcę utworzyć nową wystawę klubową, aby przygotować system na wprowadzanie wyników
 **Opis:** Użytkownik wypełnia formularz z danymi wystawy
 **Kryteria akceptacji:**
+
 - Formularz zawiera pola: nazwa, data, lokalizacja, sędzia, opis
 - Data wystawy może być w przeszłości (archiwizacja)
 - Po utworzeniu wystawa jest widoczna na liście wystaw
@@ -140,6 +142,7 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 **Tytuł:** Jako członek zarządu chcę dodać psa do systemu, aby móc rejestrować jego wyniki
 **Opis:** Użytkownik wprowadza dane psa i jego właściciela
 **Kryteria akceptacji:**
+
 - Formularz zawiera dane psa: imię, płeć, data urodzenia, hodowla, chip
 - Formularz zawiera dane właściciela: imię, nazwisko, email, telefon
 - System waliduje poprawność danych
@@ -150,6 +153,7 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 **Tytuł:** Jako członek zarządu chcę zarejestrować psa na wystawę, aby móc wprowadzać jego wyniki
 **Opis:** Użytkownik wybiera psa i przypisuje go do konkretnej klasy na wystawie
 **Kryteria akceptacji:**
+
 - Wybór psa z listy zarejestrowanych psów
 - Automatyczne określenie klasy na podstawie wieku
 - Możliwość ręcznej zmiany klasy
@@ -160,6 +164,7 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 **Tytuł:** Jako członek zarządu chcę wprowadzić ocenę psa, aby udokumentować wynik z wystawy
 **Opis:** Użytkownik wprowadza ocenę, tytuł i lokatę dla psa
 **Kryteria akceptacji:**
+
 - Wybór oceny z listy standardowych ocen FCI w języku polskim
 - Przypisanie tytułu klubowego (jeśli przyznany)
 - Przypisanie lokaty (jeśli przyznana)
@@ -171,6 +176,7 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 **Tytuł:** Jako członek zarządu chcę przeglądać wyniki wystawy, aby sprawdzić wprowadzone dane
 **Opis:** Użytkownik przegląda listę psów z wynikami na konkretnej wystawie
 **Kryteria akceptacji:**
+
 - Lista psów pogrupowana według klas
 - Wyświetlanie ocen, tytułów i lokat
 - Możliwość filtrowania i wyszukiwania
@@ -181,6 +187,7 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 **Tytuł:** Jako członek zarządu chcę sprawdzić historię wyników psa, aby przeanalizować jego osiągnięcia
 **Opis:** Użytkownik przegląda wszystkie wyniki konkretnego psa z różnych wystaw
 **Kryteria akceptacji:**
+
 - Chronologiczna lista wszystkich wystaw psa
 - Wyświetlanie ocen, tytułów i lokat
 - Statystyki osiągnięć psa
@@ -191,6 +198,7 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 **Tytuł:** Jako członek zarządu chcę zobaczyć statystyki wystawy, aby przeanalizować wyniki
 **Opis:** Użytkownik przegląda statystyki liczby psów w klasach i rozkład ocen
 **Kryteria akceptacji:**
+
 - Liczba psów w poszczególnych klasach
 - Rozkład ocen (doskonała, bardzo dobra, dobra, etc.)
 - Liczba przyznanych tytułów klubowych
@@ -202,6 +210,7 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 **Tytuł:** Jako członek zarządu chcę wyszukać psa, aby szybko znaleźć jego dane
 **Opis:** Użytkownik wyszukuje psa po imieniu, hodowli lub właścicielu
 **Kryteria akceptacji:**
+
 - Wyszukiwanie po imieniu psa
 - Wyszukiwanie po nazwie hodowli
 - Wyszukiwanie po danych właściciela
@@ -212,6 +221,7 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 **Tytuł:** Jako członek zarządu chcę zarządzać kontami użytkowników, aby kontrolować dostęp do systemu
 **Opis:** Użytkownik dodaje, edytuje i usuwa konta użytkowników systemu
 **Kryteria akceptacji:**
+
 - Dodawanie nowych użytkowników
 - Edycja danych użytkowników
 - Dezaktywacja kont użytkowników
@@ -269,18 +279,21 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 ## 8. Plan rozwoju
 
 ### Faza 1 (MVP):
+
 - Podstawowy system zarządzania wystawami
 - CRUD operacje na psach i ocenach
 - System użytkowników
 - Podstawowe statystyki
 
 ### Faza 2 (Rozszerzenie):
+
 - Opisy psów
 - Zaawansowane raporty
 - Eksport danych
 - Integracja z systemami zewnętrznymi
 
 ### Faza 3 (Ekosystem klubu):
+
 - System członkostwa
 - Zarządzanie rodowodami
 - System zawodów
@@ -289,16 +302,19 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 ## 9. Ograniczenia i ryzyka
 
 ### Ograniczenia:
+
 - Ręczne wprowadzanie wszystkich danych
 - Brak integracji z systemami ZKwP
 - Ograniczone raportowanie w MVP
 
 ### Ryzyka:
+
 - Opór użytkowników przed zmianą procesów
 - Błędy w ręcznym wprowadzaniu danych
 - Problemy z migracją historycznych danych
 
 ### Strategie łagodzenia:
+
 - Prosty i intuicyjny interfejs
 - Walidacja danych na wielu poziomach
 - Stopniowa migracja danych historycznych
@@ -307,6 +323,7 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 ## 10. Kryteria akceptacji MVP
 
 ### Funkcjonalne:
+
 - Możliwość tworzenia i zarządzania wystawami klubowymi
 - Pełny CRUD dla psów, właścicieli i ocen
 - System użytkowników z jedną rolą
@@ -314,13 +331,15 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 - Responsywny interfejs
 
 ### Niefunkcjonalne:
+
 - Czas odpowiedzi <2 sekundy
 - Dostępność 99.9%
 - Wsparcie dla urządzeń mobilnych
 - Bezpieczne przechowywanie danych
 
 ### Biznesowe:
+
 - Wszystkie wystawy klubowe z ostatniego roku w systemie
 - Minimum 50 psów w bazie danych
 - 100% członków zarządu korzysta z systemu
-- Pozytywne opinie użytkowników 
+- Pozytywne opinie użytkowników
