@@ -142,24 +142,7 @@ CREATE TABLE public.dogs (
 COMMENT ON TABLE public.dogs IS 'Psy rasy hovawart zarejestrowane w systemie';
 ```
 
-### 3.5 Współwłasność psów
-
-```sql
--- Współwłasność psów (M:N Dogs ↔ Owners)
-CREATE TABLE public.dog_owners (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    dog_id UUID NOT NULL REFERENCES public.dogs(id) ON DELETE CASCADE,
-    owner_id UUID NOT NULL REFERENCES public.owners(id) ON DELETE CASCADE,
-    is_primary BOOLEAN DEFAULT false,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    
-    UNIQUE(dog_id, owner_id)
-);
-
-COMMENT ON TABLE public.dog_owners IS 'Relacja wielu-do-wielu między psami a właścicielami';
-```
-
-### 3.6 Rejestracje psów na wystawy
+### 3.5 Rejestracje psów na wystawy
 
 ```sql
 -- Rejestracje psów na wystawy
@@ -178,7 +161,7 @@ CREATE TABLE public.show_registrations (
 COMMENT ON TABLE public.show_registrations IS 'Rejestracje psów na konkretne wystawy klubowe';
 ```
 
-### 3.7 Oceny psów
+### 3.6 Oceny psów
 
 ```sql
 -- Oceny psów z wystaw
