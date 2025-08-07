@@ -10,6 +10,7 @@ interface ShowHeaderProps {
   isUpdating: boolean;
   onDelete: () => void;
   onStatusUpdate: (status: ShowStatus) => void;
+  onEdit: () => void;
 }
 
 const ShowHeader: React.FC<ShowHeaderProps> = ({
@@ -20,6 +21,7 @@ const ShowHeader: React.FC<ShowHeaderProps> = ({
   isUpdating,
   onDelete,
   onStatusUpdate,
+  onEdit,
 }) => {
   const getStatusColor = (status: ShowStatus): string => {
     switch (status) {
@@ -135,9 +137,7 @@ const ShowHeader: React.FC<ShowHeaderProps> = ({
           <div className="flex gap-2">
             {canEdit && (
               <button
-                onClick={() =>
-                  (window.location.href = `/shows/${show.id}/edit`)
-                }
+                onClick={onEdit}
                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
               >
                 Edytuj

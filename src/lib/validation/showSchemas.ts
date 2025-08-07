@@ -7,62 +7,31 @@ const uuidSchema = z.string().uuid("Invalid UUID format");
 const dateSchema = z.string().datetime("Invalid date format");
 
 // Main schema for creating shows (uproszczony dla klubu hovawartów)
-export const createShowSchema = z
-  .object({
-    name: z
-      .string()
-      .min(1, "Name is required")
-      .max(200, "Name cannot exceed 200 characters"),
-    show_date: dateSchema,
-    registration_deadline: dateSchema,
-    location: z
-      .string()
-      .min(1, "Location is required")
-      .max(500, "Location cannot exceed 500 characters"),
-    judge_name: z
-      .string()
-      .min(1, "Judge name is required")
-      .max(200, "Judge name cannot exceed 200 characters"),
-    description: z.string().optional(),
-    max_participants: z.number().int().positive().optional(),
-  })
-  .refine(
-    (data) => {
-      const showDate = new Date(data.show_date);
-      const registrationDeadline = new Date(data.registration_deadline);
-      return registrationDeadline <= showDate;
-    },
-    {
-      message: "Registration deadline must be before or equal to show date",
-      path: ["registration_deadline"],
-    },
-  );
+export const createShowSchema = z.object({
+  name: z
+    .string()
+    .min(1, "Name is required")
+    .max(200, "Name cannot exceed 200 characters"),
+  show_date: dateSchema,
+  location: z
+    .string()
+    .min(1, "Location is required")
+    .max(500, "Location cannot exceed 500 characters"),
+  judge_name: z
+    .string()
+    .min(1, "Judge name is required")
+    .max(200, "Judge name cannot exceed 200 characters"),
+  description: z.string().optional(),
+});
 
 // Schema for updating shows
-export const updateShowSchema = z
-  .object({
-    name: z.string().min(1).max(200).optional(),
-    show_date: dateSchema.optional(),
-    registration_deadline: dateSchema.optional(),
-    location: z.string().min(1).max(500).optional(),
-    judge_name: z.string().min(1).max(200).optional(),
-    max_participants: z.number().int().positive().optional(),
-    description: z.string().optional(),
-  })
-  .refine(
-    (data) => {
-      if (data.show_date && data.registration_deadline) {
-        const showDate = new Date(data.show_date);
-        const registrationDeadline = new Date(data.registration_deadline);
-        return registrationDeadline <= showDate;
-      }
-      return true;
-    },
-    {
-      message: "Registration deadline must be before or equal to show date",
-      path: ["registration_deadline"],
-    },
-  );
+export const updateShowSchema = z.object({
+  name: z.string().min(1).max(200).optional(),
+  show_date: dateSchema.optional(),
+  location: z.string().min(1).max(500).optional(),
+  judge_name: z.string().min(1).max(200).optional(),
+  description: z.string().optional(),
+});
 
 // Schema for show query parameters (uproszczony)
 export const showQuerySchema = z.object({

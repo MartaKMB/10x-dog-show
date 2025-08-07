@@ -126,6 +126,11 @@ const DogCard: React.FC<DogCardProps> = ({ dog, onAction, userRole }) => {
             <div className="flex items-center gap-2 mb-2">
               <h3 className="text-lg font-semibold text-gray-900">
                 {dog.registration.dog.name}
+                {dog.registration.dog.kennel_name && (
+                  <span className="text-sm font-normal text-gray-600 ml-2">
+                    ({dog.registration.dog.kennel_name})
+                  </span>
+                )}
               </h3>
               <span className="text-lg">
                 {getGenderIcon(dog.registration.dog.gender)}
@@ -212,7 +217,7 @@ const DogCard: React.FC<DogCardProps> = ({ dog, onAction, userRole }) => {
               actions={[
                 {
                   id: "edit",
-                  label: "Edytuj",
+                  label: "Edytuj psa",
                   icon: "✏️",
                   action: "edit",
                   disabled: !dog.canEdit,

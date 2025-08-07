@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from "react";
-import type {
-  CreateRegistrationDto,
-  BreedResponseDto,
-  DogClass,
-} from "../../types";
+import type { CreateRegistrationDto, DogClass } from "../../types";
 
 interface AddDogModalProps {
   showId: string;
@@ -16,7 +12,6 @@ interface AddDogModalProps {
 
 interface DogFormData {
   name: string;
-  breed_id: string;
   gender: "male" | "female";
   birth_date: string;
   microchip_number: string;
@@ -32,10 +27,6 @@ interface OwnerFormData {
   last_name: string;
   email: string;
   phone: string;
-  address: string;
-  city: string;
-  postal_code: string;
-  country: string;
   kennel_name: string;
   gdpr_consent: boolean;
 }
@@ -49,10 +40,8 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
   isProcessing,
   onAddDog,
 }) => {
-  const [breeds, setBreeds] = useState<BreedResponseDto[]>([]);
   const [dogData, setDogData] = useState<DogFormData>({
     name: "",
-    breed_id: "",
     gender: "male",
     birth_date: "",
     microchip_number: "",
@@ -68,39 +57,18 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
     last_name: "",
     email: "",
     phone: "",
-    address: "",
-    city: "",
-    postal_code: "",
-    country: "Polska",
     kennel_name: "",
     gdpr_consent: false,
   });
 
   const [errors, setErrors] = useState<ValidationErrors>({});
-  const [isLoadingBreeds, setIsLoadingBreeds] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
-      loadBreeds();
+      // Reset form when modal opens
+      resetForm();
     }
   }, [isOpen]);
-
-  const loadBreeds = async () => {
-    try {
-      setIsLoadingBreeds(true);
-      const response = await fetch("/api/breeds?is_active=true");
-      if (!response.ok) {
-        throw new Error("Błąd ładowania ras");
-      }
-      const breedsData = await response.json();
-      setBreeds(breedsData.data || breedsData);
-    } catch (error) {
-      console.error("Error loading breeds:", error);
-      setErrors({ breeds: ["Błąd ładowania ras"] });
-    } finally {
-      setIsLoadingBreeds(false);
-    }
-  };
 
   const validateForm = (): boolean => {
     const newErrors: ValidationErrors = {};
@@ -108,9 +76,6 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
     // Dog validation
     if (!dogData.name.trim()) {
       newErrors.name = ["Nazwa psa jest wymagana"];
-    }
-    if (!dogData.breed_id) {
-      newErrors.breed_id = ["Rasa jest wymagana"];
     }
     if (!dogData.birth_date) {
       newErrors.birth_date = ["Data urodzenia jest wymagana"];
@@ -133,12 +98,6 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
       newErrors.owner_email = ["Email właściciela jest wymagany"];
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ownerData.email)) {
       newErrors.owner_email = ["Nieprawidłowy format email"];
-    }
-    if (!ownerData.address.trim()) {
-      newErrors.owner_address = ["Adres właściciela jest wymagany"];
-    }
-    if (!ownerData.city.trim()) {
-      newErrors.owner_city = ["Miasto właściciela jest wymagane"];
     }
     if (!ownerData.gdpr_consent) {
       newErrors.owner_gdpr_consent = ["Zgoda GDPR jest wymagana"];
@@ -174,47 +133,83 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
     }
 
     try {
-      const registrationData: CreateRegistrationDto = {
-        dog: {
-          name: dogData.name,
-          breed_id: dogData.breed_id,
-          gender: dogData.gender,
-          birth_date: dogData.birth_date,
-          microchip_number: dogData.microchip_number,
-          kennel_club_number: dogData.kennel_club_number || null,
-          kennel_name: dogData.kennel_name || null,
-          father_name: dogData.father_name || null,
-          mother_name: dogData.mother_name || null,
+      // Create owner first
+      const ownerResponse = await fetch("/api/owners", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-        owner: {
+        body: JSON.stringify({
           first_name: ownerData.first_name,
           last_name: ownerData.last_name,
           email: ownerData.email,
           phone: ownerData.phone || null,
-          address: ownerData.address,
-          city: ownerData.city,
-          postal_code: ownerData.postal_code || null,
-          country: ownerData.country,
+          address: "Brak adresu", // Required field but not used for Hovawart Club
+          city: "Brak miasta", // Required field but not used for Hovawart Club
           kennel_name: ownerData.kennel_name || null,
           gdpr_consent: ownerData.gdpr_consent,
+        }),
+      });
+
+      if (!ownerResponse.ok) {
+        const errorData = await ownerResponse.json();
+        throw new Error(
+          errorData.error?.message || "Błąd tworzenia właściciela",
+        );
+      }
+
+      const owner = await ownerResponse.json();
+
+      // Create dog
+      const dogResponse = await fetch("/api/dogs", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-        registration: {
-          dog_class: dogData.dog_class as DogClass,
-        },
+        body: JSON.stringify({
+          name: dogData.name,
+          gender: dogData.gender,
+          birth_date: dogData.birth_date,
+          microchip_number: dogData.microchip_number,
+          kennel_name: dogData.kennel_name || null,
+          father_name: dogData.father_name || null,
+          mother_name: dogData.mother_name || null,
+          owners: [
+            {
+              id: owner.id,
+              is_primary: true,
+            },
+          ],
+        }),
+      });
+
+      if (!dogResponse.ok) {
+        const errorData = await dogResponse.json();
+        throw new Error(errorData.error?.message || "Błąd tworzenia psa");
+      }
+
+      const dog = await dogResponse.json();
+
+      // Create registration
+      const registrationData: CreateRegistrationDto = {
+        dog_id: dog.id,
+        dog_class: dogData.dog_class as DogClass,
       };
 
       await onAddDog(registrationData);
       onSuccess();
+      resetForm();
     } catch (error) {
       console.error("Error adding dog:", error);
-      setErrors({ submit: ["Błąd podczas dodawania psa"] });
+      setErrors({
+        submit: [error instanceof Error ? error.message : "Błąd dodawania psa"],
+      });
     }
   };
 
   const resetForm = () => {
     setDogData({
       name: "",
-      breed_id: "",
       gender: "male",
       birth_date: "",
       microchip_number: "",
@@ -229,10 +224,6 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
       last_name: "",
       email: "",
       phone: "",
-      address: "",
-      city: "",
-      postal_code: "",
-      country: "Polska",
       kennel_name: "",
       gdpr_consent: false,
     });
@@ -293,36 +284,6 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
                   {errors.name && (
                     <p className="text-red-600 text-sm mt-1">
                       {errors.name[0]}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="breed"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Rasa *
-                  </label>
-                  <select
-                    id="breed"
-                    value={dogData.breed_id}
-                    onChange={(e) =>
-                      handleDogDataChange("breed_id", e.target.value)
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    disabled={isLoadingBreeds}
-                  >
-                    <option value="">Wybierz rasę</option>
-                    {breeds.map((breed) => (
-                      <option key={breed.id} value={breed.id}>
-                        {breed.name_pl}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.breed_id && (
-                    <p className="text-red-600 text-sm mt-1">
-                      {errors.breed_id[0]}
                     </p>
                   )}
                 </div>
@@ -587,75 +548,6 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="+48 123 456 789"
                   />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="owner-address"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Adres *
-                  </label>
-                  <input
-                    type="text"
-                    id="owner-address"
-                    value={ownerData.address}
-                    onChange={(e) =>
-                      handleOwnerDataChange("address", e.target.value)
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="ul. Przykładowa 1"
-                  />
-                  {errors.owner_address && (
-                    <p className="text-red-600 text-sm mt-1">
-                      {errors.owner_address[0]}
-                    </p>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label
-                      htmlFor="owner-city"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Miasto *
-                    </label>
-                    <input
-                      type="text"
-                      id="owner-city"
-                      value={ownerData.city}
-                      onChange={(e) =>
-                        handleOwnerDataChange("city", e.target.value)
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Warszawa"
-                    />
-                    {errors.owner_city && (
-                      <p className="text-red-600 text-sm mt-1">
-                        {errors.owner_city[0]}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="owner-postal-code"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Kod pocztowy
-                    </label>
-                    <input
-                      type="text"
-                      id="owner-postal-code"
-                      value={ownerData.postal_code}
-                      onChange={(e) =>
-                        handleOwnerDataChange("postal_code", e.target.value)
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="00-000"
-                    />
-                  </div>
                 </div>
 
                 <div>

@@ -326,14 +326,8 @@ export class ShowService {
    * @returns Updated show
    */
   async updateStatus(id: string, status: ShowStatus): Promise<ShowResponseDto> {
-    const currentShow = await this.getShowById(id);
-
-    // Validate status transition
-    if (currentShow.status === "completed" && status !== "completed") {
-      throw new Error(
-        "BUSINESS_RULE_ERROR: Cannot change status of completed show",
-      );
-    }
+    // For Hovawart Club, allow all status transitions
+    // Shows can be moved back to draft even if completed
 
     const { data: show, error } = await this.supabase
       .from("shows")

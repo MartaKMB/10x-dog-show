@@ -148,15 +148,13 @@ const DogsList: React.FC<DogsListProps> = ({
             <span className="text-sm text-gray-600">Sortuj:</span>
             <button
               onClick={() => handleSort("name")}
-              className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`px-3 py-1 text-sm rounded-md transition-colors ${
+                sortBy === "name"
+                  ? "bg-blue-100 text-blue-700"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
             >
               Nazwa {getSortIcon("name")}
-            </button>
-            <button
-              onClick={() => handleSort("class")}
-              className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              Klasa {getSortIcon("class")}
             </button>
           </div>
 

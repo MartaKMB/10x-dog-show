@@ -19,8 +19,10 @@ interface EditDogModalProps {
 
 interface EditFormData {
   dog_class: string;
-  is_paid: boolean;
-  registration_fee: string;
+  name: string;
+  kennel_name: string;
+  father_name: string;
+  mother_name: string;
 }
 
 type ValidationErrors = Record<string, string[]>;
@@ -35,8 +37,10 @@ const EditDogModal: React.FC<EditDogModalProps> = ({
 }) => {
   const [formData, setFormData] = useState<EditFormData>({
     dog_class: registration.dog_class,
-    is_paid: registration.is_paid,
-    registration_fee: registration.registration_fee?.toString() || "",
+    name: registration.dog.name,
+    kennel_name: registration.dog.kennel_name || "",
+    father_name: registration.dog.father_name || "",
+    mother_name: registration.dog.mother_name || "",
   });
 
   const [errors, setErrors] = useState<ValidationErrors>({});
@@ -45,8 +49,10 @@ const EditDogModal: React.FC<EditDogModalProps> = ({
     if (isOpen) {
       setFormData({
         dog_class: registration.dog_class,
-        is_paid: registration.is_paid,
-        registration_fee: registration.registration_fee?.toString() || "",
+        name: registration.dog.name,
+        kennel_name: registration.dog.kennel_name || "",
+        father_name: registration.dog.father_name || "",
+        mother_name: registration.dog.mother_name || "",
       });
       setErrors({});
     }
@@ -59,11 +65,12 @@ const EditDogModal: React.FC<EditDogModalProps> = ({
       newErrors.dog_class = ["Klasa psa jest wymagana"];
     }
 
-    if (
-      formData.registration_fee &&
-      isNaN(parseFloat(formData.registration_fee))
-    ) {
-      newErrors.registration_fee = ["Nieprawidłowa wartość opłaty"];
+    if (!formData.name.trim()) {
+      newErrors.name = ["Nazwa psa jest wymagana"];
+    }
+
+    if (!formData.kennel_name.trim()) {
+      newErrors.kennel_name = ["Nazwa hodowli jest wymagana"];
     }
 
     setErrors(newErrors);
@@ -91,16 +98,13 @@ const EditDogModal: React.FC<EditDogModalProps> = ({
     try {
       const updateData: UpdateRegistrationDto = {
         dog_class: formData.dog_class as DogClass,
-        is_paid: formData.is_paid,
       };
 
       await onEditDog(registration.id, updateData);
       onSuccess();
     } catch (error) {
       console.error("Error updating registration:", error);
-      setErrors({
-        submit: [error instanceof Error ? error.message : "Nieznany błąd"],
-      });
+      setErrors({ submit: ["Błąd podczas aktualizacji psa"] });
     }
   };
 
@@ -136,9 +140,7 @@ const EditDogModal: React.FC<EditDogModalProps> = ({
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4">
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-900">
-              Edytuj rejestrację psa
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-900">Edytuj psa</h2>
             <button
               onClick={handleClose}
               disabled={isProcessing}
@@ -170,9 +172,9 @@ const EditDogModal: React.FC<EditDogModalProps> = ({
                 </p>
               </div>
               <div>
-                <span className="font-medium text-gray-700">Rasa:</span>
+                <span className="font-medium text-gray-700">Płeć:</span>
                 <p className="text-gray-900">
-                  {registration.dog.breed.name_pl}
+                  {registration.dog.gender === "male" ? "Samiec" : "Suka"}
                 </p>
               </div>
               <div>
@@ -227,58 +229,84 @@ const EditDogModal: React.FC<EditDogModalProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label
-                  htmlFor="is_paid"
+                  htmlFor="name"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  Status płatności
+                  Nazwa psa *
                 </label>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="is_paid"
-                    checked={formData.is_paid}
-                    onChange={(e) =>
-                      handleFieldChange("is_paid", e.target.checked)
-                    }
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                  />
-                  <label
-                    htmlFor="is_paid"
-                    className="ml-2 block text-sm text-gray-700"
-                  >
-                    Opłacone
-                  </label>
-                </div>
+                <input
+                  id="name"
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => handleFieldChange("name", e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    errors.name ? "border-red-300" : "border-gray-300"
+                  }`}
+                />
+                {errors.name && (
+                  <p className="text-red-600 text-sm mt-1">{errors.name[0]}</p>
+                )}
               </div>
 
               <div>
                 <label
-                  htmlFor="registration_fee"
+                  htmlFor="kennel_name"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  Opłata wpisowa (PLN)
+                  Nazwa hodowli *
                 </label>
                 <input
-                  id="registration_fee"
-                  type="number"
-                  value={formData.registration_fee}
+                  id="kennel_name"
+                  type="text"
+                  value={formData.kennel_name}
                   onChange={(e) =>
-                    handleFieldChange("registration_fee", e.target.value)
+                    handleFieldChange("kennel_name", e.target.value)
                   }
-                  placeholder="0.00"
-                  step="0.01"
-                  min="0"
                   className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.registration_fee
-                      ? "border-red-300"
-                      : "border-gray-300"
+                    errors.kennel_name ? "border-red-300" : "border-gray-300"
                   }`}
                 />
-                {errors.registration_fee && (
+                {errors.kennel_name && (
                   <p className="text-red-600 text-sm mt-1">
-                    {errors.registration_fee[0]}
+                    {errors.kennel_name[0]}
                   </p>
                 )}
+              </div>
+
+              <div>
+                <label
+                  htmlFor="father_name"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Imię ojca
+                </label>
+                <input
+                  id="father_name"
+                  type="text"
+                  value={formData.father_name}
+                  onChange={(e) =>
+                    handleFieldChange("father_name", e.target.value)
+                  }
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 border-gray-300"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="mother_name"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Imię matki
+                </label>
+                <input
+                  id="mother_name"
+                  type="text"
+                  value={formData.mother_name}
+                  onChange={(e) =>
+                    handleFieldChange("mother_name", e.target.value)
+                  }
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 border-gray-300"
+                />
               </div>
             </div>
           </div>

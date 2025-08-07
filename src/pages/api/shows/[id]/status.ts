@@ -6,6 +6,15 @@ import { supabaseClient } from "../../../../db/supabase.client";
 import type { ErrorResponseDto } from "../../../../types";
 
 export const PATCH: APIRoute = async ({ params, request }) => {
+  return handleStatusUpdate(params, request);
+};
+
+export const PUT: APIRoute = async ({ params, request }) => {
+  return handleStatusUpdate(params, request);
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function handleStatusUpdate(params: any, request: Request) {
   try {
     const { id } = params;
 
@@ -108,4 +117,4 @@ export const PATCH: APIRoute = async ({ params, request }) => {
       },
     );
   }
-};
+}
