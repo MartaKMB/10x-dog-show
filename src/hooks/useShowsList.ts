@@ -41,21 +41,35 @@ export const useShowsList = () => {
 
         // Add filters
         if (filters.status) params.append("status", filters.status);
-        if (filters.fromDate) params.append("from_date", filters.fromDate);
-        if (filters.toDate) params.append("to_date", filters.toDate);
+        if (filters.fromDate) {
+          // Convert date to datetime format (start of day)
+          const fromDate = new Date(filters.fromDate);
+          fromDate.setHours(0, 0, 0, 0);
+          params.append("from_date", fromDate.toISOString());
+        }
+        if (filters.toDate) {
+          // Convert date to datetime format (end of day)
+          const toDate = new Date(filters.toDate);
+          toDate.setHours(23, 59, 59, 999);
+          params.append("to_date", toDate.toISOString());
+        }
         if (filters.search) params.append("search", filters.search);
 
         // Add pagination
         params.append("page", pagination.page.toString());
         params.append("limit", pagination.limit.toString());
 
-        const response = await fetch(`/api/shows?${params.toString()}`);
+        const url = `/api/shows?${params.toString()}`;
+        console.warn("Loading shows with URL:", url);
+
+        const response = await fetch(url);
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const data = await response.json();
+        console.warn("Shows response:", data);
 
         setState({
           shows: data.data || [],

@@ -102,30 +102,11 @@ export class ShowService {
    * @returns true if editable, throws error if not
    */
   private validateShowEditable(showStatus: string, operation: string): boolean {
-    const nonEditableStatuses = ["in_progress", "completed", "cancelled"];
+    const nonEditableStatuses = ["completed"];
 
     if (nonEditableStatuses.includes(showStatus)) {
       throw new Error(
         `BUSINESS_RULE_ERROR: Cannot ${operation} show with status '${showStatus}'`,
-      );
-    }
-
-    return true;
-  }
-
-  /**
-   * Validates participant limit
-   * @param currentCount Current number of registrations
-   * @param maxParticipants Maximum allowed participants
-   * @returns true if valid, throws error if limit exceeded
-   */
-  private validateParticipantLimit(
-    currentCount: number,
-    maxParticipants: number | null,
-  ): boolean {
-    if (maxParticipants && currentCount >= maxParticipants) {
-      throw new Error(
-        "BUSINESS_RULE_ERROR: Show has reached maximum participant limit",
       );
     }
 
@@ -160,18 +141,10 @@ export class ShowService {
 
   /**
    * Validates if show accepts registrations
-   * @param showStatus Current show status
-   * @returns true if accepts registrations, throws error if not
+   * @returns true if accepts registrations
    */
-  private validateShowAcceptsRegistrations(showStatus: string): boolean {
-    const acceptingStatuses = ["open_for_registration"];
-
-    if (!acceptingStatuses.includes(showStatus)) {
-      throw new Error(
-        `BUSINESS_RULE_ERROR: Show with status '${showStatus}' does not accept registrations`,
-      );
-    }
-
+  private validateShowAcceptsRegistrations(): boolean {
+    // For Hovawart Club, all shows accept registrations (they are created after the fact)
     return true;
   }
 
@@ -182,7 +155,7 @@ export class ShowService {
    * @returns Created show
    */
   async create(data: CreateShowInput): Promise<ShowResponseDto> {
-    await this.validateBusinessRules(data);
+    await this.validateBusinessRules();
 
     const showData = {
       ...data,
@@ -224,6 +197,12 @@ export class ShowService {
     if (params.to_date) {
       query = query.lte("show_date", params.to_date);
     }
+    if (params.search) {
+      // Search in name, location, and judge_name
+      query = query.or(
+        `name.ilike.%${params.search}%,location.ilike.%${params.search}%,judge_name.ilike.%${params.search}%`,
+      );
+    }
 
     // Apply pagination
     const page = params.page || 1;
@@ -258,19 +237,10 @@ export class ShowService {
 
   /**
    * Validates business rules for show creation
-   * @param data Show creation data
-   * @param organizerId Organizer user ID
    */
-  private async validateBusinessRules(data: CreateShowInput): Promise<void> {
-    // Validate dates
-    const showDate = new Date(data.show_date);
-    const registrationDeadline = new Date(data.registration_deadline);
-
-    if (registrationDeadline > showDate) {
-      throw new Error(
-        "BUSINESS_RULE_ERROR: Registration deadline must be before show date",
-      );
-    }
+  private async validateBusinessRules(): Promise<void> {
+    // No specific business rules for Hovawart Club shows
+    // Shows are created after the fact, so no date validation needed
   }
 
   /**
@@ -460,7 +430,7 @@ export class ShowService {
    */
   async createRegistration(showId: string, data: any): Promise<any> {
     const show = await this.getShowById(showId);
-    this.validateShowAcceptsRegistrations(show.status);
+    this.validateShowAcceptsRegistrations();
 
     // Validate dog exists
     const { data: dog, error: dogError } = await this.supabase
@@ -479,13 +449,7 @@ export class ShowService {
     // Check for duplicate registration
     await this.validateNoDuplicateRegistration(showId, data.dog_id);
 
-    // Check participant limit
-    const { count: currentCount } = await this.supabase
-      .from("show_registrations")
-      .select("*", { count: "exact", head: true })
-      .eq("show_id", showId);
-
-    this.validateParticipantLimit(currentCount || 0, show.max_participants);
+    // No participant limit validation for Hovawart Club shows
 
     const registrationData = {
       show_id: showId,
@@ -654,11 +618,9 @@ export class ShowService {
       name: show.name,
       status: show.status,
       show_date: show.show_date,
-      registration_deadline: show.registration_deadline,
       location: show.location,
       judge_name: show.judge_name,
       description: show.description,
-      max_participants: show.max_participants,
       registered_dogs: registeredDogs || 0,
       created_at: show.created_at,
     };

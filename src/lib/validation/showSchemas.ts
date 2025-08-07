@@ -66,32 +66,17 @@ export const updateShowSchema = z
 
 // Schema for show query parameters (uproszczony)
 export const showQuerySchema = z.object({
-  status: z
-    .enum([
-      "draft",
-      "open_for_registration",
-      "registration_closed",
-      "in_progress",
-      "completed",
-      "cancelled",
-    ])
-    .optional(),
+  status: z.enum(["draft", "completed"]).optional(),
   from_date: z.string().datetime().optional(),
   to_date: z.string().datetime().optional(),
+  search: z.string().optional(),
   page: z.number().min(1).default(1),
   limit: z.number().min(1).max(100).default(20),
 });
 
 // Schema for updating show status
 export const updateShowStatusSchema = z.object({
-  status: z.enum([
-    "draft",
-    "open_for_registration",
-    "registration_closed",
-    "in_progress",
-    "completed",
-    "cancelled",
-  ]),
+  status: z.enum(["draft", "completed"]),
 });
 
 // Schema for creating registrations (uproszczony)
