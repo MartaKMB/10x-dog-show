@@ -1,8 +1,8 @@
 import React from "react";
-import type { ShowResponseDto } from "../../types";
+import type { ShowResponse } from "../../types";
 
 interface ShowCardProps {
-  show: ShowResponseDto;
+  show: ShowResponse;
 }
 
 const ShowCard: React.FC<ShowCardProps> = ({ show }) => {
@@ -11,15 +11,9 @@ const ShowCard: React.FC<ShowCardProps> = ({ show }) => {
       case "draft":
         return "bg-gray-100 text-gray-800";
       case "open_for_registration":
-        return "bg-green-100 text-green-800";
-      case "registration_closed":
-        return "bg-yellow-100 text-yellow-800";
-      case "in_progress":
-        return "bg-blue-100 text-blue-800";
+        return "bg-gray-100 text-gray-800";
       case "completed":
-        return "bg-purple-100 text-purple-800";
-      case "cancelled":
-        return "bg-red-100 text-red-800";
+        return "bg-green-100 text-green-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -30,28 +24,11 @@ const ShowCard: React.FC<ShowCardProps> = ({ show }) => {
       case "draft":
         return "Szkic";
       case "open_for_registration":
-        return "Otwarta rejestracja";
-      case "registration_closed":
-        return "Zamknięta rejestracja";
-      case "in_progress":
-        return "W trakcie";
+        return "Szkic";
       case "completed":
-        return "Zakończona";
-      case "cancelled":
-        return "Anulowana";
+        return "Opisana";
       default:
         return status;
-    }
-  };
-
-  const getShowTypeText = (showType: string) => {
-    switch (showType) {
-      case "national":
-        return "Krajowa";
-      case "international":
-        return "Międzynarodowa";
-      default:
-        return showType;
     }
   };
 
@@ -66,6 +43,7 @@ const ShowCard: React.FC<ShowCardProps> = ({ show }) => {
   const handleCardClick = () => {
     window.location.href = `/shows/${show.id}`;
   };
+
   return (
     <div
       onClick={handleCardClick}
@@ -93,61 +71,39 @@ const ShowCard: React.FC<ShowCardProps> = ({ show }) => {
         </span>
       </div>
 
-      {/* Show Type */}
-      <div className="mb-3">
-        <span className="text-sm text-gray-600">
-          Typ: {getShowTypeText(show.show_type)}
-        </span>
-      </div>
-
       {/* Date */}
       <div className="mb-3">
         <div className="text-sm text-gray-600">
           <span className="font-medium">Data wystawy:</span>{" "}
           {formatDate(show.show_date)}
         </div>
-        <div className="text-sm text-gray-600">
-          <span className="font-medium">Termin rejestracji:</span>{" "}
-          {formatDate(show.registration_deadline)}
-        </div>
       </div>
 
-      {/* Branch */}
-      {show.branch && (
-        <div className="mb-3">
-          <div className="text-sm text-gray-600">
-            <span className="font-medium">Oddział:</span> {show.branch.name},{" "}
-            {show.branch.city}
-          </div>
+      {/* Location and Judge */}
+      <div className="mb-4">
+        <div className="text-sm text-gray-600">
+          <span className="font-medium">Lokalizacja:</span> {show.location}
         </div>
-      )}
-
-      {/* Organizer */}
-      {show.organizer && (
-        <div className="mb-4">
-          <div className="text-sm text-gray-600">
-            <span className="font-medium">Organizator:</span>{" "}
-            {show.organizer.first_name} {show.organizer.last_name}
-          </div>
+        <div className="text-sm text-gray-600">
+          <span className="font-medium">Sędzia:</span> {show.judge_name}
         </div>
-      )}
+      </div>
 
       {/* Stats */}
       <div className="flex justify-between items-center text-sm text-gray-600">
         <div>
-          {show.max_participants && (
-            <span>Maks. uczestników: {show.max_participants}</span>
-          )}
+          <span>Dodane psy: {show.registered_dogs}</span>
         </div>
-        <div>{show.entry_fee && <span>Opłata: {show.entry_fee} PLN</span>}</div>
       </div>
 
-      {/* Language */}
-      <div className="mt-3 pt-3 border-t border-gray-100">
-        <span className="text-xs text-gray-500 uppercase">
-          Język: {show.language === "pl" ? "Polski" : "English"}
-        </span>
-      </div>
+      {/* Description */}
+      {show.description && (
+        <div className="mt-3 pt-3 border-t border-gray-100">
+          <p className="text-sm text-gray-600 line-clamp-2">
+            {show.description}
+          </p>
+        </div>
+      )}
     </div>
   );
 };

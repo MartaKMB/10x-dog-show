@@ -1,8 +1,8 @@
 import React from "react";
-import type { ShowDetailResponseDto, UserRole, ShowStatus } from "../../types";
+import type { ShowResponse, UserRole, ShowStatus } from "../../types";
 
 interface ShowHeaderProps {
-  show: ShowDetailResponseDto;
+  show: ShowResponse;
   userRole: UserRole;
   canEdit: boolean;
   canDelete: boolean;
@@ -14,7 +14,6 @@ interface ShowHeaderProps {
 
 const ShowHeader: React.FC<ShowHeaderProps> = ({
   show,
-  userRole,
   canEdit,
   canDelete,
   isDeleting,
@@ -26,16 +25,8 @@ const ShowHeader: React.FC<ShowHeaderProps> = ({
     switch (status) {
       case "draft":
         return "bg-gray-500 text-white";
-      case "open_for_registration":
-        return "bg-green-500 text-white";
-      case "registration_closed":
-        return "bg-yellow-500 text-white";
-      case "in_progress":
-        return "bg-blue-500 text-white";
       case "completed":
-        return "bg-purple-500 text-white";
-      case "cancelled":
-        return "bg-red-500 text-white";
+        return "bg-green-500 text-white";
       default:
         return "bg-gray-500 text-white";
     }
@@ -45,16 +36,8 @@ const ShowHeader: React.FC<ShowHeaderProps> = ({
     switch (status) {
       case "draft":
         return "Szkic";
-      case "open_for_registration":
-        return "Otwarta rejestracja";
-      case "registration_closed":
-        return "Rejestracja zamknięta";
-      case "in_progress":
-        return "W trakcie";
       case "completed":
-        return "Zakończona";
-      case "cancelled":
-        return "Anulowana";
+        return "Opisana";
       default:
         return status;
     }
@@ -102,125 +85,76 @@ const ShowHeader: React.FC<ShowHeaderProps> = ({
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-gray-600">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
             <div>
-              <span className="font-medium">Data wystawy:</span>
-              <br />
+              <span className="font-medium">Data wystawy:</span>{" "}
               {formatDate(show.show_date)}
             </div>
             <div>
-              <span className="font-medium">Deadline rejestracji:</span>
-              <br />
-              {formatDate(show.registration_deadline)}
+              <span className="font-medium">Lokalizacja:</span> {show.location}
             </div>
             <div>
-              <span className="font-medium">Oddział:</span>
-              <br />
-              {show.branch.name}, {show.branch.city}
+              <span className="font-medium">Sędzia:</span> {show.judge_name}
             </div>
             <div>
-              <span className="font-medium">Organizator:</span>
-              <br />
-              {show.organizer.first_name} {show.organizer.last_name}
+              <span className="font-medium">Dodane psy:</span>{" "}
+              {show.registered_dogs}
             </div>
           </div>
 
           {show.description && (
-            <div className="mt-4">
-              <span className="font-medium text-gray-700">Opis:</span>
-              <p className="text-gray-600 mt-1">{show.description}</p>
-            </div>
-          )}
-
-          {show.entry_fee && (
-            <div className="mt-2">
-              <span className="font-medium text-gray-700">Opłata wpisowa:</span>
-              <span className="text-gray-600 ml-2">{show.entry_fee} PLN</span>
+            <div className="mt-4 text-sm text-gray-600">
+              <span className="font-medium">Opis:</span> {show.description}
             </div>
           )}
         </div>
 
         {/* Actions */}
-        {userRole === "department_representative" && (
-          <div className="flex flex-col gap-2">
-            {/* Temporarily disabled - edit show functionality
+        <div className="flex flex-col sm:flex-row gap-2">
+          {/* Status Change */}
+          <div className="flex items-center gap-2">
+            <label
+              htmlFor="status-select"
+              className="text-sm font-medium text-gray-700"
+            >
+              Status:
+            </label>
+            <select
+              id="status-select"
+              value={show.status}
+              onChange={(e) => handleStatusChange(e.target.value as ShowStatus)}
+              disabled={isUpdating}
+              className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="draft">Szkic</option>
+              <option value="completed">Opisana</option>
+            </select>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-2">
             {canEdit && (
               <button
                 onClick={() =>
                   (window.location.href = `/shows/${show.id}/edit`)
                 }
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-                disabled={isUpdating}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
               >
-                Edytuj wystawę
+                Edytuj
               </button>
             )}
-            */}
-
-            {/* Status Management */}
-            {canEdit && show.status === "draft" && (
-              <button
-                onClick={() => handleStatusChange("open_for_registration")}
-                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
-                disabled={isUpdating}
-              >
-                {isUpdating ? "Aktualizowanie..." : "Otwórz rejestrację"}
-              </button>
-            )}
-
-            {canEdit && show.status === "open_for_registration" && (
-              <button
-                onClick={() => handleStatusChange("registration_closed")}
-                className="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700 transition-colors"
-                disabled={isUpdating}
-              >
-                {isUpdating ? "Aktualizowanie..." : "Zamknij rejestrację"}
-              </button>
-            )}
-
-            {canEdit && show.status === "registration_closed" && (
-              <button
-                onClick={() => handleStatusChange("in_progress")}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-                disabled={isUpdating}
-              >
-                {isUpdating ? "Aktualizowanie..." : "Rozpocznij wystawę"}
-              </button>
-            )}
-
-            {canEdit && show.status === "in_progress" && (
-              <button
-                onClick={() => handleStatusChange("completed")}
-                className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
-                disabled={isUpdating}
-              >
-                {isUpdating ? "Aktualizowanie..." : "Zakończ wystawę"}
-              </button>
-            )}
-
-            {canEdit &&
-              (show.status === "draft" ||
-                show.status === "open_for_registration") && (
-                <button
-                  onClick={() => handleStatusChange("cancelled")}
-                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
-                  disabled={isUpdating}
-                >
-                  {isUpdating ? "Aktualizowanie..." : "Anuluj wystawę"}
-                </button>
-              )}
 
             {canDelete && (
               <button
                 onClick={handleDelete}
-                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
                 disabled={isDeleting}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 transition-colors text-sm font-medium"
               >
-                {isDeleting ? "Usuwanie..." : "Usuń wystawę"}
+                {isDeleting ? "Usuwanie..." : "Usuń"}
               </button>
             )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

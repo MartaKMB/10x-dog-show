@@ -1,25 +1,16 @@
 import { useState, useCallback } from "react";
-import type { ShowResponseDto } from "../types";
+import type { ShowResponse, PaginationInfo } from "../types";
 
 interface ShowFilters {
   status?: string;
-  showType?: string;
   fromDate?: string;
   toDate?: string;
-  organizerId?: string;
   search?: string;
 }
 
-interface PaginationState {
-  page: number;
-  limit: number;
-  total: number;
-  pages: number;
-}
-
 interface ShowsListState {
-  shows: ShowResponseDto[];
-  pagination: PaginationState;
+  shows: ShowResponse[];
+  pagination: PaginationInfo;
   isLoading: boolean;
   error: string | null;
 }
@@ -29,7 +20,7 @@ export const useShowsList = () => {
     shows: [],
     pagination: {
       page: 1,
-      limit: 20,
+      limit: 12,
       total: 0,
       pages: 0,
     },
@@ -38,21 +29,23 @@ export const useShowsList = () => {
   });
 
   const loadShows = useCallback(
-    async (filters: ShowFilters, pagination: PaginationState) => {
+    async (
+      filters: ShowFilters,
+      pagination: { page: number; limit: number },
+    ) => {
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
       try {
         // Build query parameters
         const params = new URLSearchParams();
 
+        // Add filters
         if (filters.status) params.append("status", filters.status);
-        if (filters.showType) params.append("show_type", filters.showType);
         if (filters.fromDate) params.append("from_date", filters.fromDate);
         if (filters.toDate) params.append("to_date", filters.toDate);
-        if (filters.organizerId)
-          params.append("organizer_id", filters.organizerId);
         if (filters.search) params.append("search", filters.search);
 
+        // Add pagination
         params.append("page", pagination.page.toString());
         params.append("limit", pagination.limit.toString());
 
@@ -67,8 +60,8 @@ export const useShowsList = () => {
         setState({
           shows: data.data || [],
           pagination: data.pagination || {
-            page: 1,
-            limit: 20,
+            page: pagination.page,
+            limit: pagination.limit,
             total: 0,
             pages: 0,
           },
@@ -88,11 +81,16 @@ export const useShowsList = () => {
     [],
   );
 
+  const refreshShows = useCallback(() => {
+    loadShows({}, { page: 1, limit: 12 });
+  }, [loadShows]);
+
   return {
     shows: state.shows,
     pagination: state.pagination,
     isLoading: state.isLoading,
     error: state.error,
     loadShows,
+    refreshShows,
   };
 };

@@ -180,21 +180,17 @@ export interface ShowListResponse {
 export interface ShowCreateRequest {
   name: string;
   show_date: string;
-  registration_deadline: string;
   location: string;
   judge_name: string;
   description?: string;
-  max_participants?: number;
 }
 
 export interface ShowUpdateRequest {
   name?: string;
   show_date?: string;
-  registration_deadline?: string;
   location?: string;
   judge_name?: string;
   description?: string;
-  max_participants?: number;
 }
 
 export interface ShowStatusUpdateRequest {
@@ -206,11 +202,9 @@ export interface ShowResponse {
   name: string;
   status: ShowStatus;
   show_date: string;
-  registration_deadline: string;
   location: string;
   judge_name: string;
   description: string | null;
-  max_participants: number | null;
   registered_dogs: number;
   created_at: string;
 }
@@ -350,12 +344,10 @@ export interface RegistrationListResponse {
 export interface RegistrationCreateRequest {
   dog_id: string;
   dog_class: DogClass;
-  registration_fee?: number;
 }
 
 export interface RegistrationUpdateRequest {
   dog_class?: DogClass;
-  is_paid?: boolean;
 }
 
 export interface RegistrationResponse {
@@ -365,18 +357,15 @@ export interface RegistrationResponse {
     name: string;
     gender: DogGender;
     birth_date: string;
-    breed?: {
-      id: string;
-      name_pl: string;
-      name_en: string;
-      fci_group: FCIGroup;
-    };
+    microchip_number: string | null;
+    kennel_name: string | null;
+    father_name: string | null;
+    mother_name: string | null;
+    owners: DogOwnerInfo[];
   };
   dog_class: DogClass;
   catalog_number: number | null;
   registered_at: string;
-  is_paid?: boolean;
-  registration_fee?: number;
 }
 
 export interface CatalogGenerationResponse {
@@ -579,16 +568,9 @@ export interface DogHistoryResponse {
 
 export interface RegistrationStats {
   total_registrations: number;
-  paid: number;
-  unpaid: number;
   by_class: Record<DogClass, number>;
   by_gender: Record<DogGender, number>;
   by_breed_group: Record<FCIGroup, number>;
-  revenue: {
-    total: number;
-    paid: number;
-    outstanding: number;
-  };
 }
 
 export interface EvaluationStats {
@@ -883,16 +865,8 @@ export interface ShowDetailsViewModel {
 
 export interface ShowStats {
   totalDogs: number;
-  paidRegistrations: number;
-  unpaidRegistrations: number;
   byClass: Record<DogClass, number>;
   byGender: Record<DogGender, number>;
-  byBreedGroup: Record<FCIGroup, number>;
-  revenue: {
-    total: number;
-    paid: number;
-    outstanding: number;
-  };
 }
 
 export interface FilterState {
@@ -905,7 +879,7 @@ export interface FilterState {
 }
 
 export interface DogCardViewModel {
-  registration: RegistrationResponseDto;
+  registration: RegistrationResponse;
   canEdit: boolean;
   canDelete: boolean;
   isExpanded: boolean;

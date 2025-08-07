@@ -1,13 +1,14 @@
 import React, { useEffect, useState, useCallback } from "react";
 import type {
-  ShowDetailResponseDto,
-  RegistrationResponseDto,
+  ShowResponse,
+  RegistrationResponse,
   ShowStats as ShowStatsType,
   FilterState,
+  UserRole,
+  ShowStatus,
 } from "../../types";
 import ShowHeader from "./ShowHeader";
 import ShowStats from "./ShowStats.tsx";
-import RegistrationFilters from "./RegistrationFilters.tsx";
 import DogsList from "./DogsList.tsx";
 import AddDogModal from "./AddDogModal.tsx";
 import EditDogModal from "./EditDogModal.tsx";
@@ -22,12 +23,12 @@ import { useDogManagement } from "../../hooks/useDogManagement";
 
 interface ShowDetailsViewProps {
   showId: string;
-  userRole?: string;
+  userRole?: UserRole;
 }
 
 interface ShowDetailsViewModel {
-  show: ShowDetailResponseDto | null;
-  registrations: RegistrationResponseDto[];
+  show: ShowResponse | null;
+  registrations: RegistrationResponse[];
   stats: ShowStatsType;
   canEdit: boolean;
   canDelete: boolean;
@@ -38,22 +39,26 @@ interface ShowDetailsViewModel {
 
 const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
   showId,
-  userRole = "department_representative",
+  userRole = "club_board",
 }) => {
   const [viewModel, setViewModel] = useState<ShowDetailsViewModel>({
     show: null,
     registrations: [],
     stats: {
       totalDogs: 0,
-      paidRegistrations: 0,
-      unpaidRegistrations: 0,
-      byClass: {} as Record<string, number>,
-      byGender: {} as Record<string, number>,
-      byBreedGroup: {} as Record<string, number>,
-      revenue: {
-        total: 0,
-        paid: 0,
-        outstanding: 0,
+      byClass: {
+        baby: 0,
+        puppy: 0,
+        junior: 0,
+        intermediate: 0,
+        open: 0,
+        working: 0,
+        champion: 0,
+        veteran: 0,
+      },
+      byGender: {
+        male: 0,
+        female: 0,
       },
     },
     canEdit: false,
@@ -68,9 +73,9 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedRegistration, setSelectedRegistration] =
-    useState<RegistrationResponseDto | null>(null);
+    useState<RegistrationResponse | null>(null);
 
-  const { show, registrations, isLoading, error, loadShowData, updateFilters } =
+  const { show, registrations, isLoading, error, loadShowData } =
     useShowDetails(showId);
   const { isDeleting, isUpdating, deleteShow, updateShowStatus } =
     useShowActions(show ?? null);
@@ -90,7 +95,7 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
   useEffect(() => {
     if (show && registrations) {
       const stats = calculateStats(registrations);
-      const canEdit = canUserEditShow(show);
+      const canEdit = canUserEditShow();
       const canDelete = canUserDeleteShow(show);
 
       setViewModel((prev) => ({
@@ -106,108 +111,73 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
     }
   }, [show, registrations]);
 
-  useEffect(() => {
-    if (error) {
-      setViewModel((prev) => ({
-        ...prev,
-        error,
-        isLoading: false,
-      }));
-    }
-  }, [error]);
+  const calculateStats = (
+    registrations: RegistrationResponse[],
+  ): ShowStatsType => {
+    const byClass: Record<string, number> = {
+      baby: 0,
+      puppy: 0,
+      junior: 0,
+      intermediate: 0,
+      open: 0,
+      working: 0,
+      champion: 0,
+      veteran: 0,
+    };
+    const byGender: Record<string, number> = {
+      male: 0,
+      female: 0,
+    };
 
-  const calculateStats = useCallback(
-    (regs: RegistrationResponseDto[]): ShowStatsType => {
-      const byClass: Record<string, number> = {};
-      const byGender: Record<string, number> = {};
-      const byBreedGroup: Record<string, number> = {};
-      let paidCount = 0;
-      let unpaidCount = 0;
-      let totalRevenue = 0;
-      let paidRevenue = 0;
-      let outstandingRevenue = 0;
+    registrations.forEach((registration) => {
+      byClass[registration.dog_class] =
+        (byClass[registration.dog_class] || 0) + 1;
+      byGender[registration.dog.gender] =
+        (byGender[registration.dog.gender] || 0) + 1;
+    });
 
-      regs.forEach((reg) => {
-        // Count by class
-        byClass[reg.dog_class] = (byClass[reg.dog_class] || 0) + 1;
-
-        // Count by gender
-        byGender[reg.dog.gender] = (byGender[reg.dog.gender] || 0) + 1;
-
-        // Count by breed group
-        const fciGroup = reg.dog.breed.fci_group;
-        byBreedGroup[fciGroup] = (byBreedGroup[fciGroup] || 0) + 1;
-
-        // Count by payment status and calculate revenue
-        const fee = reg.registration_fee || 0;
-        totalRevenue += fee;
-
-        if (reg.is_paid) {
-          paidCount++;
-          paidRevenue += fee;
-        } else {
-          unpaidCount++;
-          outstandingRevenue += fee;
-        }
-      });
-
-      return {
-        totalDogs: regs.length,
-        paidRegistrations: paidCount,
-        unpaidRegistrations: unpaidCount,
-        byClass,
-        byGender,
-        byBreedGroup,
-        revenue: {
-          total: totalRevenue,
-          paid: paidRevenue,
-          outstanding: outstandingRevenue,
-        },
-      };
-    },
-    [],
-  );
-
-  const canUserEditShow = useCallback(
-    (show: ShowDetailResponseDto): boolean => {
-      // Sekretarze nie mogą edytować wystaw - tylko przedstawiciele oddziałów
-      if (userRole === "secretary") {
-        return false;
-      }
-      return show.status === "draft" || show.status === "open_for_registration";
-    },
-    [userRole],
-  );
-
-  const canUserDeleteShow = useCallback(
-    (show: ShowDetailResponseDto): boolean => {
-      // Sekretarze nie mogą usuwać wystaw - tylko przedstawiciele oddziałów
-      if (userRole === "secretary") {
-        return false;
-      }
-      return show.status === "draft";
-    },
-    [userRole],
-  );
-
-  const handleFiltersChange = (newFilters: FilterState) => {
-    updateFilters(newFilters);
-    setViewModel((prev) => ({
-      ...prev,
-      filters: newFilters,
-    }));
+    return {
+      totalDogs: registrations.length,
+      byClass,
+      byGender,
+    };
   };
+
+  const canUserEditShow = (): boolean => {
+    return userRole === "club_board";
+  };
+
+  const canUserDeleteShow = (showData: ShowResponse): boolean => {
+    return userRole === "club_board" && showData.registered_dogs === 0;
+  };
+
+  const handleStatusUpdate = useCallback(
+    async (status: ShowStatus) => {
+      if (show) {
+        await updateShowStatus(status);
+        await loadShowData();
+      }
+    },
+    [show, updateShowStatus, loadShowData],
+  );
+
+  const handleDeleteShow = useCallback(async () => {
+    if (show) {
+      await deleteShow();
+      window.location.href = "/shows";
+    }
+  }, [show, deleteShow]);
 
   const handleAddDog = () => {
     setIsAddModalOpen(true);
   };
 
-  const handleEditDog = (registration: RegistrationResponseDto) => {
+  const handleEditDog = (registration: RegistrationResponse) => {
     setSelectedRegistration(registration);
     setIsEditModalOpen(true);
   };
 
-  const handleDeleteDog = (registration: RegistrationResponseDto) => {
+  const handleDeleteDog = (registration: RegistrationResponse) => {
     setSelectedRegistration(registration);
     setIsDeleteModalOpen(true);
   };
@@ -223,12 +193,6 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
     loadShowData();
   };
 
-  const handleDeleteDogSuccess = () => {
-    setIsDeleteModalOpen(false);
-    setSelectedRegistration(null);
-    loadShowData();
-  };
-
   const handleModalClose = () => {
     setIsAddModalOpen(false);
     setIsEditModalOpen(false);
@@ -238,106 +202,79 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <LoadingSpinner size="lg" text="Ładowanie danych wystawy..." />
+      <div className="flex justify-center py-12">
+        <LoadingSpinner size="lg" text="Ładowanie szczegółów wystawy..." />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <ErrorDisplay
-          error={error}
-          onRetry={loadShowData}
-          title="Błąd ładowania danych"
-        />
-      </div>
+      <ErrorDisplay
+        error={error}
+        onRetry={loadShowData}
+        title="Błąd ładowania wystawy"
+      />
     );
   }
 
-  if (!viewModel.show) {
+  if (!show) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <EmptyState
-          title="Wystawa nie została znaleziona"
-          description="Nie udało się załadować danych wystawy. Sprawdź czy podany adres URL jest poprawny."
-        />
-      </div>
+      <EmptyState
+        title="Wystawa nie została znaleziona"
+        description="Wystawa o podanym ID nie istnieje lub została usunięta."
+        icon="❌"
+        actionLabel="Wróć do listy wystaw"
+        onAction={() => (window.location.href = "/shows")}
+      />
     );
   }
 
   return (
-    <>
+    <div className="space-y-6">
+      {/* Offline Indicator */}
       <OfflineIndicator />
-      <div className="container mx-auto px-4 py-8">
-        {viewModel.show && (
-          <ShowHeader
-            show={viewModel.show}
-            userRole={userRole as "department_representative" | "secretary"}
-            canEdit={viewModel.canEdit}
-            canDelete={viewModel.canDelete}
-            isDeleting={isDeleting}
-            isUpdating={isUpdating}
-            onDelete={deleteShow}
-            onStatusUpdate={updateShowStatus}
-          />
-        )}
 
-        <div className="mt-8">
-          <ShowStats stats={viewModel.stats} userRole={userRole} />
-        </div>
+      {/* Show Header */}
+      <ShowHeader
+        show={show}
+        userRole={userRole}
+        canEdit={viewModel.canEdit}
+        canDelete={viewModel.canDelete}
+        isDeleting={isDeleting}
+        isUpdating={isUpdating}
+        onDelete={handleDeleteShow}
+        onStatusUpdate={handleStatusUpdate}
+      />
 
-        <div className="mt-8">
-          <RegistrationFilters
-            onFiltersChange={handleFiltersChange}
-            currentFilters={viewModel.filters}
-            userRole={userRole}
-          />
-        </div>
+      {/* Show Stats */}
+      <ShowStats stats={viewModel.stats} userRole={userRole} />
 
-        <div className="mt-8">
-          {viewModel.registrations.length === 0 ? (
-            <EmptyState
-              title="Brak zarejestrowanych psów"
-              description="Nie ma jeszcze żadnych psów zarejestrowanych na tę wystawę."
-              action={
-                viewModel.canEdit ? (
-                  <button
-                    onClick={handleAddDog}
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-                  >
-                    Dodaj pierwszego psa
-                  </button>
-                ) : undefined
-              }
-            />
-          ) : (
-            <DogsList
-              registrations={viewModel.registrations}
-              showStatus={viewModel.show.status}
-              canAddDogs={viewModel.canEdit}
-              onAddDog={handleAddDog}
-              onEditDog={handleEditDog}
-              onDeleteDog={handleDeleteDog}
-              canEdit={viewModel.canEdit}
-              canDelete={viewModel.canEdit}
-              userRole={userRole}
-            />
-          )}
-        </div>
+      {/* Dogs List */}
+      <DogsList
+        registrations={viewModel.registrations}
+        showStatus={show.status}
+        canAddDogs={viewModel.canEdit}
+        canEdit={viewModel.canEdit}
+        canDelete={viewModel.canDelete}
+        userRole={userRole}
+        onAddDog={handleAddDog}
+        onEditDog={handleEditDog}
+        onDeleteDog={handleDeleteDog}
+      />
 
-        {/* Modal Components */}
-        <AddDogModal
-          showId={showId}
-          isOpen={isAddModalOpen}
-          onClose={handleModalClose}
-          onSuccess={handleAddDogSuccess}
-          isProcessing={isAdding}
-          onAddDog={addDog}
-        />
+      {/* Modals */}
+      <AddDogModal
+        showId={showId}
+        isOpen={isAddModalOpen}
+        onClose={handleModalClose}
+        onSuccess={handleAddDogSuccess}
+        isProcessing={isAdding}
+        onAddDog={addDog}
+      />
 
-        {selectedRegistration && (
+      {selectedRegistration && (
+        <>
           <EditDogModal
             registration={selectedRegistration}
             isOpen={isEditModalOpen}
@@ -346,20 +283,20 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
             isProcessing={isEditing}
             onEditDog={editDog}
           />
-        )}
 
-        {selectedRegistration && (
           <DeleteDogConfirmation
             registration={selectedRegistration}
             isOpen={isDeleteModalOpen}
             onClose={handleModalClose}
-            onConfirm={handleDeleteDogSuccess}
+            onConfirm={() =>
+              selectedRegistration && deleteDog(selectedRegistration.id)
+            }
             isProcessing={isDeletingDog}
             onDeleteDog={deleteDog}
           />
-        )}
-      </div>
-    </>
+        </>
+      )}
+    </div>
   );
 };
 

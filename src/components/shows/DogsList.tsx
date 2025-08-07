@@ -1,17 +1,17 @@
 import React, { useState } from "react";
-import type { RegistrationResponseDto, ShowStatus } from "../../types";
+import type { RegistrationResponse, ShowStatus, UserRole } from "../../types";
 import DogCard from "./DogCard.tsx";
 
 interface DogsListProps {
-  registrations: RegistrationResponseDto[];
+  registrations: RegistrationResponse[];
   showStatus: ShowStatus;
   canAddDogs: boolean;
   canEdit: boolean;
   canDelete: boolean;
-  userRole?: string;
+  userRole?: UserRole;
   onAddDog: () => void;
-  onEditDog: (registration: RegistrationResponseDto) => void;
-  onDeleteDog: (registration: RegistrationResponseDto) => void;
+  onEditDog: (registration: RegistrationResponse) => void;
+  onDeleteDog: (registration: RegistrationResponse) => void;
 }
 
 const DogsList: React.FC<DogsListProps> = ({
@@ -20,7 +20,7 @@ const DogsList: React.FC<DogsListProps> = ({
   canAddDogs,
   canEdit,
   canDelete,
-  userRole = "department_representative",
+  userRole = "club_board",
   onAddDog,
   onEditDog,
   onDeleteDog,
@@ -28,40 +28,75 @@ const DogsList: React.FC<DogsListProps> = ({
   const [sortBy, setSortBy] = useState<"name" | "class">("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
+  const getClassLabel = (dogClass: string): string => {
+    const classLabels: Record<string, string> = {
+      baby: "Baby",
+      puppy: "Szczenię",
+      junior: "Junior",
+      intermediate: "Młodzież",
+      open: "Otwarta",
+      working: "Pracująca",
+      champion: "Champion",
+      veteran: "Weteran",
+    };
+    return classLabels[dogClass] || dogClass;
+  };
+
+  const getClassOrder = (dogClass: string): number => {
+    const classOrder: Record<string, number> = {
+      baby: 1,
+      puppy: 2,
+      junior: 3,
+      intermediate: 4,
+      open: 5,
+      working: 6,
+      champion: 7,
+      veteran: 8,
+    };
+    return classOrder[dogClass] || 999;
+  };
+
   const getGroupedRegistrations = () => {
-    const grouped: Record<string, RegistrationResponseDto[]> = {};
+    const grouped: Record<string, Record<string, RegistrationResponse[]>> = {
+      female: {},
+      male: {},
+    };
 
     registrations.forEach((registration) => {
-      const breedKey = `${registration.dog.breed.fci_group}-${registration.dog.breed.name_pl}`;
-      if (!grouped[breedKey]) {
-        grouped[breedKey] = [];
+      const gender = registration.dog.gender;
+      const dogClass = registration.dog_class;
+
+      if (!grouped[gender][dogClass]) {
+        grouped[gender][dogClass] = [];
       }
-      grouped[breedKey].push(registration);
+      grouped[gender][dogClass].push(registration);
     });
 
-    // Sort dogs within each breed group
-    Object.keys(grouped).forEach((breedKey) => {
-      grouped[breedKey].sort((a, b) => {
-        let aValue: string | number;
-        let bValue: string | number;
+    // Sort dogs within each class group
+    Object.keys(grouped).forEach((gender) => {
+      Object.keys(grouped[gender]).forEach((dogClass) => {
+        grouped[gender][dogClass].sort((a, b) => {
+          let aValue: string | number;
+          let bValue: string | number;
 
-        switch (sortBy) {
-          case "name":
-            aValue = a.dog.name.toLowerCase();
-            bValue = b.dog.name.toLowerCase();
-            break;
-          case "class":
-            aValue = a.dog_class;
-            bValue = b.dog_class;
-            break;
-          default:
-            aValue = a.dog.name.toLowerCase();
-            bValue = b.dog.name.toLowerCase();
-        }
+          switch (sortBy) {
+            case "name":
+              aValue = a.dog.name.toLowerCase();
+              bValue = b.dog.name.toLowerCase();
+              break;
+            case "class":
+              aValue = a.dog_class;
+              bValue = b.dog_class;
+              break;
+            default:
+              aValue = a.dog.name.toLowerCase();
+              bValue = b.dog.name.toLowerCase();
+          }
 
-        if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
-        if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
-        return 0;
+          if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
+          if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
+          return 0;
+        });
       });
     });
 
@@ -84,13 +119,19 @@ const DogsList: React.FC<DogsListProps> = ({
 
   const groupedRegistrations = getGroupedRegistrations();
 
+  const getGenderLabel = (gender: string): string => {
+    return gender === "female" ? "Suki" : "Samce";
+  };
+
+  const getGenderIcon = (gender: string): string => {
+    return gender === "female" ? "♀️" : "♂️";
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">
-            Zarejestrowane psy
-          </h2>
+          <h2 className="text-2xl font-bold text-gray-900">Dodane psy</h2>
           <p className="text-gray-600 mt-1">
             {registrations.length}{" "}
             {registrations.length === 1
@@ -101,173 +142,194 @@ const DogsList: React.FC<DogsListProps> = ({
           </p>
         </div>
 
-        {canAddDogs && userRole === "department_representative" && (
-          <button
-            onClick={onAddDog}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-            disabled={
-              showStatus === "in_progress" || showStatus === "completed"
-            }
-          >
-            + Dodaj psa
-          </button>
-        )}
-      </div>
+        <div className="flex flex-col sm:flex-row gap-2">
+          {/* Sort Controls */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-600">Sortuj:</span>
+            <button
+              onClick={() => handleSort("name")}
+              className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Nazwa {getSortIcon("name")}
+            </button>
+            <button
+              onClick={() => handleSort("class")}
+              className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Klasa {getSortIcon("class")}
+            </button>
+          </div>
 
-      {/* Sort Controls */}
-      <div className="mb-4 p-4 bg-gray-50 rounded-lg">
-        <div className="flex flex-wrap gap-4 items-center">
-          <span className="text-sm font-medium text-gray-700">
-            Sortuj według:
-          </span>
-
-          <button
-            onClick={() => handleSort("name")}
-            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-              sortBy === "name"
-                ? "bg-blue-100 text-blue-800"
-                : "bg-white text-gray-700 hover:bg-gray-100"
-            }`}
-          >
-            Nazwa {getSortIcon("name")}
-          </button>
-
-          <button
-            onClick={() => handleSort("class")}
-            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-              sortBy === "class"
-                ? "bg-blue-100 text-blue-800"
-                : "bg-white text-gray-700 hover:bg-gray-100"
-            }`}
-          >
-            Klasa {getSortIcon("class")}
-          </button>
-        </div>
-      </div>
-
-      {/* Dogs by Breed */}
-      {Object.keys(groupedRegistrations).length > 0 ? (
-        <div className="space-y-8">
-          {Object.entries(groupedRegistrations).map(
-            ([breedKey, breedRegistrations]) => {
-              const [fciGroup, breedName] = breedKey.split("-");
-              return (
-                <div key={breedKey} className="bg-gray-50 rounded-lg p-6">
-                  <div className="mb-4">
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                      {breedName}
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      Grupa FCI: {fciGroup} • {breedRegistrations.length}{" "}
-                      {breedRegistrations.length === 1
-                        ? "pies"
-                        : breedRegistrations.length < 5
-                          ? "psy"
-                          : "psów"}
-                    </p>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {breedRegistrations.map((registration) => (
-                      <DogCard
-                        key={registration.id}
-                        dog={{
-                          dog: {
-                            id: registration.dog.id,
-                            name: registration.dog.name,
-                            breed: {
-                              id: "",
-                              name_pl: registration.dog.breed.name_pl,
-                              name_en: registration.dog.breed.name_en,
-                              fci_group: registration.dog.breed.fci_group,
-                            },
-                            gender: registration.dog.gender,
-                            birth_date: registration.dog.birth_date,
-                            microchip_number: "",
-                            kennel_club_number: null,
-                            kennel_name: null,
-                            father_name: null,
-                            mother_name: null,
-                            created_at: "",
-                            updated_at: "",
-                            deleted_at: null,
-                            scheduled_for_deletion: false,
-                            owners: [],
-                          },
-                          registration: registration,
-                          descriptionStatus: { status: "none" },
-                          canEdit,
-                          canDelete,
-                          canCreateDescription: true,
-                          isExpanded: false,
-                          isProcessing: false,
-                        }}
-                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                        onAction={(action, _dogId) => {
-                          if (action === "edit") onEditDog(registration);
-                          if (action === "delete") onDeleteDog(registration);
-                          if (action === "create_description") {
-                            // Navigate to description creation page
-                            window.location.href = `/shows/${registration.show_id}/dogs/${registration.dog.id}/description/new`;
-                          }
-                        }}
-                        userRole={
-                          userRole as "department_representative" | "secretary"
-                        }
-                        showStatus={showStatus}
-                      />
-                    ))}
-                  </div>
-                </div>
-              );
-            },
+          {/* Add Dog Button */}
+          {canAddDogs && (
+            <button
+              onClick={onAddDog}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
+            >
+              + Dodaj psa
+            </button>
           )}
         </div>
-      ) : (
+      </div>
+
+      {/* Dogs List */}
+      {registrations.length === 0 ? (
         <div className="text-center py-12">
-          <div className="text-gray-400 text-6xl mb-4">🐕</div>
-          <h3 className="text-xl font-semibold text-gray-600 mb-2">
-            Brak zarejestrowanych psów
+          <div className="text-4xl mb-4">🐕</div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            Brak dodanych psów
           </h3>
-          <p className="text-gray-500 mb-6">
-            {canAddDogs
-              ? "Dodaj pierwszego psa do tej wystawy."
-              : "Nie ma jeszcze żadnych rejestracji na tę wystawę."}
+          <p className="text-gray-600 mb-4">
+            Nie ma jeszcze żadnych psów dodanych do tej wystawy.
           </p>
           {canAddDogs && (
             <button
               onClick={onAddDog}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-              disabled={
-                showStatus === "in_progress" || showStatus === "completed"
-              }
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
             >
               Dodaj pierwszego psa
             </button>
           )}
         </div>
-      )}
+      ) : (
+        <div className="space-y-8">
+          {/* Females Section */}
+          {Object.keys(groupedRegistrations.female).length > 0 && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">{getGenderIcon("female")}</span>
+                <h3 className="text-xl font-bold text-gray-900">
+                  {getGenderLabel("female")}
+                </h3>
+              </div>
 
-      {/* Status Warning */}
-      {(showStatus === "in_progress" || showStatus === "completed") &&
-        canAddDogs && (
-          <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <div className="flex items-center">
-              <div className="text-yellow-600 mr-3">⚠️</div>
-              <div>
-                <h4 className="text-sm font-medium text-yellow-800">
-                  {showStatus === "in_progress"
-                    ? "Wystawa w trakcie"
-                    : "Wystawa zakończona"}
-                </h4>
-                <p className="text-sm text-yellow-700 mt-1">
-                  {showStatus === "in_progress"
-                    ? "Nie można już dodawać nowych psów do wystawy w trakcie."
-                    : "Nie można dodawać psów do zakończonej wystawy."}
-                </p>
+              <div className="space-y-4">
+                {Object.keys(groupedRegistrations.female)
+                  .sort((a, b) => getClassOrder(a) - getClassOrder(b))
+                  .map((dogClass) => {
+                    const dogs = groupedRegistrations.female[dogClass];
+                    return (
+                      <div
+                        key={`female-${dogClass}`}
+                        className="border border-gray-200 rounded-lg"
+                      >
+                        <div className="bg-pink-50 px-4 py-3 border-b border-gray-200">
+                          <h4 className="text-lg font-semibold text-gray-900">
+                            Klasa {getClassLabel(dogClass)}
+                          </h4>
+                          <p className="text-sm text-gray-600">
+                            {dogs.length}{" "}
+                            {dogs.length === 1
+                              ? "suka"
+                              : dogs.length < 5
+                                ? "suki"
+                                : "suk"}
+                          </p>
+                        </div>
+                        <div className="divide-y divide-gray-200">
+                          {dogs.map((registration) => (
+                            <DogCard
+                              key={registration.id}
+                              dog={{
+                                registration: registration,
+                                canEdit,
+                                canDelete,
+                                isExpanded: false,
+                                isProcessing: false,
+                              }}
+                              onAction={(action) => {
+                                switch (action) {
+                                  case "edit":
+                                    onEditDog(registration);
+                                    break;
+                                  case "delete":
+                                    onDeleteDog(registration);
+                                    break;
+                                  default:
+                                    console.warn("Unknown action:", action);
+                                }
+                              }}
+                              userRole={userRole}
+                              showStatus={showStatus}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
               </div>
             </div>
-          </div>
-        )}
+          )}
+
+          {/* Males Section */}
+          {Object.keys(groupedRegistrations.male).length > 0 && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">{getGenderIcon("male")}</span>
+                <h3 className="text-xl font-bold text-gray-900">
+                  {getGenderLabel("male")}
+                </h3>
+              </div>
+
+              <div className="space-y-4">
+                {Object.keys(groupedRegistrations.male)
+                  .sort((a, b) => getClassOrder(a) - getClassOrder(b))
+                  .map((dogClass) => {
+                    const dogs = groupedRegistrations.male[dogClass];
+                    return (
+                      <div
+                        key={`male-${dogClass}`}
+                        className="border border-gray-200 rounded-lg"
+                      >
+                        <div className="bg-blue-50 px-4 py-3 border-b border-gray-200">
+                          <h4 className="text-lg font-semibold text-gray-900">
+                            Klasa {getClassLabel(dogClass)}
+                          </h4>
+                          <p className="text-sm text-gray-600">
+                            {dogs.length}{" "}
+                            {dogs.length === 1
+                              ? "pies"
+                              : dogs.length < 5
+                                ? "psy"
+                                : "psów"}
+                          </p>
+                        </div>
+                        <div className="divide-y divide-gray-200">
+                          {dogs.map((registration) => (
+                            <DogCard
+                              key={registration.id}
+                              dog={{
+                                registration: registration,
+                                canEdit,
+                                canDelete,
+                                isExpanded: false,
+                                isProcessing: false,
+                              }}
+                              onAction={(action) => {
+                                switch (action) {
+                                  case "edit":
+                                    onEditDog(registration);
+                                    break;
+                                  case "delete":
+                                    onDeleteDog(registration);
+                                    break;
+                                  default:
+                                    console.warn("Unknown action:", action);
+                                }
+                              }}
+                              userRole={userRole}
+                              showStatus={showStatus}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

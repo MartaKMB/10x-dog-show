@@ -25,7 +25,6 @@ interface DogFormData {
   father_name: string;
   mother_name: string;
   dog_class: string;
-  registration_fee: string;
 }
 
 interface OwnerFormData {
@@ -62,7 +61,6 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
     father_name: "",
     mother_name: "",
     dog_class: "",
-    registration_fee: "",
   });
 
   const [ownerData, setOwnerData] = useState<OwnerFormData>({
@@ -98,7 +96,7 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
       setBreeds(breedsData.data || breedsData);
     } catch (error) {
       console.error("Error loading breeds:", error);
-      setErrors({ breeds: ["Nie udało się załadować listy ras"] });
+      setErrors({ breeds: ["Błąd ładowania ras"] });
     } finally {
       setIsLoadingBreeds(false);
     }
@@ -111,32 +109,15 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
     if (!dogData.name.trim()) {
       newErrors.name = ["Nazwa psa jest wymagana"];
     }
-
     if (!dogData.breed_id) {
       newErrors.breed_id = ["Rasa jest wymagana"];
     }
-
     if (!dogData.birth_date) {
       newErrors.birth_date = ["Data urodzenia jest wymagana"];
-    } else {
-      const birthDate = new Date(dogData.birth_date);
-      const today = new Date();
-      if (birthDate > today) {
-        newErrors.birth_date = ["Data urodzenia nie może być w przyszłości"];
-      }
-      if (today.getFullYear() - birthDate.getFullYear() > 20) {
-        newErrors.birth_date = ["Pies nie może być starszy niż 20 lat"];
-      }
     }
-
     if (!dogData.microchip_number.trim()) {
-      newErrors.microchip_number = ["Numer microchip jest wymagany"];
-    } else if (!/^\d{15}$/.test(dogData.microchip_number)) {
-      newErrors.microchip_number = [
-        "Numer microchip musi mieć dokładnie 15 cyfr",
-      ];
+      newErrors.microchip_number = ["Numer chipa jest wymagany"];
     }
-
     if (!dogData.dog_class) {
       newErrors.dog_class = ["Klasa psa jest wymagana"];
     }
@@ -145,27 +126,22 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
     if (!ownerData.first_name.trim()) {
       newErrors.owner_first_name = ["Imię właściciela jest wymagane"];
     }
-
     if (!ownerData.last_name.trim()) {
       newErrors.owner_last_name = ["Nazwisko właściciela jest wymagane"];
     }
-
     if (!ownerData.email.trim()) {
-      newErrors.owner_email = ["Email jest wymagany"];
+      newErrors.owner_email = ["Email właściciela jest wymagany"];
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ownerData.email)) {
       newErrors.owner_email = ["Nieprawidłowy format email"];
     }
-
     if (!ownerData.address.trim()) {
-      newErrors.owner_address = ["Adres jest wymagany"];
+      newErrors.owner_address = ["Adres właściciela jest wymagany"];
     }
-
     if (!ownerData.city.trim()) {
-      newErrors.owner_city = ["Miasto jest wymagane"];
+      newErrors.owner_city = ["Miasto właściciela jest wymagane"];
     }
-
     if (!ownerData.gdpr_consent) {
-      newErrors.owner_gdpr_consent = ["Zgoda RODO jest wymagana"];
+      newErrors.owner_gdpr_consent = ["Zgoda GDPR jest wymagana"];
     }
 
     setErrors(newErrors);
@@ -174,7 +150,6 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
 
   const handleDogDataChange = (field: keyof DogFormData, value: string) => {
     setDogData((prev) => ({ ...prev, [field]: value }));
-    // Clear error when user starts typing
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: [] }));
     }
@@ -185,9 +160,9 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
     value: string | boolean,
   ) => {
     setOwnerData((prev) => ({ ...prev, [field]: value }));
-    // Clear error when user starts typing
-    if (errors[`owner_${field}`]) {
-      setErrors((prev) => ({ ...prev, [`owner_${field}`]: [] }));
+    const errorKey = `owner_${field}`;
+    if (errors[errorKey]) {
+      setErrors((prev) => ({ ...prev, [errorKey]: [] }));
     }
   };
 
@@ -199,76 +174,40 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
     }
 
     try {
-      // First, create or find owner
-      const ownerResponse = await fetch("/api/owners", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          first_name: ownerData.first_name,
-          last_name: ownerData.last_name,
-          email: ownerData.email,
-          phone: ownerData.phone || undefined,
-          address: ownerData.address,
-          city: ownerData.city,
-          postal_code: ownerData.postal_code || undefined,
-          country: ownerData.country,
-          kennel_name: ownerData.kennel_name || undefined,
-          language: "pl",
-          gdpr_consent: ownerData.gdpr_consent,
-        }),
-      });
-
-      if (!ownerResponse.ok) {
-        const errorData = await ownerResponse.json();
-        throw new Error(
-          errorData.error?.message || "Błąd tworzenia właściciela",
-        );
-      }
-
-      const owner = await ownerResponse.json();
-
-      // Then, create dog
-      const dogResponse = await fetch("/api/dogs", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      const registrationData: CreateRegistrationDto = {
+        dog: {
           name: dogData.name,
           breed_id: dogData.breed_id,
           gender: dogData.gender,
           birth_date: dogData.birth_date,
           microchip_number: dogData.microchip_number,
-          kennel_club_number: dogData.kennel_club_number || undefined,
-          kennel_name: dogData.kennel_name || undefined,
-          father_name: dogData.father_name || undefined,
-          mother_name: dogData.mother_name || undefined,
-          owners: [{ id: owner.id, is_primary: true }],
-        }),
-      });
-
-      if (!dogResponse.ok) {
-        const errorData = await dogResponse.json();
-        throw new Error(errorData.error?.message || "Błąd tworzenia psa");
-      }
-
-      const dog = await dogResponse.json();
-
-      // Finally, create registration
-      const registrationData: CreateRegistrationDto = {
-        dog_id: dog.id,
-        dog_class: dogData.dog_class as DogClass,
-        registration_fee: dogData.registration_fee
-          ? parseFloat(dogData.registration_fee)
-          : undefined,
+          kennel_club_number: dogData.kennel_club_number || null,
+          kennel_name: dogData.kennel_name || null,
+          father_name: dogData.father_name || null,
+          mother_name: dogData.mother_name || null,
+        },
+        owner: {
+          first_name: ownerData.first_name,
+          last_name: ownerData.last_name,
+          email: ownerData.email,
+          phone: ownerData.phone || null,
+          address: ownerData.address,
+          city: ownerData.city,
+          postal_code: ownerData.postal_code || null,
+          country: ownerData.country,
+          kennel_name: ownerData.kennel_name || null,
+          gdpr_consent: ownerData.gdpr_consent,
+        },
+        registration: {
+          dog_class: dogData.dog_class as DogClass,
+        },
       };
 
       await onAddDog(registrationData);
       onSuccess();
-      resetForm();
     } catch (error) {
       console.error("Error adding dog:", error);
-      setErrors({
-        submit: [error instanceof Error ? error.message : "Nieznany błąd"],
-      });
+      setErrors({ submit: ["Błąd podczas dodawania psa"] });
     }
   };
 
@@ -284,7 +223,6 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
       father_name: "",
       mother_name: "",
       dog_class: "",
-      registration_fee: "",
     });
     setOwnerData({
       first_name: "",
@@ -302,22 +240,9 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
   };
 
   const handleClose = () => {
-    if (!isProcessing) {
-      resetForm();
-      onClose();
-    }
+    resetForm();
+    onClose();
   };
-
-  const dogClasses = [
-    { value: "baby", label: "Baby" },
-    { value: "puppy", label: "Szczenię" },
-    { value: "junior", label: "Junior" },
-    { value: "intermediate", label: "Młodzież" },
-    { value: "open", label: "Otwarta" },
-    { value: "working", label: "Pracująca" },
-    { value: "champion", label: "Champion" },
-    { value: "veteran", label: "Weteran" },
-  ];
 
   if (!isOpen) return null;
 
@@ -326,7 +251,7 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
       <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-900">
+            <h2 className="text-xl font-bold text-gray-900">
               Dodaj psa do wystawy
             </h2>
             <button
@@ -340,12 +265,6 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
         </div>
 
         <form onSubmit={handleSubmit} className="p-6">
-          {errors.submit && (
-            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-800">{errors.submit[0]}</p>
-            </div>
-          )}
-
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Dog Information */}
             <div>
@@ -356,21 +275,20 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
               <div className="space-y-4">
                 <div>
                   <label
-                    htmlFor="dogName"
+                    htmlFor="dog-name"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
                     Nazwa psa *
                   </label>
                   <input
-                    id="dogName"
                     type="text"
+                    id="dog-name"
                     value={dogData.name}
                     onChange={(e) =>
                       handleDogDataChange("name", e.target.value)
                     }
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                      errors.name ? "border-red-300" : "border-gray-300"
-                    }`}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Nazwa psa"
                   />
                   {errors.name && (
                     <p className="text-red-600 text-sm mt-1">
@@ -378,22 +296,21 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
                     </p>
                   )}
                 </div>
+
                 <div>
                   <label
-                    htmlFor="breedSelect"
+                    htmlFor="breed"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
                     Rasa *
                   </label>
                   <select
-                    id="breedSelect"
+                    id="breed"
                     value={dogData.breed_id}
                     onChange={(e) =>
                       handleDogDataChange("breed_id", e.target.value)
                     }
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                      errors.breed_id ? "border-red-300" : "border-gray-300"
-                    }`}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     disabled={isLoadingBreeds}
                   >
                     <option value="">Wybierz rasę</option>
@@ -413,13 +330,13 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label
-                      htmlFor="genderSelect"
+                      htmlFor="gender"
                       className="block text-sm font-medium text-gray-700 mb-1"
                     >
                       Płeć *
                     </label>
                     <select
-                      id="genderSelect"
+                      id="gender"
                       value={dogData.gender}
                       onChange={(e) =>
                         handleDogDataChange("gender", e.target.value)
@@ -430,23 +347,22 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
                       <option value="female">Suka</option>
                     </select>
                   </div>
+
                   <div>
                     <label
-                      htmlFor="birthDateInput"
+                      htmlFor="birth-date"
                       className="block text-sm font-medium text-gray-700 mb-1"
                     >
                       Data urodzenia *
                     </label>
                     <input
-                      id="birthDateInput"
                       type="date"
+                      id="birth-date"
                       value={dogData.birth_date}
                       onChange={(e) =>
                         handleDogDataChange("birth_date", e.target.value)
                       }
-                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                        errors.birth_date ? "border-red-300" : "border-gray-300"
-                      }`}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     {errors.birth_date && (
                       <p className="text-red-600 text-sm mt-1">
@@ -455,26 +371,23 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
                     )}
                   </div>
                 </div>
+
                 <div>
                   <label
-                    htmlFor="microchipInput"
+                    htmlFor="microchip"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
-                    Numer microchip *
+                    Numer chipa *
                   </label>
                   <input
-                    id="microchipInput"
                     type="text"
+                    id="microchip"
                     value={dogData.microchip_number}
                     onChange={(e) =>
                       handleDogDataChange("microchip_number", e.target.value)
                     }
-                    placeholder="15 cyfr"
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                      errors.microchip_number
-                        ? "border-red-300"
-                        : "border-gray-300"
-                    }`}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="15-cyfrowy numer chipa"
                   />
                   {errors.microchip_number && (
                     <p className="text-red-600 text-sm mt-1">
@@ -483,132 +396,93 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
                   )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label
-                      htmlFor="dogClassSelect"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Klasa psa *
-                    </label>
-                    <select
-                      id="dogClassSelect"
-                      value={dogData.dog_class}
-                      onChange={(e) =>
-                        handleDogDataChange("dog_class", e.target.value)
-                      }
-                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                        errors.dog_class ? "border-red-300" : "border-gray-300"
-                      }`}
-                    >
-                      <option value="">Wybierz klasę</option>
-                      {dogClasses.map((dogClass) => (
-                        <option key={dogClass.value} value={dogClass.value}>
-                          {dogClass.label}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.dog_class && (
-                      <p className="text-red-600 text-sm mt-1">
-                        {errors.dog_class[0]}
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="registrationFee"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Opłata wpisowa (PLN)
-                    </label>
-                    <input
-                      id="registrationFee"
-                      type="number"
-                      value={dogData.registration_fee}
-                      onChange={(e) =>
-                        handleDogDataChange("registration_fee", e.target.value)
-                      }
-                      placeholder="0.00"
-                      step="0.01"
-                      min="0"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
+                <div>
+                  <label
+                    htmlFor="dog-class"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Klasa psa *
+                  </label>
+                  <select
+                    id="dog-class"
+                    value={dogData.dog_class}
+                    onChange={(e) =>
+                      handleDogDataChange("dog_class", e.target.value)
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Wybierz klasę</option>
+                    <option value="baby">Baby</option>
+                    <option value="puppy">Szczenię</option>
+                    <option value="junior">Junior</option>
+                    <option value="intermediate">Młodzież</option>
+                    <option value="open">Otwarta</option>
+                    <option value="working">Pracująca</option>
+                    <option value="champion">Champion</option>
+                    <option value="veteran">Weteran</option>
+                  </select>
+                  {errors.dog_class && (
+                    <p className="text-red-600 text-sm mt-1">
+                      {errors.dog_class[0]}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="kennel-name"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Nazwa hodowli
+                  </label>
+                  <input
+                    type="text"
+                    id="kennel-name"
+                    value={dogData.kennel_name}
+                    onChange={(e) =>
+                      handleDogDataChange("kennel_name", e.target.value)
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Nazwa hodowli"
+                  />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label
-                      htmlFor="kennelName"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Nazwa hodowli
-                    </label>
-                    <input
-                      id="kennelName"
-                      type="text"
-                      value={dogData.kennel_name}
-                      onChange={(e) =>
-                        handleDogDataChange("kennel_name", e.target.value)
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="kennelClubNumber"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Nr ZKwP
-                    </label>
-                    <input
-                      id="kennelClubNumber"
-                      type="text"
-                      value={dogData.kennel_club_number}
-                      onChange={(e) =>
-                        handleDogDataChange(
-                          "kennel_club_number",
-                          e.target.value,
-                        )
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label
-                      htmlFor="fatherName"
+                      htmlFor="father-name"
                       className="block text-sm font-medium text-gray-700 mb-1"
                     >
                       Ojciec
                     </label>
                     <input
-                      id="fatherName"
                       type="text"
+                      id="father-name"
                       value={dogData.father_name}
                       onChange={(e) =>
                         handleDogDataChange("father_name", e.target.value)
                       }
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Imię ojca"
                     />
                   </div>
+
                   <div>
                     <label
-                      htmlFor="motherName"
+                      htmlFor="mother-name"
                       className="block text-sm font-medium text-gray-700 mb-1"
                     >
                       Matka
                     </label>
                     <input
-                      id="motherName"
                       type="text"
+                      id="mother-name"
                       value={dogData.mother_name}
                       onChange={(e) =>
                         handleDogDataChange("mother_name", e.target.value)
                       }
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Imię matki"
                     />
                   </div>
                 </div>
@@ -625,23 +499,20 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label
-                      htmlFor="ownerFirstName"
+                      htmlFor="owner-first-name"
                       className="block text-sm font-medium text-gray-700 mb-1"
                     >
                       Imię *
                     </label>
                     <input
-                      id="ownerFirstName"
                       type="text"
+                      id="owner-first-name"
                       value={ownerData.first_name}
                       onChange={(e) =>
                         handleOwnerDataChange("first_name", e.target.value)
                       }
-                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                        errors.owner_first_name
-                          ? "border-red-300"
-                          : "border-gray-300"
-                      }`}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Imię"
                     />
                     {errors.owner_first_name && (
                       <p className="text-red-600 text-sm mt-1">
@@ -649,25 +520,23 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
                       </p>
                     )}
                   </div>
+
                   <div>
                     <label
-                      htmlFor="ownerLastName"
+                      htmlFor="owner-last-name"
                       className="block text-sm font-medium text-gray-700 mb-1"
                     >
                       Nazwisko *
                     </label>
                     <input
-                      id="ownerLastName"
                       type="text"
+                      id="owner-last-name"
                       value={ownerData.last_name}
                       onChange={(e) =>
                         handleOwnerDataChange("last_name", e.target.value)
                       }
-                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                        errors.owner_last_name
-                          ? "border-red-300"
-                          : "border-gray-300"
-                      }`}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Nazwisko"
                     />
                     {errors.owner_last_name && (
                       <p className="text-red-600 text-sm mt-1">
@@ -676,23 +545,23 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
                     )}
                   </div>
                 </div>
+
                 <div>
                   <label
-                    htmlFor="ownerEmail"
+                    htmlFor="owner-email"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
                     Email *
                   </label>
                   <input
-                    id="ownerEmail"
                     type="email"
+                    id="owner-email"
                     value={ownerData.email}
                     onChange={(e) =>
                       handleOwnerDataChange("email", e.target.value)
                     }
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                      errors.owner_email ? "border-red-300" : "border-gray-300"
-                    }`}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="email@example.com"
                   />
                   {errors.owner_email && (
                     <p className="text-red-600 text-sm mt-1">
@@ -700,42 +569,42 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
                     </p>
                   )}
                 </div>
+
                 <div>
                   <label
-                    htmlFor="ownerPhone"
+                    htmlFor="owner-phone"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
                     Telefon
                   </label>
                   <input
-                    id="ownerPhone"
                     type="tel"
+                    id="owner-phone"
                     value={ownerData.phone}
                     onChange={(e) =>
                       handleOwnerDataChange("phone", e.target.value)
                     }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="+48 123 456 789"
                   />
                 </div>
+
                 <div>
                   <label
-                    htmlFor="ownerAddress"
+                    htmlFor="owner-address"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
                     Adres *
                   </label>
                   <input
-                    id="ownerAddress"
                     type="text"
+                    id="owner-address"
                     value={ownerData.address}
                     onChange={(e) =>
                       handleOwnerDataChange("address", e.target.value)
                     }
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                      errors.owner_address
-                        ? "border-red-300"
-                        : "border-gray-300"
-                    }`}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="ul. Przykładowa 1"
                   />
                   {errors.owner_address && (
                     <p className="text-red-600 text-sm mt-1">
@@ -747,21 +616,20 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label
-                      htmlFor="ownerCity"
+                      htmlFor="owner-city"
                       className="block text-sm font-medium text-gray-700 mb-1"
                     >
                       Miasto *
                     </label>
                     <input
-                      id="ownerCity"
                       type="text"
+                      id="owner-city"
                       value={ownerData.city}
                       onChange={(e) =>
                         handleOwnerDataChange("city", e.target.value)
                       }
-                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                        errors.owner_city ? "border-red-300" : "border-gray-300"
-                      }`}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Warszawa"
                     />
                     {errors.owner_city && (
                       <p className="text-red-600 text-sm mt-1">
@@ -769,63 +637,50 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
                       </p>
                     )}
                   </div>
+
                   <div>
                     <label
-                      htmlFor="ownerPostalCode"
+                      htmlFor="owner-postal-code"
                       className="block text-sm font-medium text-gray-700 mb-1"
                     >
                       Kod pocztowy
                     </label>
                     <input
-                      id="ownerPostalCode"
                       type="text"
+                      id="owner-postal-code"
                       value={ownerData.postal_code}
                       onChange={(e) =>
                         handleOwnerDataChange("postal_code", e.target.value)
                       }
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="00-000"
                     />
                   </div>
                 </div>
+
                 <div>
                   <label
-                    htmlFor="ownerCountry"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Kraj
-                  </label>
-                  <input
-                    id="ownerCountry"
-                    type="text"
-                    value={ownerData.country}
-                    onChange={(e) =>
-                      handleOwnerDataChange("country", e.target.value)
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="ownerKennelName"
+                    htmlFor="owner-kennel-name"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
                     Nazwa hodowli
                   </label>
                   <input
-                    id="ownerKennelName"
                     type="text"
+                    id="owner-kennel-name"
                     value={ownerData.kennel_name}
                     onChange={(e) =>
                       handleOwnerDataChange("kennel_name", e.target.value)
                     }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Nazwa hodowli"
                   />
                 </div>
 
                 <div className="flex items-center">
                   <input
                     type="checkbox"
-                    id="gdpr_consent"
+                    id="gdpr-consent"
                     checked={ownerData.gdpr_consent}
                     onChange={(e) =>
                       handleOwnerDataChange("gdpr_consent", e.target.checked)
@@ -833,7 +688,7 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
                   <label
-                    htmlFor="gdpr_consent"
+                    htmlFor="gdpr-consent"
                     className="ml-2 block text-sm text-gray-700"
                   >
                     Wyrażam zgodę na przetwarzanie danych osobowych zgodnie z
@@ -841,7 +696,7 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
                   </label>
                 </div>
                 {errors.owner_gdpr_consent && (
-                  <p className="text-red-600 text-sm">
+                  <p className="text-red-600 text-sm mt-1">
                     {errors.owner_gdpr_consent[0]}
                   </p>
                 )}
@@ -849,19 +704,27 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
             </div>
           </div>
 
-          <div className="mt-8 flex justify-end gap-4">
+          {/* Error Messages */}
+          {errors.submit && (
+            <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-md">
+              <p className="text-red-600 text-sm">{errors.submit[0]}</p>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="flex justify-end gap-3 mt-6 pt-6 border-t border-gray-200">
             <button
               type="button"
               onClick={handleClose}
               disabled={isProcessing}
-              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors"
             >
               Anuluj
             </button>
             <button
               type="submit"
               disabled={isProcessing}
-              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
             >
               {isProcessing ? "Dodawanie..." : "Dodaj psa"}
             </button>

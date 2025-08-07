@@ -5,24 +5,24 @@ import ShowDetailsView from "../../../components/shows/ShowDetailsView.tsx";
 const { showId } = Astro.params;
 
 // TODO: Get user role from authentication
-const userRole = "department_representative";
+const userRole = "club_board";
 
 if (!showId) {
   return Astro.redirect("/shows");
 }
 ---
 
-<Layout title="Szczegóły wystawy - 10x Dog Show">
+<Layout title="Szczegóły wystawy - Klub Hovawarta Show">
   <div class="space-y-6">
     <!-- Header -->
     <div class="bg-white shadow rounded-lg p-6">
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold text-gray-900 mb-2">Szczegóły wystawy</h1>
-          <p class="text-gray-600">Zarządzanie wystawą i rejestracjami psów</p>
+          <p class="text-gray-600">Zarządzanie wystawą klubową</p>
         </div>
         <div class="flex items-center gap-2 text-sm text-gray-500">
-          <span>Rola: {userRole === "department_representative" ? "Przedstawiciel związku" : "Sekretarz"}</span>
+          <span>Rola: Członek zarządu klubu</span>
         </div>
       </div>
     </div>
