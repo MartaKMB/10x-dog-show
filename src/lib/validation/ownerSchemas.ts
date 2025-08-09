@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+// Identifier schema
+export const ownerIdSchema = z.string().uuid("Invalid owner ID format");
+
 // Email validation schema
 const emailSchema = z
   .string()
