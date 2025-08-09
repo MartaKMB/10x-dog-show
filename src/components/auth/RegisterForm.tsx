@@ -17,25 +17,25 @@ const RegisterForm: React.FC = () => {
   const validate = (): boolean => {
     const newErrors: ValidationErrors = {};
 
-    if (!firstName.trim()) newErrors.firstName = ["Imię jest wymagane"]; 
-    if (!lastName.trim()) newErrors.lastName = ["Nazwisko jest wymagane"]; 
+    if (!firstName.trim()) newErrors.firstName = ["Imię jest wymagane"];
+    if (!lastName.trim()) newErrors.lastName = ["Nazwisko jest wymagane"];
 
     if (!email.trim()) {
-      newErrors.email = ["Email jest wymagany"]; 
+      newErrors.email = ["Email jest wymagany"];
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = ["Nieprawidłowy format email"]; 
+      newErrors.email = ["Nieprawidłowy format email"];
     }
 
     if (!password) {
-      newErrors.password = ["Hasło jest wymagane"]; 
+      newErrors.password = ["Hasło jest wymagane"];
     } else if (password.length < 8) {
-      newErrors.password = ["Hasło musi mieć co najmniej 8 znaków"]; 
+      newErrors.password = ["Hasło musi mieć co najmniej 8 znaków"];
     }
 
     if (!confirmPassword) {
-      newErrors.confirmPassword = ["Potwierdź hasło"]; 
+      newErrors.confirmPassword = ["Potwierdź hasło"];
     } else if (confirmPassword !== password) {
-      newErrors.confirmPassword = ["Hasła muszą być zgodne"]; 
+      newErrors.confirmPassword = ["Hasła muszą być zgodne"];
     }
 
     setErrors(newErrors);
@@ -50,13 +50,33 @@ const RegisterForm: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      // Miejsce na integrację z backendem (rejestracja)
-      await new Promise((resolve) => setTimeout(resolve, 700));
-      setSuccessMessage(
-        "Konto utworzono (placeholder). Możesz się teraz zalogować.",
-      );
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          password,
+          first_name: firstName,
+          last_name: lastName,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorBody = await response.json().catch(() => null);
+        const message =
+          errorBody?.error?.message ??
+          "Nie udało się utworzyć konta. Spróbuj ponownie.";
+        throw new Error(message);
+      }
+
+      // Po udanej rejestracji i ustanowieniu sesji przekieruj na dashboard
+      window.location.href = "/";
     } catch (err) {
-      setServerError("Wystąpił błąd podczas rejestracji");
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Wystąpił błąd podczas rejestracji";
+      setServerError(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -80,7 +100,10 @@ const RegisterForm: React.FC = () => {
       <form onSubmit={onSubmit} className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label htmlFor="first_name" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="first_name"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Imię
             </label>
             <input
@@ -98,7 +121,10 @@ const RegisterForm: React.FC = () => {
           </div>
 
           <div>
-            <label htmlFor="last_name" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="last_name"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Nazwisko
             </label>
             <input
@@ -117,7 +143,10 @@ const RegisterForm: React.FC = () => {
         </div>
 
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Email
           </label>
           <input
@@ -136,7 +165,10 @@ const RegisterForm: React.FC = () => {
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Hasło
           </label>
           <input
@@ -155,7 +187,10 @@ const RegisterForm: React.FC = () => {
         </div>
 
         <div>
-          <label htmlFor="confirm_password" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="confirm_password"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Powtórz hasło
           </label>
           <input
@@ -169,7 +204,9 @@ const RegisterForm: React.FC = () => {
             autoComplete="new-password"
           />
           {errors.confirmPassword && (
-            <p className="text-red-600 text-sm mt-1">{errors.confirmPassword[0]}</p>
+            <p className="text-red-600 text-sm mt-1">
+              {errors.confirmPassword[0]}
+            </p>
           )}
         </div>
 
@@ -191,5 +228,3 @@ const RegisterForm: React.FC = () => {
 };
 
 export default RegisterForm;
-
-
