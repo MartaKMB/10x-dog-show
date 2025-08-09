@@ -9,3 +9,5 @@ export const supabaseClient = createClient<Database>(
   supabaseUrl,
   supabaseAnonKey,
 );
+
+export type { Database } from "./database.types.ts";

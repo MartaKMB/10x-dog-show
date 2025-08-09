@@ -15,15 +15,15 @@ const LoginForm: React.FC = () => {
     const newErrors: ValidationErrors = {};
 
     if (!email.trim()) {
-      newErrors.email = ["Email jest wymagany"]; 
+      newErrors.email = ["Email jest wymagany"];
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = ["Nieprawidłowy format email"]; 
+      newErrors.email = ["Nieprawidłowy format email"];
     }
 
     if (!password) {
-      newErrors.password = ["Hasło jest wymagane"]; 
+      newErrors.password = ["Hasło jest wymagane"];
     } else if (password.length < 8) {
-      newErrors.password = ["Hasło musi mieć co najmniej 8 znaków"]; 
+      newErrors.password = ["Hasło musi mieć co najmniej 8 znaków"];
     }
 
     setErrors(newErrors);
@@ -38,11 +38,25 @@ const LoginForm: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      // Miejsce na integrację z backendem lub Supabase Auth
-      await new Promise((resolve) => setTimeout(resolve, 600));
-      setSuccessMessage("Zalogowano pomyślnie (placeholder)");
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        const errorBody = await response.json().catch(() => null);
+        const message =
+          errorBody?.error?.message ?? "Nieprawidłowy email lub hasło.";
+        throw new Error(message);
+      }
+
+      // SSR-first cookies are set by the server. Redirect to dashboard.
+      window.location.href = "/";
     } catch (err) {
-      setServerError("Wystąpił błąd podczas logowania");
+      const message =
+        err instanceof Error ? err.message : "Wystąpił błąd podczas logowania";
+      setServerError(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -66,7 +80,10 @@ const LoginForm: React.FC = () => {
 
       <form onSubmit={onSubmit} className="space-y-4">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Email
           </label>
           <input
@@ -85,7 +102,10 @@ const LoginForm: React.FC = () => {
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Hasło
           </label>
           <input
@@ -104,7 +124,10 @@ const LoginForm: React.FC = () => {
         </div>
 
         <div className="flex items-center justify-between">
-          <a href="/auth/forgot-password" className="text-sm text-blue-600 hover:underline">
+          <a
+            href="/auth/forgot-password"
+            className="text-sm text-blue-600 hover:underline"
+          >
             Zapomniałeś hasła?
           </a>
         </div>
@@ -127,5 +150,3 @@ const LoginForm: React.FC = () => {
 };
 
 export default LoginForm;
-
-

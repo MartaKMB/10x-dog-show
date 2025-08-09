@@ -18,10 +18,10 @@ export default defineConfig({
       jsxImportSource: "react",
     },
     optimizeDeps: {
-      include: ["@supabase/supabase-js"],
+      include: ["@supabase/supabase-js", "@supabase/ssr"],
     },
     ssr: {
-      noExternal: ["@supabase/supabase-js"],
+      noExternal: ["@supabase/supabase-js", "@supabase/ssr"],
     },
   },
   adapter: node({
