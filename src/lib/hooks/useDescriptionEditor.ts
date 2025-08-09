@@ -33,6 +33,7 @@ interface HistoryState {
 
 export function useDescriptionEditor({
   descriptionId,
+  dogId,
   showId,
   initialData,
 }: UseDescriptionEditorProps) {
@@ -41,14 +42,12 @@ export function useDescriptionEditor({
     content_pl: initialData?.content_pl || "",
     content_en: initialData?.content_en || "",
     evaluation: {
+      dog_id: dogId,
       dog_class: initialData?.evaluation?.dog_class || "open",
       grade: initialData?.evaluation?.grade || undefined,
       baby_puppy_grade: initialData?.evaluation?.baby_puppy_grade || undefined,
-      title: initialData?.evaluation?.title || undefined,
+      club_title: initialData?.evaluation?.club_title || undefined,
       placement: initialData?.evaluation?.placement || undefined,
-      points: initialData?.evaluation?.points || undefined,
-      is_best_in_group: initialData?.evaluation?.is_best_in_group || false,
-      is_best_in_show: initialData?.evaluation?.is_best_in_show || false,
     },
   });
 
@@ -203,7 +202,7 @@ export function useDescriptionEditor({
       loadVersions();
     }
     checkPermissions();
-  }, [descriptionId]);
+  }, [descriptionId, loadVersions, checkPermissions]);
 
   return {
     // Stan

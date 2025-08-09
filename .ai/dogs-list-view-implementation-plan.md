@@ -1,14 +1,17 @@
 # Plan implementacji widoku Dogs List
 
 ## 1. Przegląd
+
 Widok listy psów (Dogs List) zapewnia zarządzanie psami w systemie klubu hovawarta: przeglądanie, filtrowanie, wyszukiwanie oraz paginację. Wykorzystuje uproszczony model danych MVP (bez ras i FCI) i istniejące API do listowania i operacji na psach. Celem jest szybkie odnalezienie psa po nazwie, numerze chipa, płci czy nazwie hodowli oraz wgląd w powiązanych właścicieli.
 
 ## 2. Routing widoku
+
 - Ścieżka: `/dogs`
 - Plik strony: `src/pages/dogs/index.astro`
 - Montowany komponent React: `DogsListView` (nowy, w `src/components/dogs/DogsListView.tsx`)
 
 ## 3. Struktura komponentów
+
 - `pages/dogs/index.astro`
   - `components/dogs/DogsListView.tsx`
     - `components/dogs/DogFilters.tsx`
@@ -21,7 +24,9 @@ Widok listy psów (Dogs List) zapewnia zarządzanie psami w systemie klubu hovaw
       - `components/shows/EmptyState.tsx`
 
 ## 4. Szczegóły komponentów
+
 ### DogsListView
+
 - Opis: Kontener widoku listy psów. Odpowiada za stan, pobieranie danych, obsługę filtrów, wyszukiwania i paginacji. Renderuje filtry, tabelę i elementy stanu (ładowanie, błąd, pustka).
 - Główne elementy:
   - Nagłówek z tytułem i (opcjonalnie) przyciskiem „Dodaj psa” (link do przyszłego `/dogs/new`).
@@ -38,6 +43,7 @@ Widok listy psów (Dogs List) zapewnia zarządzanie psami w systemie klubu hovaw
 - Propsy: brak (to widok-strona). Opcjonalnie `initialQuery` w przyszłości.
 
 ### DogFilters
+
 - Opis: Panel filtrów i wyszukiwarki dla listy psów (dostosowany do MVP bez ras/FCI).
 - Główne elementy:
   - Search input (po nazwie psa, hodowli; backend przeszukuje `name`, `kennel_name`).
@@ -62,6 +68,7 @@ Widok listy psów (Dogs List) zapewnia zarządzanie psami w systemie klubu hovaw
   - `onClearFilters: () => void`
 
 ### DogsTable
+
 - Opis: Tabela wyników psów.
 - Główne elementy: `<table>` z kolumnami: Imię, Płeć, Data urodzenia, Chip (jeśli jest), Hodowla, Właściciele (pierwszy + liczba), Akcje (opcjonalnie – np. „Zobacz szczegóły”).
 - Obsługiwane interakcje: klik w wiersz lub przycisk „Szczegóły”.
@@ -73,6 +80,7 @@ Widok listy psów (Dogs List) zapewnia zarządzanie psami w systemie klubu hovaw
   - `onRowClick?: (dogId: string) => void`
 
 ### DogRow
+
 - Opis: Pojedynczy wiersz psa z formatowaniem danych oraz renderem listy właścicieli (ograniczonej dla czytelności).
 - Główne elementy: `<tr>` + `<td>` kolumny, skrót właścicieli „Jan K. (+2)”.
 - Interakcje: klik w wiersz → `onRowClick`.
@@ -82,11 +90,13 @@ Widok listy psów (Dogs List) zapewnia zarządzanie psami w systemie klubu hovaw
   - `onClick?: (dogId: string) => void`
 
 ### Reużywane komponenty wspólne
+
 - `Pagination` (z `components/shows/Pagination.tsx`):
   - Propsy: `currentPage`, `totalPages`, `totalItems`, `onPageChange(page)`.
 - `LoadingSpinner`, `ErrorDisplay`, `EmptyState` (z `components/shows/…`): bez zmian.
 
 ## 5. Typy
+
 - Reużywane z `@types.ts` (`10x-dog-show/src/types.ts`):
   - `DogResponse`, `DogQueryParams`, `PaginationInfo`, `PaginatedResponse<T>`.
 - Nowe (ViewModely):
@@ -104,11 +114,13 @@ Widok listy psów (Dogs List) zapewnia zarządzanie psami w systemie klubu hovaw
     - `error: string | null`
 
 ## 6. Zarządzanie stanem
+
 - Lokalny stan w `DogsListView` lub dedykowany hook `useDogsCatalog` (zalecane) analogiczny do `useOwnersList`:
   - `state: DogsListViewModel` + akcje: `updateFilters`, `updateSearch`, `updatePagination`, `clearFilters`, `fetchDogs`.
 - Debounce dla wyszukiwarki w `DogFilters` (300 ms).
 
 ## 7. Integracja API
+
 - Specyfikacja: `@api-plan-hov.md` → sekcja Dogs Management (`GET /dogs`, `GET /dogs/{id}`, `POST /dogs`, `PUT /dogs/{id}`, `DELETE /dogs/{id}`).
 - Implementacja endpointów w kodzie:
   - `@dogs/index.ts` → `src/pages/api/dogs/index.ts` (GET list, POST create)
@@ -123,12 +135,14 @@ Widok listy psów (Dogs List) zapewnia zarządzanie psami w systemie klubu hovaw
   - `page >= 1`, `1 <= limit <= 100`
 
 ## 8. Interakcje użytkownika
+
 - Wpisz frazę w wyszukiwarkę → po 300 ms automatyczne zapytanie do API z `search`.
 - Zmień filtr płci / hodowli / chipu → reset strony na 1, zapytanie do API.
 - Kliknij numer strony w paginacji → aktualizacja `page`, zapytanie do API.
 - Klik w psa → (opcjonalnie) nawigacja do `/dogs/[dogId]` (gdy strona powstanie).
 
 ## 9. Warunki i walidacja
+
 - Walidacja formularza filtrów przed wykonaniem zapytania:
   - `search.length === 0 || 2 <= length <= 100`.
   - `microchip_number` spełnia `/^[0-9]{15}$/` jeśli niepusty.
@@ -136,6 +150,7 @@ Widok listy psów (Dogs List) zapewnia zarządzanie psami w systemie klubu hovaw
 - Obsługa paginacji: blokuj przejście na `< 1` i `> pages`.
 
 ## 10. Obsługa błędów
+
 - Format błędów zgodny z `ErrorResponse` (`@types.ts`).
 - Scenariusze:
   - `VALIDATION_ERROR` (400) → pokaż listę pól w `ErrorDisplay` lub komunikat pod filtrami.
@@ -145,6 +160,7 @@ Widok listy psów (Dogs List) zapewnia zarządzanie psami w systemie klubu hovaw
 - Timeouts / sieć: retry on demand (`onRetry`).
 
 ## 11. Kroki implementacji
+
 1. Routing:
    - Utwórz `src/pages/dogs/index.astro` montujący komponent React `DogsListView` w layoucie głównym.
 2. Komponenty:
@@ -168,6 +184,7 @@ Widok listy psów (Dogs List) zapewnia zarządzanie psami w systemie klubu hovaw
    - Weryfikacja zgodności z PRD i User Stories.
 
 ---
+
 - PRD: `@prd-hov.md` (`10x-dog-show/.ai/prd-hov.md`)
 - Opis widoku (UI plan): `@ui-plan-hov.md` → sekcja „Dogs List”
 - User Stories adresowane: US-003 (Dodawanie psa do systemu – nawigacja z listy), US-009 (Wyszukiwanie psów)

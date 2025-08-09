@@ -4,7 +4,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (mobileMenuButton && mobileMenu) {
     mobileMenuButton.addEventListener("click", function () {
-      const isExpanded = mobileMenuButton.getAttribute("aria-expanded") === "true";
+      const isExpanded =
+        mobileMenuButton.getAttribute("aria-expanded") === "true";
 
       mobileMenuButton.setAttribute("aria-expanded", String(!isExpanded));
       mobileMenu.classList.toggle("hidden");
@@ -23,5 +24,3 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 });
-
-

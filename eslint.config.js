@@ -79,6 +79,8 @@ const reactConfig = tseslint.config({
   rules: {
     ...eslintPluginReactHooks.configs.recommended.rules,
     "react/react-in-jsx-scope": "off",
+    // Using TypeScript for props typing; disable prop-types requirement
+    "react/prop-types": "off",
     "react-compiler/react-compiler": "error",
   },
 });

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import type { DogGender } from "../../types";
 
 interface AddDogFormProps {
