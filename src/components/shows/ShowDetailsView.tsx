@@ -121,7 +121,7 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
       (async () => {
         try {
           const res = await fetch(
-            `/api/shows/${show.id}/evaluations?page=1&limit=1000`,
+            `/api/shows/${show.id}/evaluations?page=1&limit=100`,
           );
           if (res.ok) {
             const data = await res.json();

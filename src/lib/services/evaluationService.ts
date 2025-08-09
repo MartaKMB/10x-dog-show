@@ -39,8 +39,7 @@ export class EvaluationService {
           )
         `,
         )
-        .eq("show_id", showId)
-        .is("deleted_at", null);
+        .eq("show_id", showId);
 
       // Apply filters
       if (params?.dog_class) {
@@ -57,8 +56,7 @@ export class EvaluationService {
       const { count } = await this.supabase
         .from("evaluations")
         .select("*", { count: "exact", head: true })
-        .eq("show_id", showId)
-        .is("deleted_at", null);
+        .eq("show_id", showId);
 
       // Apply pagination
       const page = params?.page || 1;
@@ -183,7 +181,7 @@ export class EvaluationService {
       }
 
       // 2. Validate business rules
-      await this.validateUpdateBusinessRules(showId, data);
+      await this.validateUpdateBusinessRules(showId, evaluationId, data);
 
       // 3. Update evaluation
       const { data: evaluation, error } = await this.supabase
@@ -362,6 +360,7 @@ export class EvaluationService {
    */
   private async validateUpdateBusinessRules(
     showId: string,
+    evaluationId: string,
     data: UpdateEvaluationInput,
   ): Promise<void> {
     // Check if show is still editable
@@ -395,7 +394,7 @@ export class EvaluationService {
         .select("id")
         .eq("show_id", showId)
         .eq("club_title", data.club_title)
-        .neq("id", showId) // Exclude current evaluation
+        .neq("id", evaluationId) // Exclude current evaluation
         .single();
 
       if (!titleError && existingTitle) {

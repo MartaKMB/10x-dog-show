@@ -28,12 +28,16 @@ export const GET: APIRoute = async ({ params, request }) => {
       );
     }
 
-    // Parse query parameters
+    // Parse query parameters (ensure undefined, not null, for optional fields)
     const url = new URL(request.url);
     const queryParams = {
-      dog_class: url.searchParams.get("dog_class"),
-      grade: url.searchParams.get("grade"),
-      club_title: url.searchParams.get("club_title"),
+      dog_class: (url.searchParams.get("dog_class") || undefined) as
+        | string
+        | undefined,
+      grade: (url.searchParams.get("grade") || undefined) as string | undefined,
+      club_title: (url.searchParams.get("club_title") || undefined) as
+        | string
+        | undefined,
       page: parseInt(url.searchParams.get("page") || "1"),
       limit: parseInt(url.searchParams.get("limit") || "20"),
     };

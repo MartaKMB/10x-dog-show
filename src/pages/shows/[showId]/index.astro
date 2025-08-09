@@ -26,7 +26,7 @@ const { showId } = Astro.params;
     {/* Preview banner for guests */}
     { /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */ }
     { /* @ts-ignore Astro typing */ }
-    { !Astro.locals.user && (
+    { !Astro.locals.auth?.user && (
       <div class="bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-4">
         To jest tryb podglądu. Zaloguj się, aby edytować dane wystawy i listę psów.
       </div>
