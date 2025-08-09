@@ -23,7 +23,10 @@ export const createDogSchema = z
       .string()
       .regex(/^[0-9]{15}$/, "Microchip number must be exactly 15 digits")
       .optional(),
-    kennel_name: z.string().max(200).optional(),
+    kennel_name: z
+      .string()
+      .min(1, "Kennel name is required")
+      .max(200, "Kennel name cannot exceed 200 characters"),
     father_name: z.string().max(100).optional(),
     mother_name: z.string().max(100).optional(),
     owners: z

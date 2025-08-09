@@ -69,7 +69,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userRole }) => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
           <div className="text-center p-3 bg-gray-50 rounded-lg">
             <div className="font-medium text-gray-900">Wersja</div>
-            <div className="text-gray-600">1.0.0</div>
+            <div className="text-gray-600">2.0.0</div>
           </div>
           <div className="text-center p-3 bg-gray-50 rounded-lg">
             <div className="font-medium text-gray-900">Status</div>

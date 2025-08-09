@@ -230,34 +230,27 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
         );
       }
 
-      // Optionally create evaluation
-      const hasEval =
-        !!dogData.grade ||
-        !!dogData.baby_puppy_grade ||
-        !!dogData.club_title ||
-        !!dogData.placement;
-      if (hasEval) {
-        const evalPayload: Record<string, unknown> = {
-          dog_id: dog.id,
-          dog_class: dogData.dog_class as DogClass,
-          club_title: dogData.club_title || undefined,
-          placement: dogData.placement || undefined,
-        };
-        if (dogData.dog_class === "baby" || dogData.dog_class === "puppy") {
-          evalPayload["baby_puppy_grade"] = dogData.baby_puppy_grade;
-        } else {
-          evalPayload["grade"] = dogData.grade;
-        }
+      // Always create evaluation - required as part of show results
+      const evalPayload: Record<string, unknown> = {
+        dog_id: dog.id,
+        dog_class: dogData.dog_class as DogClass,
+        club_title: dogData.club_title || undefined,
+        placement: dogData.placement || undefined,
+      };
+      if (dogData.dog_class === "baby" || dogData.dog_class === "puppy") {
+        evalPayload["baby_puppy_grade"] = dogData.baby_puppy_grade;
+      } else {
+        evalPayload["grade"] = dogData.grade;
+      }
 
-        const evalResponse = await fetch(`/api/shows/${showId}/evaluations`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(evalPayload),
-        });
-        if (!evalResponse.ok) {
-          const errorData = await evalResponse.json();
-          throw new Error(errorData.error?.message || "Błąd zapisu oceny psa");
-        }
+      const evalResponse = await fetch(`/api/shows/${showId}/evaluations`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(evalPayload),
+      });
+      if (!evalResponse.ok) {
+        const errorData = await evalResponse.json();
+        throw new Error(errorData.error?.message || "Błąd zapisu oceny psa");
       }
 
       onSuccess();
@@ -400,37 +393,7 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
 
                 {/* Microchip removed for now */}
 
-                <div>
-                  <label
-                    htmlFor="dog-class"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Klasa psa *
-                  </label>
-                  <select
-                    id="dog-class"
-                    value={dogData.dog_class}
-                    onChange={(e) =>
-                      handleDogDataChange("dog_class", e.target.value)
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">Wybierz klasę</option>
-                    <option value="baby">Baby</option>
-                    <option value="puppy">Szczenię</option>
-                    <option value="junior">Junior</option>
-                    <option value="intermediate">Młodzież</option>
-                    <option value="open">Otwarta</option>
-                    <option value="working">Pracująca</option>
-                    <option value="champion">Champion</option>
-                    <option value="veteran">Weteran</option>
-                  </select>
-                  {errors.dog_class && (
-                    <p className="text-red-600 text-sm mt-1">
-                      {errors.dog_class[0]}
-                    </p>
-                  )}
-                </div>
+                {/* Przeniesiono pole klasa psa do sekcji Wyniki wystawy */}
 
                 <div>
                   <label
@@ -650,6 +613,37 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
                 Wyniki wystawy
               </h3>
               <div className="space-y-4">
+                <div>
+                  <label
+                    htmlFor="dog-class"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Klasa psa *
+                  </label>
+                  <select
+                    id="dog-class"
+                    value={dogData.dog_class}
+                    onChange={(e) =>
+                      handleDogDataChange("dog_class", e.target.value)
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Wybierz klasę</option>
+                    <option value="baby">Baby</option>
+                    <option value="puppy">Szczenię</option>
+                    <option value="junior">Junior</option>
+                    <option value="intermediate">Młodzież</option>
+                    <option value="open">Otwarta</option>
+                    <option value="working">Pracująca</option>
+                    <option value="champion">Champion</option>
+                    <option value="veteran">Weteran</option>
+                  </select>
+                  {errors.dog_class && (
+                    <p className="text-red-600 text-sm mt-1">
+                      {errors.dog_class[0]}
+                    </p>
+                  )}
+                </div>
                 {(dogData.dog_class === "baby" ||
                   dogData.dog_class === "puppy") && (
                   <div>
@@ -717,6 +711,27 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
                       )}
                     </div>
                   )}
+
+                {!dogData.dog_class && (
+                  <div>
+                    <label
+                      htmlFor="grade-disabled"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Ocena
+                    </label>
+                    <select
+                      id="grade-disabled"
+                      disabled
+                      className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-500"
+                    >
+                      <option>Wybierz najpierw klasę psa</option>
+                    </select>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Wybierz klasę, aby dobrać właściwy rodzaj oceny.
+                    </p>
+                  </div>
+                )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
