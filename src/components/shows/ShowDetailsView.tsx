@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import type {
   ShowResponse,
   RegistrationResponse,
@@ -85,14 +85,12 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
     isAdding,
     isEditing,
     isDeleting: isDeletingDog,
-    addDog,
-    editDog,
     deleteDog,
   } = useDogManagement(showId, loadShowData);
 
   useEffect(() => {
     loadShowData();
-  }, [showId]);
+  }, [showId, loadShowData]);
 
   useEffect(() => {
     if (show && registrations) {
@@ -110,7 +108,49 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
         isLoading: false,
         error: null,
       }));
+
+      // Fetch evaluations for this show and build map by dog id
+      (async () => {
+        try {
+          const res = await fetch(
+            `/api/shows/${show.id}/evaluations?page=1&limit=1000`,
+          );
+          if (res.ok) {
+            const data = await res.json();
+            const list = (data.data || data.evaluations || []) as Array<{
+              dog: { id: string };
+              dog_class: string;
+              grade: string | null;
+              baby_puppy_grade: string | null;
+              club_title: string | null;
+              placement: string | null;
+            }>;
+            const byDog: Record<
+              string,
+              {
+                grade: string | null;
+                baby_puppy_grade: string | null;
+                club_title: string | null;
+                placement: string | null;
+              }
+            > = {};
+            list.forEach((ev) => {
+              byDog[ev.dog.id] = {
+                grade: ev.grade ?? null,
+                baby_puppy_grade: ev.baby_puppy_grade ?? null,
+                club_title: ev.club_title ?? null,
+                placement: ev.placement ?? null,
+              };
+            });
+          }
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (_err) {
+          // ignore for now
+        }
+      })();
     }
+    // eslint-disable-next-line react-compiler/react-compiler
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [show, registrations]);
 
   const calculateStats = (
@@ -211,7 +251,12 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
   }
 
   if (!show) {
-    return <EmptyState message="Wystawa nie została znaleziona" />;
+    return (
+      <EmptyState
+        title="Wystawa nie została znaleziona"
+        description="Sprawdź identyfikator wystawy i spróbuj ponownie."
+      />
+    );
   }
 
   return (
@@ -253,7 +298,6 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
         onClose={handleModalClose}
         onSuccess={handleAddDogSuccess}
         isProcessing={isAdding}
-        onAddDog={addDog}
       />
 
       <EditShowModal
@@ -268,12 +312,12 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
       {selectedRegistration && (
         <>
           <EditDogModal
+            showId={showId}
             registration={selectedRegistration}
             isOpen={isEditModalOpen}
             onClose={handleModalClose}
             onSuccess={handleEditDogSuccess}
             isProcessing={isEditing}
-            onEditDog={editDog}
           />
 
           <DeleteDogConfirmation

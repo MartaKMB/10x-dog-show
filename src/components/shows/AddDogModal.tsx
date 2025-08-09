@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import type { CreateRegistrationDto, DogClass } from "../../types";
+import type { DogClass } from "../../types";
 
 interface AddDogModalProps {
   showId: string;
@@ -7,19 +7,20 @@ interface AddDogModalProps {
   onClose: () => void;
   onSuccess: () => void;
   isProcessing: boolean;
-  onAddDog: (data: CreateRegistrationDto) => Promise<void>;
 }
 
 interface DogFormData {
   name: string;
   gender: "male" | "female";
   birth_date: string;
-  microchip_number: string;
-  kennel_club_number: string;
   kennel_name: string;
   father_name: string;
   mother_name: string;
   dog_class: string;
+  grade?: string;
+  baby_puppy_grade?: string;
+  club_title?: string;
+  placement?: string;
 }
 
 interface OwnerFormData {
@@ -34,18 +35,16 @@ interface OwnerFormData {
 type ValidationErrors = Record<string, string[]>;
 
 const AddDogModal: React.FC<AddDogModalProps> = ({
+  showId,
   isOpen,
   onClose,
   onSuccess,
   isProcessing,
-  onAddDog,
 }) => {
   const [dogData, setDogData] = useState<DogFormData>({
     name: "",
     gender: "male",
     birth_date: "",
-    microchip_number: "",
-    kennel_club_number: "",
     kennel_name: "",
     father_name: "",
     mother_name: "",
@@ -80,11 +79,34 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
     if (!dogData.birth_date) {
       newErrors.birth_date = ["Data urodzenia jest wymagana"];
     }
-    if (!dogData.microchip_number.trim()) {
-      newErrors.microchip_number = ["Numer chipa jest wymagany"];
+    if (!dogData.kennel_name.trim()) {
+      newErrors.kennel_name = ["Nazwa hodowli jest wymagana"];
     }
     if (!dogData.dog_class) {
       newErrors.dog_class = ["Klasa psa jest wymagana"];
+    }
+
+    // Evaluation validation depending on class
+    if (dogData.dog_class === "baby" || dogData.dog_class === "puppy") {
+      if (!dogData.baby_puppy_grade) {
+        newErrors.baby_puppy_grade = [
+          "Dla klas baby/puppy wymagana jest ocena baby/puppy",
+        ];
+      }
+      if (dogData.grade) {
+        newErrors.grade = [
+          "Klasy baby/puppy nie używają pola 'ocena' tylko 'ocena baby/puppy'",
+        ];
+      }
+    } else if (dogData.dog_class) {
+      if (!dogData.grade) {
+        newErrors.grade = ["Ocena jest wymagana dla wybranej klasy"];
+      }
+      if (dogData.baby_puppy_grade) {
+        newErrors.baby_puppy_grade = [
+          "Dla klas innych niż baby/puppy nie używa się 'ocena baby/puppy'",
+        ];
+      }
     }
 
     // Owner validation
@@ -107,7 +129,10 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleDogDataChange = (field: keyof DogFormData, value: string) => {
+  const handleDogDataChange = (
+    field: keyof DogFormData,
+    value: string | number,
+  ) => {
     setDogData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: [] }));
@@ -170,7 +195,6 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
           name: dogData.name,
           gender: dogData.gender,
           birth_date: dogData.birth_date,
-          microchip_number: dogData.microchip_number,
           kennel_name: dogData.kennel_name || null,
           father_name: dogData.father_name || null,
           mother_name: dogData.mother_name || null,
@@ -190,13 +214,52 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
 
       const dog = await dogResponse.json();
 
-      // Create registration
-      const registrationData: CreateRegistrationDto = {
-        dog_id: dog.id,
-        dog_class: dogData.dog_class as DogClass,
-      };
+      // Create registration directly
+      const regResponse = await fetch(`/api/shows/${showId}/registrations`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          dog_id: dog.id,
+          dog_class: dogData.dog_class as DogClass,
+        }),
+      });
+      if (!regResponse.ok) {
+        const errorData = await regResponse.json();
+        throw new Error(
+          errorData.error?.message || "Błąd tworzenia rejestracji",
+        );
+      }
 
-      await onAddDog(registrationData);
+      // Optionally create evaluation
+      const hasEval =
+        !!dogData.grade ||
+        !!dogData.baby_puppy_grade ||
+        !!dogData.club_title ||
+        !!dogData.placement;
+      if (hasEval) {
+        const evalPayload: Record<string, unknown> = {
+          dog_id: dog.id,
+          dog_class: dogData.dog_class as DogClass,
+          club_title: dogData.club_title || undefined,
+          placement: dogData.placement || undefined,
+        };
+        if (dogData.dog_class === "baby" || dogData.dog_class === "puppy") {
+          evalPayload["baby_puppy_grade"] = dogData.baby_puppy_grade;
+        } else {
+          evalPayload["grade"] = dogData.grade;
+        }
+
+        const evalResponse = await fetch(`/api/shows/${showId}/evaluations`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(evalPayload),
+        });
+        if (!evalResponse.ok) {
+          const errorData = await evalResponse.json();
+          throw new Error(errorData.error?.message || "Błąd zapisu oceny psa");
+        }
+      }
+
       onSuccess();
       resetForm();
     } catch (error) {
@@ -212,12 +275,14 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
       name: "",
       gender: "male",
       birth_date: "",
-      microchip_number: "",
-      kennel_club_number: "",
       kennel_name: "",
       father_name: "",
       mother_name: "",
       dog_class: "",
+      grade: undefined,
+      baby_puppy_grade: undefined,
+      club_title: undefined,
+      placement: undefined,
     });
     setOwnerData({
       first_name: "",
@@ -333,29 +398,7 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
                   </div>
                 </div>
 
-                <div>
-                  <label
-                    htmlFor="microchip"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Numer chipa *
-                  </label>
-                  <input
-                    type="text"
-                    id="microchip"
-                    value={dogData.microchip_number}
-                    onChange={(e) =>
-                      handleDogDataChange("microchip_number", e.target.value)
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="15-cyfrowy numer chipa"
-                  />
-                  {errors.microchip_number && (
-                    <p className="text-red-600 text-sm mt-1">
-                      {errors.microchip_number[0]}
-                    </p>
-                  )}
-                </div>
+                {/* Microchip removed for now */}
 
                 <div>
                   <label
@@ -394,7 +437,7 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
                     htmlFor="kennel-name"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
-                    Nazwa hodowli
+                    Nazwa hodowli *
                   </label>
                   <input
                     type="text"
@@ -406,6 +449,11 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Nazwa hodowli"
                   />
+                  {errors.kennel_name && (
+                    <p className="text-red-600 text-sm mt-1">
+                      {errors.kennel_name[0]}
+                    </p>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -583,8 +631,7 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
                     htmlFor="gdpr-consent"
                     className="ml-2 block text-sm text-gray-700"
                   >
-                    Wyrażam zgodę na przetwarzanie danych osobowych zgodnie z
-                    RODO *
+                    Właściciel udzielił zgody RODO *
                   </label>
                 </div>
                 {errors.owner_gdpr_consent && (
@@ -592,6 +639,152 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
                     {errors.owner_gdpr_consent[0]}
                   </p>
                 )}
+              </div>
+            </div>
+          </div>
+
+          {/* Per-show fields: catalog number and evaluation */}
+          <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Wyniki wystawy
+              </h3>
+              <div className="space-y-4">
+                {(dogData.dog_class === "baby" ||
+                  dogData.dog_class === "puppy") && (
+                  <div>
+                    <label
+                      htmlFor="baby-puppy-grade"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Ocena (baby/puppy) *
+                    </label>
+                    <select
+                      id="baby-puppy-grade"
+                      value={dogData.baby_puppy_grade || ""}
+                      onChange={(e) =>
+                        handleDogDataChange("baby_puppy_grade", e.target.value)
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">Wybierz ocenę</option>
+                      <option value="bardzo_obiecujący">
+                        Bardzo obiecujący
+                      </option>
+                      <option value="obiecujący">Obiecujący</option>
+                      <option value="dość_obiecujący">Dość obiecujący</option>
+                    </select>
+                    {errors.baby_puppy_grade && (
+                      <p className="text-red-600 text-sm mt-1">
+                        {errors.baby_puppy_grade[0]}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {dogData.dog_class &&
+                  dogData.dog_class !== "baby" &&
+                  dogData.dog_class !== "puppy" && (
+                    <div>
+                      <label
+                        htmlFor="grade"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        Ocena *
+                      </label>
+                      <select
+                        id="grade"
+                        value={dogData.grade || ""}
+                        onChange={(e) =>
+                          handleDogDataChange("grade", e.target.value)
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="">Wybierz ocenę</option>
+                        <option value="doskonała">Doskonała</option>
+                        <option value="bardzo_dobra">Bardzo dobra</option>
+                        <option value="dobra">Dobra</option>
+                        <option value="zadowalająca">Zadowalająca</option>
+                        <option value="zdyskwalifikowana">
+                          Zdyskwalifikowana
+                        </option>
+                        <option value="nieobecna">Nieobecna</option>
+                      </select>
+                      {errors.grade && (
+                        <p className="text-red-600 text-sm mt-1">
+                          {errors.grade[0]}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      htmlFor="club_title"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Tytuł klubowy
+                    </label>
+                    <select
+                      id="club_title"
+                      value={dogData.club_title || ""}
+                      onChange={(e) =>
+                        handleDogDataChange("club_title", e.target.value)
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">Brak</option>
+                      <option value="młodzieżowy_zwycięzca_klubu">
+                        Młodzieżowy Zwycięzca Klubu
+                      </option>
+                      <option value="zwycięzca_klubu">Zwycięzca Klubu</option>
+                      <option value="zwycięzca_klubu_weteranów">
+                        Zwycięzca Klubu Weteranów
+                      </option>
+                      <option value="najlepszy_reproduktor">
+                        Najlepszy Reproduktor
+                      </option>
+                      <option value="najlepsza_suka_hodowlana">
+                        Najlepsza Suka Hodowlana
+                      </option>
+                      <option value="najlepsza_para">Najlepsza Para</option>
+                      <option value="najlepsza_hodowla">
+                        Najlepsza Hodowla
+                      </option>
+                      <option value="zwycięzca_rasy">Zwycięzca Rasy</option>
+                      <option value="zwycięzca_płci_przeciwnej">
+                        Zwycięzca Płci Przeciwnej
+                      </option>
+                      <option value="najlepszy_junior">Najlepszy Junior</option>
+                      <option value="najlepszy_weteran">
+                        Najlepszy Weteran
+                      </option>
+                    </select>
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="placement"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Lokata
+                    </label>
+                    <select
+                      id="placement"
+                      value={dogData.placement || ""}
+                      onChange={(e) =>
+                        handleDogDataChange("placement", e.target.value)
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">Brak</option>
+                      <option value="1st">1</option>
+                      <option value="2nd">2</option>
+                      <option value="3rd">3</option>
+                      <option value="4th">4</option>
+                    </select>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

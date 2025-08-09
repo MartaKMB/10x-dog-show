@@ -32,42 +32,46 @@ const DogCard: React.FC<DogCardProps> = ({ dog, onAction, userRole }) => {
 
   const getGradeLabel = (grade: string | null): string => {
     if (!grade) return "Brak oceny";
-
+    // Polish FCI grades per MVP enums
     const gradeLabels: Record<string, string> = {
-      excellent: "Doskonały",
-      very_good: "Bardzo dobry",
-      good: "Dobry",
-      sufficient: "Dostateczny",
-      insufficient: "Niedostateczny",
-      disqualified: "Zdyskwalifikowany",
+      doskonała: "Doskonała",
+      bardzo_dobra: "Bardzo dobra",
+      dobra: "Dobra",
+      zadowalająca: "Zadowalająca",
+      zdyskwalifikowana: "Zdyskwalifikowana",
+      nieobecna: "Nieobecna",
     };
     return gradeLabels[grade] || grade;
   };
 
   const getTitleLabel = (title: string | null): string => {
     if (!title) return "Brak tytułu";
-
     const titleLabels: Record<string, string> = {
-      champion: "Champion",
-      junior_champion: "Junior Champion",
-      veteran_champion: "Veteran Champion",
-      best_in_show: "Best in Show",
-      best_of_breed: "Best of Breed",
-      best_of_opposite_sex: "Best of Opposite Sex",
+      młodzieżowy_zwycięzca_klubu: "Młodzieżowy Zwycięzca Klubu",
+      zwycięzca_klubu: "Zwycięzca Klubu",
+      zwycięzca_klubu_weteranów: "Zwycięzca Klubu Weteranów",
+      najlepszy_reproduktor: "Najlepszy Reproduktor",
+      najlepsza_suka_hodowlana: "Najlepsza Suka Hodowlana",
+      najlepsza_para: "Najlepsza Para",
+      najlepsza_hodowla: "Najlepsza Hodowla",
+      zwycięzca_rasy: "Zwycięzca Rasy",
+      zwycięzca_płci_przeciwnej: "Zwycięzca Płci Przeciwnej",
+      najlepszy_junior: "Najlepszy Junior",
+      najlepszy_weteran: "Najlepszy Weteran",
     };
     return titleLabels[title] || title;
   };
 
-  const getPlacementLabel = (placement: number | null): string => {
+  const getPlacementLabel = (placement: string | number | null): string => {
     if (!placement) return "Brak lokaty";
-
-    const placementLabels: Record<number, string> = {
-      1: "1. miejsce",
-      2: "2. miejsce",
-      3: "3. miejsce",
-      4: "4. miejsce",
+    const map: Record<string, string> = {
+      "1st": "1. miejsce",
+      "2nd": "2. miejsce",
+      "3rd": "3. miejsce",
+      "4th": "4. miejsce",
     };
-    return placementLabels[placement] || `${placement}. miejsce`;
+    if (typeof placement === "number") return `${placement}. miejsce`;
+    return map[placement] || String(placement);
   };
 
   const formatDate = (dateString: string): string => {
@@ -110,12 +114,21 @@ const DogCard: React.FC<DogCardProps> = ({ dog, onAction, userRole }) => {
     setIsExpanded(!isExpanded);
   };
 
-  // Mock evaluation data - w przyszłości będzie pobierane z API
-  const evaluation = {
-    grade: "excellent",
-    title: "champion",
-    placement: 1,
-  };
+  const evaluation = dog.evaluation
+    ? {
+        grade:
+          dog.evaluation.dog_class === "baby" ||
+          dog.evaluation.dog_class === "puppy"
+            ? dog.evaluation.baby_puppy_grade
+            : dog.evaluation.grade,
+        title: dog.evaluation.club_title,
+        placement: dog.evaluation.placement,
+      }
+    : {
+        grade: null as string | null,
+        title: null as string | null,
+        placement: null as string | number | null,
+      };
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">

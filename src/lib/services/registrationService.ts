@@ -101,7 +101,8 @@ export class RegistrationService {
             id,
             name,
             gender,
-            birth_date
+            birth_date,
+            kennel_name
           )
         `,
         )
@@ -228,7 +229,6 @@ export class RegistrationService {
         show_id: showId,
         dog_id: data.dog_id,
         dog_class: data.dog_class,
-        registration_fee: data.registration_fee || show.entry_fee || null,
         is_paid: false,
         registered_at: new Date().toISOString(),
       };
@@ -243,7 +243,8 @@ export class RegistrationService {
             id,
             name,
             gender,
-            birth_date
+            birth_date,
+            kennel_name
           )
         `,
         )
@@ -473,11 +474,8 @@ export class RegistrationService {
         .select(
           `
           dog_class,
-          is_paid,
-          registration_fee,
           dog: dogs (
-            gender,
-
+            gender
           )
         `,
         )
@@ -573,6 +571,11 @@ export class RegistrationService {
         name: registration.dog.name,
         gender: registration.dog.gender,
         birth_date: registration.dog.birth_date,
+        microchip_number: null,
+        kennel_name: null,
+        father_name: null,
+        mother_name: null,
+        owners: [],
       },
       dog_class: registration.dog_class,
       catalog_number: registration.catalog_number,
@@ -592,28 +595,12 @@ export class RegistrationService {
   ): RegistrationStatsDto {
     const stats: RegistrationStatsDto = {
       total_registrations: registrations.length,
-      paid: 0,
-      unpaid: 0,
       by_class: {} as Record<DogClass, number>,
       by_gender: {} as Record<DogGender, number>,
       by_breed_group: {} as Record<FCIGroup, number>,
-      revenue: {
-        total: 0,
-        paid: 0,
-        outstanding: 0,
-      },
     };
 
     registrations.forEach((reg) => {
-      // Status płatności
-      if (reg.is_paid) {
-        stats.paid++;
-        stats.revenue.paid += reg.registration_fee || 0;
-      } else {
-        stats.unpaid++;
-        stats.revenue.outstanding += reg.registration_fee || 0;
-      }
-
       // Klasa psa
       stats.by_class[reg.dog_class] = (stats.by_class[reg.dog_class] || 0) + 1;
 
@@ -629,9 +616,6 @@ export class RegistrationService {
       //   stats.by_breed_group[fciGroup] =
       //     (stats.by_breed_group[fciGroup] || 0) + 1;
       // }
-
-      // Całkowity przychód
-      stats.revenue.total += reg.registration_fee || 0;
     });
 
     return stats;

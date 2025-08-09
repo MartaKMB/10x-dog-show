@@ -229,7 +229,7 @@ export interface DogCreateRequest {
   name: string;
   gender: DogGender;
   birth_date: string;
-  microchip_number: string;
+  microchip_number?: string;
   kennel_name?: string;
   father_name?: string;
   mother_name?: string;
@@ -884,6 +884,7 @@ export interface DogCardViewModel {
   canDelete: boolean;
   isExpanded: boolean;
   isProcessing: boolean;
+  evaluation?: EvaluationResponse | null;
 }
 
 export interface ShowActionsState {

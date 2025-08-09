@@ -6,15 +6,12 @@ import type {
 } from "../../types";
 
 interface EditDogModalProps {
+  showId: string;
   registration: RegistrationResponseDto;
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
   isProcessing: boolean;
-  onEditDog: (
-    registrationId: string,
-    data: UpdateRegistrationDto,
-  ) => Promise<void>;
 }
 
 interface EditFormData {
@@ -23,17 +20,21 @@ interface EditFormData {
   kennel_name: string;
   father_name: string;
   mother_name: string;
+  grade?: string;
+  baby_puppy_grade?: string;
+  club_title?: string;
+  placement?: string;
 }
 
 type ValidationErrors = Record<string, string[]>;
 
 const EditDogModal: React.FC<EditDogModalProps> = ({
+  showId,
   registration,
   isOpen,
   onClose,
   onSuccess,
   isProcessing,
-  onEditDog,
 }) => {
   const [formData, setFormData] = useState<EditFormData>({
     dog_class: registration.dog_class,
@@ -44,6 +45,7 @@ const EditDogModal: React.FC<EditDogModalProps> = ({
   });
 
   const [errors, setErrors] = useState<ValidationErrors>({});
+  const [evaluationId, setEvaluationId] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -55,8 +57,60 @@ const EditDogModal: React.FC<EditDogModalProps> = ({
         mother_name: registration.dog.mother_name || "",
       });
       setErrors({});
+
+      // Load existing evaluation for this dog at this show
+      (async () => {
+        try {
+          const res = await fetch(
+            `/api/shows/${showId}/evaluations?limit=1000&page=1`,
+          );
+          if (res.ok) {
+            const data = await res.json();
+            const list: Array<{
+              id: string;
+              dog?: { id?: string };
+              grade?: string;
+              baby_puppy_grade?: string;
+              club_title?: string;
+              placement?: string;
+            }> = (data.data || data.evaluations || []) as Array<{
+              id: string;
+              dog?: { id?: string };
+              grade?: string;
+              baby_puppy_grade?: string;
+              club_title?: string;
+              placement?: string;
+            }>;
+            const evalItem = list.find(
+              (e) => e.dog?.id === registration.dog.id,
+            );
+            if (evalItem) {
+              setEvaluationId(evalItem.id);
+              setFormData((prev) => ({
+                ...prev,
+                grade: evalItem.grade || undefined,
+                baby_puppy_grade: evalItem.baby_puppy_grade || undefined,
+                club_title: evalItem.club_title || undefined,
+                placement: evalItem.placement || undefined,
+              }));
+            } else {
+              setEvaluationId(null);
+              setFormData((prev) => ({
+                ...prev,
+                grade: undefined,
+                baby_puppy_grade: undefined,
+                club_title: undefined,
+                placement: undefined,
+              }));
+            }
+          }
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (_e) {
+          // ignore
+        }
+      })();
     }
-  }, [isOpen, registration]);
+  }, [isOpen, registration, showId]);
 
   const validateForm = (): boolean => {
     const newErrors: ValidationErrors = {};
@@ -71,6 +125,34 @@ const EditDogModal: React.FC<EditDogModalProps> = ({
 
     if (!formData.kennel_name.trim()) {
       newErrors.kennel_name = ["Nazwa hodowli jest wymagana"];
+    }
+
+    // Validation for kennel name
+    if (!formData.kennel_name.trim()) {
+      newErrors.kennel_name = ["Nazwa hodowli jest wymagana"];
+    }
+
+    // Evaluation fields validation
+    if (formData.dog_class === "baby" || formData.dog_class === "puppy") {
+      if (!formData.baby_puppy_grade) {
+        newErrors.baby_puppy_grade = [
+          "Dla klas baby/puppy wymagana jest ocena baby/puppy",
+        ];
+      }
+      if (formData.grade) {
+        newErrors.grade = [
+          "Klasy baby/puppy nie używają pola 'ocena' tylko 'ocena baby/puppy'",
+        ];
+      }
+    } else {
+      if (!formData.grade) {
+        newErrors.grade = ["Ocena jest wymagana dla wybranej klasy"];
+      }
+      if (formData.baby_puppy_grade) {
+        newErrors.baby_puppy_grade = [
+          "Dla klas innych niż baby/puppy nie używa się 'ocena baby/puppy'",
+        ];
+      }
     }
 
     setErrors(newErrors);
@@ -96,11 +178,58 @@ const EditDogModal: React.FC<EditDogModalProps> = ({
     }
 
     try {
-      const updateData: UpdateRegistrationDto = {
+      // 1) Update dog base data
+      const dogUpdatePayload: Record<string, unknown> = {
+        name: formData.name,
+        kennel_name: formData.kennel_name,
+        father_name: formData.father_name || undefined,
+        mother_name: formData.mother_name || undefined,
+      };
+      await fetch(`/api/dogs/${registration.dog.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dogUpdatePayload),
+      });
+
+      // 2) Update registration (class)
+      const regUpdatePayload: UpdateRegistrationDto = {
         dog_class: formData.dog_class as DogClass,
       };
+      await fetch(`/api/shows/${showId}/registrations/${registration.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(regUpdatePayload),
+      });
 
-      await onEditDog(registration.id, updateData);
+      // 3) Create or update evaluation
+      const evalPayload: Record<string, unknown> = {
+        dog_class: formData.dog_class,
+        club_title: formData.club_title || undefined,
+        placement: formData.placement || undefined,
+      };
+      if (formData.dog_class === "baby" || formData.dog_class === "puppy") {
+        evalPayload["baby_puppy_grade"] = formData.baby_puppy_grade;
+      } else {
+        evalPayload["grade"] = formData.grade;
+      }
+
+      if (evaluationId) {
+        await fetch(`/api/shows/${showId}/evaluations/${evaluationId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(evalPayload),
+        });
+      } else {
+        await fetch(`/api/shows/${showId}/evaluations`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            dog_id: registration.dog.id,
+            ...evalPayload,
+          }),
+        });
+      }
+
       onSuccess();
     } catch (error) {
       console.error("Error updating registration:", error);
@@ -185,14 +314,7 @@ const EditDogModal: React.FC<EditDogModalProps> = ({
                   {formatDate(registration.dog.birth_date)}
                 </p>
               </div>
-              <div>
-                <span className="font-medium text-gray-700">
-                  Nr katalogowy:
-                </span>
-                <p className="text-gray-900">
-                  {registration.catalog_number || "Nie przypisano"}
-                </p>
-              </div>
+              {/* Numer katalogowy usunięty z widoku */}
             </div>
           </div>
 
@@ -307,6 +429,145 @@ const EditDogModal: React.FC<EditDogModalProps> = ({
                   }
                   className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 border-gray-300"
                 />
+              </div>
+            </div>
+
+            {/* Numer katalogowy usunięty z formularza */}
+
+            {/* Evaluation fields */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {(formData.dog_class === "baby" ||
+                formData.dog_class === "puppy") && (
+                <div>
+                  <label
+                    htmlFor="baby_puppy_grade"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Ocena (baby/puppy) *
+                  </label>
+                  <select
+                    id="baby_puppy_grade"
+                    value={formData.baby_puppy_grade || ""}
+                    onChange={(e) =>
+                      handleFieldChange("baby_puppy_grade", e.target.value)
+                    }
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                      errors.baby_puppy_grade
+                        ? "border-red-300"
+                        : "border-gray-300"
+                    }`}
+                  >
+                    <option value="">Wybierz ocenę</option>
+                    <option value="bardzo_obiecujący">Bardzo obiecujący</option>
+                    <option value="obiecujący">Obiecujący</option>
+                    <option value="dość_obiecujący">Dość obiecujący</option>
+                  </select>
+                  {errors.baby_puppy_grade && (
+                    <p className="text-red-600 text-sm mt-1">
+                      {errors.baby_puppy_grade[0]}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {formData.dog_class !== "baby" &&
+                formData.dog_class !== "puppy" && (
+                  <div>
+                    <label
+                      htmlFor="grade"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Ocena *
+                    </label>
+                    <select
+                      id="grade"
+                      value={formData.grade || ""}
+                      onChange={(e) =>
+                        handleFieldChange("grade", e.target.value)
+                      }
+                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                        errors.grade ? "border-red-300" : "border-gray-300"
+                      }`}
+                    >
+                      <option value="">Wybierz ocenę</option>
+                      <option value="doskonała">Doskonała</option>
+                      <option value="bardzo_dobra">Bardzo dobra</option>
+                      <option value="dobra">Dobra</option>
+                      <option value="zadowalająca">Zadowalająca</option>
+                      <option value="zdyskwalifikowana">
+                        Zdyskwalifikowana
+                      </option>
+                      <option value="nieobecna">Nieobecna</option>
+                    </select>
+                    {errors.grade && (
+                      <p className="text-red-600 text-sm mt-1">
+                        {errors.grade[0]}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+              <div>
+                <label
+                  htmlFor="club_title"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Tytuł klubowy
+                </label>
+                <select
+                  id="club_title"
+                  value={formData.club_title || ""}
+                  onChange={(e) =>
+                    handleFieldChange("club_title", e.target.value)
+                  }
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 border-gray-300"
+                >
+                  <option value="">Brak</option>
+                  <option value="młodzieżowy_zwycięzca_klubu">
+                    Młodzieżowy Zwycięzca Klubu
+                  </option>
+                  <option value="zwycięzca_klubu">Zwycięzca Klubu</option>
+                  <option value="zwycięzca_klubu_weteranów">
+                    Zwycięzca Klubu Weteranów
+                  </option>
+                  <option value="najlepszy_reproduktor">
+                    Najlepszy Reproduktor
+                  </option>
+                  <option value="najlepsza_suka_hodowlana">
+                    Najlepsza Suka Hodowlana
+                  </option>
+                  <option value="najlepsza_para">Najlepsza Para</option>
+                  <option value="najlepsza_hodowla">Najlepsza Hodowla</option>
+                  <option value="zwycięzca_rasy">Zwycięzca Rasy</option>
+                  <option value="zwycięzca_płci_przeciwnej">
+                    Zwycięzca Płci Przeciwnej
+                  </option>
+                  <option value="najlepszy_junior">Najlepszy Junior</option>
+                  <option value="najlepszy_weteran">Najlepszy Weteran</option>
+                </select>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="placement"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Lokata
+                </label>
+                <select
+                  id="placement"
+                  value={formData.placement || ""}
+                  onChange={(e) =>
+                    handleFieldChange("placement", e.target.value)
+                  }
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 border-gray-300"
+                >
+                  <option value="">Brak</option>
+                  <option value="1st">1</option>
+                  <option value="2nd">2</option>
+                  <option value="3rd">3</option>
+                  <option value="4th">4</option>
+                </select>
               </div>
             </div>
           </div>
