@@ -23,7 +23,7 @@ import { useShowActions } from "../../hooks/useShowActions";
 import { useDogManagement } from "../../hooks/useDogManagement";
 
 interface ShowDetailsViewProps {
-  showId: string;
+  showId?: string;
   userRole?: UserRole;
 }
 
@@ -42,6 +42,7 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
   showId,
   userRole = "club_board",
 }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [viewModel, setViewModel] = useState<ShowDetailsViewModel>({
     show: null,
     registrations: [],
@@ -77,26 +78,33 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
   const [selectedRegistration, setSelectedRegistration] =
     useState<RegistrationResponse | null>(null);
 
+  const resolvedShowId = showId as string;
   const { show, registrations, isLoading, error, loadShowData } =
-    useShowDetails(showId);
+    useShowDetails(resolvedShowId);
   const { isDeleting, isUpdating, deleteShow, updateShowStatus } =
-    useShowActions(show ?? null);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    useShowActions((show ?? null) as any);
   const {
     isAdding,
     isEditing,
     isDeleting: isDeletingDog,
     deleteDog,
-  } = useDogManagement(showId, loadShowData);
+  } = useDogManagement(resolvedShowId, loadShowData);
 
   useEffect(() => {
+    // detect auth from SSR body dataset (client only)
+    if (typeof document !== "undefined") {
+      const isAuth = document.body.dataset.authenticated === "true";
+      setIsAuthenticated(isAuth);
+    }
     loadShowData();
-  }, [showId, loadShowData]);
+  }, [resolvedShowId, loadShowData]);
 
   useEffect(() => {
     if (show && registrations) {
       const stats = calculateStats(registrations);
-      const canEdit = canUserEditShow();
-      const canDelete = canUserDeleteShow(show);
+      const canEdit = isAuthenticated && canUserEditShow();
+      const canDelete = isAuthenticated && canUserDeleteShow(show);
 
       setViewModel((prev) => ({
         ...prev,
@@ -293,7 +301,7 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
 
       {/* Modals */}
       <AddDogModal
-        showId={showId}
+        showId={resolvedShowId as string}
         isOpen={isAddModalOpen}
         onClose={handleModalClose}
         onSuccess={handleAddDogSuccess}
@@ -312,7 +320,7 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
       {selectedRegistration && (
         <>
           <EditDogModal
-            showId={showId}
+            showId={resolvedShowId as string}
             registration={selectedRegistration}
             isOpen={isEditModalOpen}
             onClose={handleModalClose}

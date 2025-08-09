@@ -7,9 +7,15 @@ import type { UserRole } from "../../types";
 
 interface DashboardProps {
   userRole: UserRole;
+  showQuickActions?: boolean;
+  isAuthenticated?: boolean;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ userRole }) => {
+const Dashboard: React.FC<DashboardProps> = ({
+  userRole,
+  showQuickActions = false,
+  isAuthenticated = false,
+}) => {
   const { stats, recentShows, isLoading, error, refreshData } = useDashboard();
 
   const handleShowClick = (showId: string) => {
@@ -58,8 +64,10 @@ const Dashboard: React.FC<DashboardProps> = ({ userRole }) => {
         onShowClick={handleShowClick}
       />
 
-      {/* Quick Actions Section */}
-      <QuickActions userRole={userRole} />
+      {/* Quick Actions Section - only for authenticated club board */}
+      {showQuickActions && userRole === "club_board" && (
+        <QuickActions userRole={userRole} />
+      )}
 
       {/* System Info - keep existing */}
       <div className="bg-white shadow rounded-lg p-6">
@@ -78,9 +86,9 @@ const Dashboard: React.FC<DashboardProps> = ({ userRole }) => {
           <div className="text-center p-3 bg-gray-50 rounded-lg">
             <div className="font-medium text-gray-900">Rola użytkownika</div>
             <div className="text-gray-600">
-              {userRole === "club_board"
+              {isAuthenticated && userRole === "club_board"
                 ? "Członek zarządu klubu"
-                : "Użytkownik"}
+                : "Gość (tylko podgląd)"}
             </div>
           </div>
         </div>

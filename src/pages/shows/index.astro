@@ -2,7 +2,9 @@
 import Layout from "../../layouts/Layout.astro";
 import ShowsListView from "../../components/shows/ShowsListView.tsx";
 
-// TODO: Get user role from authentication
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore Astro typing issue in lints
+const isAuthenticated = Boolean(Astro.locals.auth?.user);
 const userRole = "club_board";
 ---
 
@@ -19,16 +21,14 @@ const userRole = "club_board";
             jednym miejscu w tej aplikacji.
           </p>
         </div>
-        {
-          userRole === "club_board" && (
-            <a
-              href="/shows/new"
-              class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
-            >
-              + Nowa wystawa
-            </a>
-          )
-        }
+        {isAuthenticated && userRole === "club_board" && (
+          <a
+            href="/shows/new"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+          >
+            + Nowa wystawa
+          </a>
+        )}
       </div>
     </div>
 

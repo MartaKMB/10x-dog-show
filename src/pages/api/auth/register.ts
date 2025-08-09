@@ -95,7 +95,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
           role: "club_board",
         },
         access_token: session.access_token,
-        expires_at: new Date(session.expires_at ?? 0 * 1000).toISOString(),
+        expires_at: new Date((session.expires_at ?? 0) * 1000).toISOString(),
       }),
       { status: 200 },
     );

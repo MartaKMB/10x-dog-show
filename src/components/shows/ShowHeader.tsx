@@ -111,50 +111,54 @@ const ShowHeader: React.FC<ShowHeaderProps> = ({
           )}
         </div>
 
-        {/* Actions */}
-        <div className="flex flex-col sm:flex-row gap-2">
-          {/* Status Change */}
-          <div className="flex items-center gap-2">
-            <label
-              htmlFor="status-select"
-              className="text-sm font-medium text-gray-700"
-            >
-              Status:
-            </label>
-            <select
-              id="status-select"
-              value={show.status}
-              onChange={(e) => handleStatusChange(e.target.value as ShowStatus)}
-              disabled={isUpdating}
-              className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="draft">Szkic</option>
-              <option value="completed">Opisana</option>
-            </select>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex gap-2">
-            {canEdit && (
-              <button
-                onClick={onEdit}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
+        {/* Actions - hidden for users without edit/delete permissions */}
+        {(canEdit || canDelete) && (
+          <div className="flex flex-col sm:flex-row gap-2">
+            {/* Status Change */}
+            <div className="flex items-center gap-2">
+              <label
+                htmlFor="status-select"
+                className="text-sm font-medium text-gray-700"
               >
-                Edytuj
-              </button>
-            )}
-
-            {canDelete && (
-              <button
-                onClick={handleDelete}
-                disabled={isDeleting}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 transition-colors text-sm font-medium"
+                Status:
+              </label>
+              <select
+                id="status-select"
+                value={show.status}
+                onChange={(e) =>
+                  handleStatusChange(e.target.value as ShowStatus)
+                }
+                disabled={isUpdating || !canEdit}
+                className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                {isDeleting ? "Usuwanie..." : "Usuń"}
-              </button>
-            )}
+                <option value="draft">Szkic</option>
+                <option value="completed">Opisana</option>
+              </select>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-2">
+              {canEdit && (
+                <button
+                  onClick={onEdit}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
+                >
+                  Edytuj
+                </button>
+              )}
+
+              {canDelete && (
+                <button
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 transition-colors text-sm font-medium"
+                >
+                  {isDeleting ? "Usuwanie..." : "Usuń"}
+                </button>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

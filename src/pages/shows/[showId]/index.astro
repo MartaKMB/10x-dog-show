@@ -2,14 +2,10 @@
 import Layout from "../../../layouts/Layout.astro";
 import ShowDetailsView from "../../../components/shows/ShowDetailsView.tsx";
 
-const { showId } = Astro.params;
-
-// TODO: Get user role from authentication
 const userRole = "club_board";
-
-if (!showId) {
-  return Astro.redirect("/shows");
-}
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore Astro typing
+const { showId } = Astro.params;
 ---
 
 <Layout title="Szczegóły wystawy - Klub Hovawarta Show">
@@ -26,6 +22,15 @@ if (!showId) {
         </div>
       </div>
     </div>
+
+    {/* Preview banner for guests */}
+    { /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */ }
+    { /* @ts-ignore Astro typing */ }
+    { !Astro.locals.user && (
+      <div class="bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-4">
+        To jest tryb podglądu. Zaloguj się, aby edytować dane wystawy i listę psów.
+      </div>
+    ) }
 
     <!-- Show Details -->
     <div class="bg-white shadow rounded-lg">

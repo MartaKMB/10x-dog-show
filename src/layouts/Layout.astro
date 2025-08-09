@@ -6,9 +6,8 @@ interface Props {
 }
 
 const { title = "Klub Hovawarta Show" } = Astro.props;
-
-// TODO: Get user role from authentication
-const userRole = "club_board";
+const auth = Astro.locals.auth;
+const user = auth?.user ?? null;
 ---
 
 <!doctype html>
@@ -21,7 +20,7 @@ const userRole = "club_board";
     <title>{title}</title>
     <script src="/mobile-menu.js" defer></script>
   </head>
-  <body>
+  <body data-authenticated={user ? "true" : "false"}>
     <div class="min-h-screen bg-gray-50">
       <!-- Header -->
       <header class="bg-white shadow-sm border-b border-gray-200">
@@ -50,9 +49,41 @@ const userRole = "club_board";
 
             <!-- User menu -->
             <div class="flex items-center space-x-4">
-              <div class="hidden sm:block text-sm text-gray-500">
-                Demo User ({userRole === "club_board" ? "Członek zarządu klubu" : "Użytkownik"})
-              </div>
+              {user ? (
+                <>
+                  <div class="hidden sm:block text-sm text-gray-600">
+                    {user.email}
+                  </div>
+                  <form
+                    method="POST"
+                    action="/api/auth/logout"
+                    class="hidden md:block"
+                    onsubmit="this.querySelector('button')?.setAttribute('disabled','true')"
+                  >
+                    <button
+                      type="submit"
+                      class="px-3 py-1.5 rounded-md border border-gray-300 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Wyloguj
+                    </button>
+                  </form>
+                </>
+              ) : (
+                <div class="hidden md:flex items-center space-x-3">
+                  <a
+                    href="/auth/login"
+                    class="px-3 py-1.5 rounded-md border border-gray-300 text-sm text-gray-700 hover:bg-gray-50"
+                  >
+                    Zaloguj
+                  </a>
+                  <a
+                    href="/auth/signup"
+                    class="px-3 py-1.5 rounded-md bg-amber-600 text-white text-sm rounded hover:bg-amber-700"
+                  >
+                    Rejestracja
+                  </a>
+                </div>
+              )}
 
               <!-- Mobile menu button -->
               <button
@@ -84,6 +115,31 @@ const userRole = "club_board";
             <a href="/dogs" class="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">
               Psy
             </a>
+            {user ? (
+              <form method="POST" action="/api/auth/logout" class="px-3 py-2">
+                <button
+                  type="submit"
+                  class="w-full px-3 py-2 rounded-md border border-gray-300 text-sm text-gray-700 hover:bg-gray-50"
+                >
+                  Wyloguj
+                </button>
+              </form>
+            ) : (
+              <div class="flex space-x-2 px-3 py-2">
+                <a
+                  href="/auth/login"
+                  class="flex-1 text-center px-3 py-2 rounded-md border border-gray-300 text-sm text-gray-700 hover:bg-gray-50"
+                >
+                  Zaloguj
+                </a>
+                <a
+                  href="/auth/signup"
+                  class="flex-1 text-center px-3 py-2 rounded-md bg-amber-600 text-white text-sm hover:bg-amber-700"
+                >
+                  Rejestracja
+                </a>
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -105,4 +161,4 @@ const userRole = "club_board";
   }
 </style>
 
-<script is:inline></script>
+<!-- Client-side toggling script removed to avoid parser issues; SSR handles visibility. -->
