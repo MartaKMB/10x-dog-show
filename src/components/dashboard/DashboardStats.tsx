@@ -3,11 +3,8 @@ import React from "react";
 interface DashboardStatsProps {
   stats: {
     totalShows: number;
-    activeShows: number;
-    totalDogs: number;
-    totalOwners: number;
-    upcomingShows: number;
     completedShows: number;
+    totalDogs: number;
   };
   isLoading?: boolean;
 }
@@ -19,7 +16,7 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[...Array(6)].map((_, index) => (
+        {[...Array(3)].map((_, index) => (
           <div
             key={index}
             className="bg-white shadow rounded-lg p-6 animate-pulse"
@@ -42,39 +39,18 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({
       description: "Łączna liczba wystaw",
     },
     {
-      title: "Aktywne wystawy",
-      value: stats.activeShows,
-      icon: "🟢",
-      color: "bg-green-500",
-      description: "Wystawy w trakcie",
-    },
-    {
-      title: "Zarejestrowane psy",
-      value: stats.totalDogs,
-      icon: "🐕",
-      color: "bg-purple-500",
-      description: "Łączna liczba psów",
-    },
-    {
-      title: "Właściciele",
-      value: stats.totalOwners,
-      icon: "👥",
-      color: "bg-orange-500",
-      description: "Zarejestrowani właściciele",
-    },
-    {
-      title: "Nadchodzące wystawy",
-      value: stats.upcomingShows,
-      icon: "📅",
-      color: "bg-indigo-500",
-      description: "Planowane wystawy",
-    },
-    {
-      title: "Zakończone wystawy",
+      title: "Uzupełnione wystawy",
       value: stats.completedShows,
       icon: "✅",
       color: "bg-gray-500",
-      description: "Ukończone wystawy",
+      description: "Uzupełnione wystawy",
+    },
+    {
+      title: "Dodane psy",
+      value: stats.totalDogs,
+      icon: "🐕",
+      color: "bg-purple-500",
+      description: "Łączna liczba psów w serwisie",
     },
   ];
 

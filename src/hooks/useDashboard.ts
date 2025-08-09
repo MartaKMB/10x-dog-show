@@ -3,11 +3,8 @@ import type { ShowResponse } from "../types";
 
 interface DashboardStats {
   totalShows: number;
-  activeShows: number;
-  totalDogs: number;
-  totalOwners: number;
-  upcomingShows: number;
   completedShows: number;
+  totalDogs: number;
 }
 
 interface DashboardState {
@@ -19,11 +16,8 @@ interface DashboardState {
 
 const defaultStats: DashboardStats = {
   totalShows: 0,
-  activeShows: 0,
-  totalDogs: 0,
-  totalOwners: 0,
-  upcomingShows: 0,
   completedShows: 0,
+  totalDogs: 0,
 };
 
 export const useDashboard = () => {

@@ -24,16 +24,8 @@ const RecentShows: React.FC<RecentShowsProps> = ({
     switch (status) {
       case "draft":
         return "bg-gray-100 text-gray-800";
-      case "open_for_registration":
-        return "bg-green-100 text-green-800";
-      case "registration_closed":
-        return "bg-yellow-100 text-yellow-800";
-      case "in_progress":
-        return "bg-blue-100 text-blue-800";
       case "completed":
         return "bg-purple-100 text-purple-800";
-      case "cancelled":
-        return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -43,16 +35,8 @@ const RecentShows: React.FC<RecentShowsProps> = ({
     switch (status) {
       case "draft":
         return "Szkic";
-      case "open_for_registration":
-        return "Otwarta rejestracja";
-      case "registration_closed":
-        return "Zamknięta rejestracja";
-      case "in_progress":
-        return "W trakcie";
       case "completed":
-        return "Zakończona";
-      case "cancelled":
-        return "Anulowana";
+        return "Uzupełniona";
       default:
         return status;
     }
@@ -77,7 +61,12 @@ const RecentShows: React.FC<RecentShowsProps> = ({
     );
   }
 
-  if (shows.length === 0) {
+  // Show only draft and completed statuses
+  const filteredShows = shows.filter(
+    (s) => s.status === "draft" || s.status === "completed",
+  );
+
+  if (filteredShows.length === 0) {
     return (
       <div className="bg-white shadow rounded-lg p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
@@ -111,7 +100,7 @@ const RecentShows: React.FC<RecentShowsProps> = ({
       </div>
 
       <div className="space-y-4">
-        {shows.slice(0, 5).map((show) => (
+        {filteredShows.slice(0, 5).map((show) => (
           <button
             key={show.id}
             className="w-full text-left border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer"

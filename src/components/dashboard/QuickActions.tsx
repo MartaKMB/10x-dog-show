@@ -29,52 +29,10 @@ const QuickActions: React.FC<QuickActionsProps> = ({ userRole }) => {
     {
       id: "new-dog",
       title: "Dodaj psa",
-      description: "Zarejestruj nowego psa",
+      description: "Dodaj nowego psa do serwisu",
       icon: "🐕",
       href: "/dogs/new",
       color: "bg-green-600 hover:bg-green-700",
-      requiredRole: ["club_board"],
-    },
-    {
-      id: "new-owner",
-      title: "Dodaj właściciela",
-      description: "Zarejestruj nowego właściciela",
-      icon: "👥",
-      href: "/owners/new",
-      color: "bg-purple-600 hover:bg-purple-700",
-      requiredRole: ["club_board"],
-    },
-    {
-      id: "view-shows",
-      title: "Wystawy",
-      description: "Przeglądaj wszystkie wystawy",
-      icon: "📅",
-      href: "/shows",
-      color: "bg-indigo-600 hover:bg-indigo-700",
-    },
-    {
-      id: "view-dogs",
-      title: "Psy",
-      description: "Przeglądaj zarejestrowane psy",
-      icon: "🐾",
-      href: "/dogs",
-      color: "bg-orange-600 hover:bg-orange-700",
-    },
-    {
-      id: "view-owners",
-      title: "Właściciele",
-      description: "Przeglądaj właścicieli",
-      icon: "👤",
-      href: "/owners",
-      color: "bg-teal-600 hover:bg-teal-700",
-    },
-    {
-      id: "evaluations",
-      title: "Oceny",
-      description: "Zarządzaj ocenami wystaw",
-      icon: "⭐",
-      href: "/evaluations",
-      color: "bg-yellow-600 hover:bg-yellow-700",
       requiredRole: ["club_board"],
     },
     {
@@ -99,7 +57,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({ userRole }) => {
       <h2 className="text-lg font-semibold text-gray-900 mb-4">
         Szybkie akcje
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {availableActions.map((action) => (
           <a
             key={action.id}

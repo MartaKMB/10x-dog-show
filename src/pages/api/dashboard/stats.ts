@@ -4,11 +4,8 @@ import type { ErrorResponseDto } from "../../../types";
 
 interface DashboardStats {
   totalShows: number;
-  activeShows: number;
-  totalDogs: number;
-  totalOwners: number;
-  upcomingShows: number;
   completedShows: number;
+  totalDogs: number;
 }
 
 export const GET: APIRoute = async () => {
@@ -20,30 +17,6 @@ export const GET: APIRoute = async () => {
       .is("deleted_at", null);
 
     if (showsError) throw showsError;
-
-    // Get active shows (draft, open_for_registration, registration_closed, in_progress)
-    const { count: activeShows, error: activeShowsError } = await supabaseClient
-      .from("shows")
-      .select("*", { count: "exact", head: true })
-      .is("deleted_at", null)
-      .in("status", [
-        "draft",
-        "open_for_registration",
-        "registration_closed",
-        "in_progress",
-      ]);
-
-    if (activeShowsError) throw activeShowsError;
-
-    // Get upcoming shows (future dates)
-    const { count: upcomingShows, error: upcomingShowsError } =
-      await supabaseClient
-        .from("shows")
-        .select("*", { count: "exact", head: true })
-        .is("deleted_at", null)
-        .gte("show_date", new Date().toISOString().split("T")[0]);
-
-    if (upcomingShowsError) throw upcomingShowsError;
 
     // Get completed shows
     const { count: completedShows, error: completedShowsError } =
@@ -63,21 +36,10 @@ export const GET: APIRoute = async () => {
 
     if (dogsError) throw dogsError;
 
-    // Get total owners
-    const { count: totalOwners, error: ownersError } = await supabaseClient
-      .from("owners")
-      .select("*", { count: "exact", head: true })
-      .is("deleted_at", null);
-
-    if (ownersError) throw ownersError;
-
     const stats: DashboardStats = {
       totalShows: totalShows || 0,
-      activeShows: activeShows || 0,
-      totalDogs: totalDogs || 0,
-      totalOwners: totalOwners || 0,
-      upcomingShows: upcomingShows || 0,
       completedShows: completedShows || 0,
+      totalDogs: totalDogs || 0,
     };
 
     return new Response(JSON.stringify({ data: stats }), {
