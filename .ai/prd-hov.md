@@ -126,7 +126,36 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 - Po udanym logowaniu użytkownik jest przekierowany do dashboardu
 - Sesja użytkownika jest utrzymywana przez określony czas
 
-### US-002: Tworzenie wystawy
+### US-002: Wgląd
+
+**Tytuł:** Wgląd
+
+**Opis:** Jako użytkownik chcę móc oglądać, wyświetlać dane z aplikacji.
+
+**Kryteria akceptacji:**
+
+  - Użytkownik może przeglądać wszystkie dane serwisu (zblurowne dane właściela)
+  - Funkcjonalnośćedycji nie jest dostępna bez logowania się do systemu (US-003).
+
+### US-003: Bezpieczny dostęp i uwierzytelnianie
+
+**Tytuł:** Bezpieczny dostęp
+
+**Opis:** Jako użytkownik chcę mieć możliwość rejestracji i logowania się do systemu w sposób zapewniający bezpieczeństwo moich danych.
+
+**Kryteria akceptacji:**
+
+  - Logowanie i rejestracja odbywają się na dedykowanych stronach.
+  - Logowanie wymaga podania adresu email i hasła.
+  - Rejestracja wymaga podania adresu email, hasła i potwierdzenia hasła.
+  - Użytkownik MOŻE korzystać z serwisu BEZ trybu edycji bez logowania się do systemu (US-002).
+  - Użytkownik NIE MOŻE korzystać z funkcji edycji bez logowania się do systemu (US-003).
+  - Użytkownik może logować się do systemu poprzez przycisk w prawym górnym rogu.
+  - Użytkownik może się wylogować z systemu poprzez przycisk w prawym górnym rogu w głównym @Layout.astro.
+  - Nie korzystamy z zewnętrznych serwisów logowania (np. Google, GitHub).
+  - Odzyskiwanie hasła powinno być możliwe.
+
+### US-004: Tworzenie wystawy
 
 **Tytuł:** Jako członek zarządu chcę utworzyć nową wystawę klubową, aby przygotować system na wprowadzanie wyników
 **Opis:** Użytkownik wypełnia formularz z danymi wystawy
@@ -137,7 +166,7 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 - Po utworzeniu wystawa jest widoczna na liście wystaw
 - Możliwość edycji danych wystawy
 
-### US-003: Dodawanie psa do systemu
+### US-005: Dodawanie psa do systemu
 
 **Tytuł:** Jako członek zarządu chcę dodać psa do systemu, aby móc rejestrować jego wyniki
 **Opis:** Użytkownik wprowadza dane psa i jego właściciela
@@ -148,7 +177,7 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 - System waliduje poprawność danych
 - Pies jest dostępny do rejestracji na wystawy
 
-### US-004: Rejestracja psa na wystawę
+### US-006: Rejestracja psa na wystawę
 
 **Tytuł:** Jako członek zarządu chcę zarejestrować psa na wystawę, aby móc wprowadzać jego wyniki
 **Opis:** Użytkownik wybiera psa i przypisuje go do konkretnej klasy na wystawie
@@ -159,7 +188,7 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 - Możliwość ręcznej zmiany klasy
 - Przypisanie numeru katalogowego
 
-### US-005: Wprowadzanie oceny psa
+### US-007: Wprowadzanie oceny psa
 
 **Tytuł:** Jako członek zarządu chcę wprowadzić ocenę psa, aby udokumentować wynik z wystawy
 **Opis:** Użytkownik wprowadza ocenę, tytuł i lokatę dla psa
@@ -171,7 +200,7 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 - Możliwość edycji przed finalizacją wystawy
 - Walidacja zgodności oceny z przyznanym tytułem
 
-### US-006: Przeglądanie wyników wystawy
+### US-008: Przeglądanie wyników wystawy
 
 **Tytuł:** Jako członek zarządu chcę przeglądać wyniki wystawy, aby sprawdzić wprowadzone dane
 **Opis:** Użytkownik przegląda listę psów z wynikami na konkretnej wystawie
@@ -182,7 +211,7 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 - Możliwość filtrowania i wyszukiwania
 - Sortowanie według różnych kryteriów
 
-### US-007: Historia wyników psa
+### US-009: Historia wyników psa
 
 **Tytuł:** Jako członek zarządu chcę sprawdzić historię wyników psa, aby przeanalizować jego osiągnięcia
 **Opis:** Użytkownik przegląda wszystkie wyniki konkretnego psa z różnych wystaw
@@ -193,7 +222,7 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 - Statystyki osiągnięć psa
 - Możliwość eksportu historii
 
-### US-008: Statystyki wystawy
+### US-010: Statystyki wystawy
 
 **Tytuł:** Jako członek zarządu chcę zobaczyć statystyki wystawy, aby przeanalizować wyniki
 **Opis:** Użytkownik przegląda statystyki liczby psów w klasach i rozkład ocen
@@ -205,7 +234,7 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 - Statystyki tytułów (Mł. Zw. Kl., Zw. Kl., Zw. Kl. Wet., etc.)
 - Podstawowe wykresy i tabele
 
-### US-009: Wyszukiwanie psów
+### US-011: Wyszukiwanie psów
 
 **Tytuł:** Jako członek zarządu chcę wyszukać psa, aby szybko znaleźć jego dane
 **Opis:** Użytkownik wyszukuje psa po imieniu, hodowli lub właścicielu
@@ -216,7 +245,7 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 - Wyszukiwanie po danych właściciela
 - Wyniki z podstawowymi informacjami
 
-### US-010: Zarządzanie użytkownikami
+### US-012: Zarządzanie użytkownikami
 
 **Tytuł:** Jako członek zarządu chcę zarządzać kontami użytkowników, aby kontrolować dostęp do systemu
 **Opis:** Użytkownik dodaje, edytuje i usuwa konta użytkowników systemu
