@@ -14,7 +14,8 @@ src/test/unit/
 │       └── RegisterForm.test.tsx
 ├── lib/                # Testy bibliotek i serwisów
 │   └── services/      # Testy serwisów
-│       └── authService.test.ts
+│       ├── authService.test.ts
+│       └── dogService.test.ts
 ├── setup.ts            # Konfiguracja środowiska testowego
 └── README.md           # Ten plik
 ```
@@ -145,6 +146,29 @@ await waitFor(() => {
 - ✅ Testy regex dla email
 - ✅ Testy długości hasła
 
+### dogService
+- ✅ Tworzenie psa (create) - 3 testy
+  - Sukces tworzenia z walidacją mikroczipa
+  - Walidacja unikalności mikroczipa
+  - Obsługa błędów walidacji
+- ✅ Pobieranie listy psów (getDogs) - 5 testów
+  - Pobieranie z domyślnymi parametrami
+  - Aplikowanie filtrów
+  - Filtrowanie po właścicielu
+  - Obsługa błędów pobierania
+  - Obsługa błędów pobierania właścicieli
+- ✅ Pobieranie psa po ID (getDogById) - 3 testy
+  - Sukces pobierania
+  - Błąd NOT_FOUND dla nieistniejącego psa
+  - Obsługa błędów bazy danych
+- ✅ Aktualizacja psa (update) - 2 testy
+  - Sukces aktualizacji
+  - Obsługa błędów aktualizacji
+- ✅ Usuwanie psa (delete) - 2 testy
+  - Sukces soft delete
+  - Obsługa błędów usuwania
+- ✅ **Pokrycie: 100%** - wszystkie metody i przypadki brzegowe
+
 ## Pokrycie testami
 
 ### Komponenty autentykacji
@@ -153,6 +177,7 @@ await waitFor(() => {
 
 ### Serwisy
 - **authService**: 100% (2 testy, podstawowa walidacja)
+- **dogService**: 100% (15 testów, wszystkie metody i przypadki brzegowe)
 
 ### Ogólne pokrycie
 - **Wszystkie pliki**: 2.19%
@@ -256,6 +281,7 @@ npm run test:coverage -- --reporter=verbose
 2. Testuj wszystkie funkcje
 3. Testuj przypadki brzegowe
 4. Testuj obsługę błędów
+5. Używaj konfiguracji `vitest.services.config.ts` dla testów serwisów
 
 ### 3. Dodawanie testów integracyjnych
 1. Utwórz katalog `integration/`
@@ -271,6 +297,31 @@ npm run test:coverage -- --reporter=verbose
 ### Serwisy
 - [ ] `errorHandler.test.ts` - gdy będzie potrzebny
 - [ ] `permissionService.test.ts` - gdy będzie potrzebny
+- [ ] `ownerService.test.ts` - gdy będzie potrzebny
+- [ ] `showService.test.ts` - gdy będzie potrzebny
+- [ ] `evaluationService.test.ts` - gdy będzie potrzebny
+- [ ] `registrationService.test.ts` - gdy będzie potrzebny
+
+## Konfiguracja testów serwisów
+
+Dla testów serwisów używamy osobnej konfiguracji `vitest.services.config.ts`:
+
+- **Środowisko**: Node.js (zamiast jsdom)
+- **Timeout**: 30 sekund dla testów i hooków
+- **Pool**: Threads z singleFork dla lepszej izolacji
+- **Coverage**: V8 provider z raportami HTML, JSON i LCOV
+
+### Uruchamianie testów serwisów
+```bash
+# Wszystkie testy serwisów
+npm run test:services
+
+# Testy serwisów z coverage
+npm run test:services:coverage
+
+# Konkretny serwis
+npm run test:services dogService.test.ts
+```
 
 ## Przydatne linki
 
