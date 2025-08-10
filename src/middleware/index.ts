@@ -7,11 +7,13 @@ export const onRequest = defineMiddleware(
       headers: request.headers,
       cookies,
     });
+
+    // Use getUser() instead of getSession() for better security
     const {
-      data: { session },
-    } = await supabase.auth.getSession();
+      data: { user },
+    } = await supabase.auth.getUser();
     locals.supabase = supabase;
-    locals.auth = { session, user: session?.user ?? null };
+    locals.auth = { user, session: user ? null : null };
 
     // All routes are public for now; middleware only enriches locals
     return next();
