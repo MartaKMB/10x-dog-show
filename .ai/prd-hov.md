@@ -299,6 +299,14 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 - Walidacja danych na poziomie aplikacji i bazy
 - Backup danych
 
+### Testowanie:
+
+- **Testy jednostkowe**: Vitest z React Testing Library dla komponentów UI
+- **Testy integracyjne**: Vitest dla API routes i middleware
+- **Testy e2e**: Playwright dla pełnych scenariuszy użytkownika
+- **Pokrycie kodu**: Minimalne 30% linii, 20% gałęzi dla MVP
+- **Automatyzacja**: CI/CD pipeline z testami przed każdym PR
+
 ### Responsywność:
 
 - Pełna funkcjonalność na desktop (1024px+)
@@ -365,6 +373,9 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 - Dostępność 99.9%
 - Wsparcie dla urządzeń mobilnych
 - Bezpieczne przechowywanie danych
+- **Jakość kodu**: Testy jednostkowe i integracyjne z Vitest
+- **Stabilność**: Testy e2e z Playwright dla krytycznych ścieżek
+- **Pokrycie testów**: 30% linii, 20% gałęzi minimum dla MVP
 
 ### Biznesowe:
 

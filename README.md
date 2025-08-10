@@ -56,6 +56,13 @@ A modern web application for managing and archiving dog show results, specifical
 - **Husky + lint-staged** - Git hooks for code quality
 - **TypeScript ESLint** - TypeScript-specific linting rules
 
+### Testing
+
+- **Vitest** - Fast unit and integration testing framework
+- **React Testing Library** - Component testing utilities
+- **Playwright** - End-to-end testing for browser automation
+- **MSW** - API mocking for integration tests
+
 ### External Services
 
 - **Resend** - Email delivery service
@@ -120,6 +127,9 @@ A modern web application for managing and archiving dog show results, specifical
 | `npm run lint:fix` | Fix ESLint errors automatically      |
 | `npm run format`   | Format code with Prettier            |
 | `npm run astro`    | Run Astro CLI commands               |
+| `npm run test`     | Run unit and integration tests       |
+| `npm run test:e2e` | Run end-to-end tests with Playwright |
+| `npm run test:ui`  | Run tests with Vitest UI              |
 
 ## 🎯 Project Scope
 
@@ -193,6 +203,8 @@ A modern web application for managing and archiving dog show results, specifical
 - **User Satisfaction**: >90% satisfaction rate
 - **System Performance**: <2 seconds response time
 - **Uptime**: 99.9% availability
+- **Code Quality**: 30% line coverage, 20% branch coverage minimum
+- **Test Reliability**: 100% pass rate for critical tests (auth, CRUD)
 
 ## 📄 License
 

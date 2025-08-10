@@ -31,10 +31,10 @@ Poza zakresem: modyfikacje schematu DB (zarządzane deklaratywnie w osobnym proc
 ### 3. Typy testów
 
 - **Testy jednostkowe (UI/Logika)**:
-  - Narzędzia: Jest + React Testing Library, `@testing-library/user-event`, `jest-axe` dla a11y.
+  - Narzędzia: Vitest + React Testing Library, `@testing-library/user-event`, `@axe-core/vitest` dla a11y.
   - Zakres: walidacje formularzy (`zod`), logika komponentów, renderowanie stanów (loading, error), utils i serwisy (`src/lib/services/*`).
 - **Testy integracyjne (API/SSR/Komponenty z usługami)**:
-  - Narzędzia: Jest (Node env), MSW do mockowania Supabase/HTTP, Supertest lub fetch do testowania API routes.
+  - Narzędzia: Vitest (Node env), MSW do mockowania Supabase/HTTP, Supertest lub fetch do testowania API routes.
   - Zakres: przepływy auth przez API (`/api/auth/*`), middleware atrybucja `locals.auth`, spójność SSR cookies, integracja komponentów z serwisami.
 - **Testy e2e (przeglądarka)**:
   - Narzędzia: Playwright.
@@ -45,7 +45,7 @@ Poza zakresem: modyfikacje schematu DB (zarządzane deklaratywnie w osobnym proc
 - **Testy bezpieczeństwa**:
   - Zakres: nieautoryzowany dostęp do POST/PUT/DELETE (401/403), wycieki danych w odpowiedziach, odporność CSRF dla JSON (nagłówki), poprawność zarządzania cookies (HttpOnly, SameSite).
 - **Testy dostępności (a11y)**:
-  - Narzędzia: `jest-axe`, Playwright a11y snapshot.
+  - Narzędzia: `@axe-core/vitest`, Playwright a11y snapshot.
   - Zakres: formularze auth i kluczowe strony list/szczegółów.
 
 ### 4. Scenariusze testowe dla kluczowych funkcjonalności
@@ -80,14 +80,14 @@ Przy każdej ścieżce uwzględnić testy: happy-path, walidacje, uprawnienia, b
 
 ### 6. Narzędzia do testowania
 
-- Jednostkowe/integracyjne: Jest, React Testing Library, MSW, Supertest (lub fetch), `jest-axe`.
+- Jednostkowe/integracyjne: Vitest, React Testing Library, MSW, Supertest (lub fetch), `@axe-core/vitest`.
 - E2E: Playwright.
 - Jakość: ESLint, TypeScript (tsc --noEmit), Prettier.
 - Wydajność: Lighthouse, k6/autocannon (opcjonalnie).
 - Raportowanie: JUnit/HTML reporter dla CI, coverage lcov.
 
 Zasady dla testów jednostkowych (wyciąg):
-- Struktura `describe/it`, setup/teardown `beforeEach/afterEach`, unikać nadmiernych snapshotów, używać precyzyjnych matcherów, mockować IO i czas, raportować coverage z sensownymi celami.
+- Struktura `describe/test`, setup/teardown `beforeEach/afterEach`, unikać nadmiernych snapshotów, używać precyzyjnych matcherów, mockować IO i czas, raportować coverage z sensownymi celami.
 
 ### 7. Harmonogram testów
 
