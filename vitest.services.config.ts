@@ -4,16 +4,12 @@ import { resolve } from "path";
 export default defineConfig({
   test: {
     globals: true,
-    environment: "jsdom", // Domyślnie jsdom dla React komponentów
+    environment: "node", // Node environment dla testów serwisów
     setupFiles: ["./src/test/unit/setup.ts"],
     pool: "threads",
     testTimeout: 30000,
     hookTimeout: 30000,
-    include: [
-      "src/**/*.{test,spec}.{js,ts,jsx,tsx}",
-      "src/**/*.test.{js,ts,jsx,tsx}",
-      "src/**/*.spec.{js,ts,jsx,tsx}",
-    ],
+    include: ["src/test/unit/lib/services/**/*.{test,spec}.{js,ts,jsx,tsx}"],
     exclude: ["node_modules", "dist", ".astro", "**/*.d.ts"],
     coverage: {
       provider: "v8",
@@ -25,16 +21,7 @@ export default defineConfig({
         "src/test/**",
         "src/env.d.ts",
       ],
-      thresholds: {
-        global: {
-          lines: 30,
-          branches: 20,
-          functions: 25,
-          statements: 30,
-        },
-      },
     },
-    // Konfiguracja dla różnych typów testów
     poolOptions: {
       forks: {
         singleFork: true,

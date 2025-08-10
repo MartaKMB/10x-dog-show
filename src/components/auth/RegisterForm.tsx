@@ -15,7 +15,7 @@ const RegisterForm: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validate = (): boolean => {
-    const newErrors: ValidationErrors = {};
+    const newErrors: ValidationErrors = { ...errors }; // Zachowaj istniejące błędy
 
     if (!firstName.trim()) newErrors.firstName = ["Imię jest wymagane"];
     if (!lastName.trim()) newErrors.lastName = ["Nazwisko jest wymagane"];
@@ -40,6 +40,31 @@ const RegisterForm: React.FC = () => {
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+
+  // Walidacja w czasie rzeczywistym dla pola email
+  const validateEmail = (emailValue: string) => {
+    if (!emailValue.trim()) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.email;
+        return newErrors;
+      });
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) {
+      setErrors((prev) => ({ ...prev, email: ["Nieprawidłowy format email"] }));
+    } else {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.email;
+        return newErrors;
+      });
+    }
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newEmail = e.target.value;
+    setEmail(newEmail);
+    validateEmail(newEmail);
   };
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -153,7 +178,7 @@ const RegisterForm: React.FC = () => {
             id="email"
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={handleEmailChange}
             className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
               errors.email ? "border-red-300" : "border-gray-300"
             }`}
