@@ -22,8 +22,16 @@
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:install": "playwright install",
     "test:e2e:codegen": "playwright codegen",
+    "test:e2e:cloud": "NODE_ENV=test playwright test --config=playwright.config.ts",
+    "test:e2e:cloud:ui": "NODE_ENV=test playwright test --ui --config=playwright.config.ts",
+    "test:e2e:local": "NODE_ENV=test playwright test --config=playwright.config.ts",
+    "test:e2e:watch": "NODE_ENV=test playwright test --config=playwright.config.ts --grep",
+    "test:e2e:headed": "NODE_ENV=test playwright test --config=playwright.config.ts --headed",
+    "test:e2e:trace": "NODE_ENV=test playwright test --config=playwright.config.ts --trace on",
     "test:typecheck": "tsc --noEmit",
-    "test:all": "npm run test:typecheck && npm run test:run && npm run test:e2e"
+    "test:all": "npm run test:typecheck && npm run test:run && npm run test:e2e:cloud",
+    "test:smoke": "npm run test:unit && npm run test:e2e:cloud --grep='smoke'",
+    "test:ci": "npm run test:typecheck && npm run test:run && npm run test:e2e:cloud --reporter=junit"
   },
   "dependencies": {
     "@astrojs/node": "^9.1.3",
