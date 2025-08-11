@@ -12,9 +12,9 @@ const ForgotPasswordForm: React.FC = () => {
   const validate = (): boolean => {
     const newErrors: ValidationErrors = {};
     if (!email.trim()) {
-      newErrors.email = ["Email jest wymagany"]; 
+      newErrors.email = ["Email jest wymagany"];
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = ["Nieprawidłowy format email"]; 
+      newErrors.email = ["Nieprawidłowy format email"];
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -39,7 +39,9 @@ const ForgotPasswordForm: React.FC = () => {
 
   return (
     <div className="max-w-md mx-auto">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Odzyskiwanie hasła</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">
+        Odzyskiwanie hasła
+      </h1>
 
       {infoMessage && (
         <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-800">
@@ -49,7 +51,10 @@ const ForgotPasswordForm: React.FC = () => {
 
       <form onSubmit={onSubmit} className="space-y-4">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Email
           </label>
           <input
@@ -78,5 +83,3 @@ const ForgotPasswordForm: React.FC = () => {
 };
 
 export default ForgotPasswordForm;
-
-

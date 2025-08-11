@@ -134,8 +134,8 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 
 **Kryteria akceptacji:**
 
-  - Użytkownik może przeglądać wszystkie dane serwisu (zblurowne dane właściela)
-  - Funkcjonalnośćedycji nie jest dostępna bez logowania się do systemu (US-003).
+- Użytkownik może przeglądać wszystkie dane serwisu (zblurowne dane właściela)
+- Funkcjonalnośćedycji nie jest dostępna bez logowania się do systemu (US-003).
 
 ### US-003: Bezpieczny dostęp i uwierzytelnianie
 
@@ -145,15 +145,15 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 
 **Kryteria akceptacji:**
 
-  - Logowanie i rejestracja odbywają się na dedykowanych stronach.
-  - Logowanie wymaga podania adresu email i hasła.
-  - Rejestracja wymaga podania adresu email, hasła i potwierdzenia hasła.
-  - Użytkownik MOŻE korzystać z serwisu BEZ trybu edycji bez logowania się do systemu (US-002).
-  - Użytkownik NIE MOŻE korzystać z funkcji edycji bez logowania się do systemu (US-003).
-  - Użytkownik może logować się do systemu poprzez przycisk w prawym górnym rogu.
-  - Użytkownik może się wylogować z systemu poprzez przycisk w prawym górnym rogu w głównym @Layout.astro.
-  - Nie korzystamy z zewnętrznych serwisów logowania (np. Google, GitHub).
-  - Odzyskiwanie hasła powinno być możliwe.
+- Logowanie i rejestracja odbywają się na dedykowanych stronach.
+- Logowanie wymaga podania adresu email i hasła.
+- Rejestracja wymaga podania adresu email, hasła i potwierdzenia hasła.
+- Użytkownik MOŻE korzystać z serwisu BEZ trybu edycji bez logowania się do systemu (US-002).
+- Użytkownik NIE MOŻE korzystać z funkcji edycji bez logowania się do systemu (US-003).
+- Użytkownik może logować się do systemu poprzez przycisk w prawym górnym rogu.
+- Użytkownik może się wylogować z systemu poprzez przycisk w prawym górnym rogu w głównym @Layout.astro.
+- Nie korzystamy z zewnętrznych serwisów logowania (np. Google, GitHub).
+- Odzyskiwanie hasła powinno być możliwe.
 
 ### US-004: Tworzenie wystawy
 

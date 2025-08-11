@@ -38,56 +38,72 @@ const user = auth?.user ?? null;
 
             <!-- Navigation -->
             <nav class="hidden md:flex space-x-8" data-testid="desktop-navigation">
-              <a href="/" class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium" data-testid="nav-dashboard-link">
+              <a
+                href="/"
+                class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                data-testid="nav-dashboard-link"
+              >
                 Dashboard
               </a>
-              <a href="/shows" class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium" data-testid="nav-shows-link">
+              <a
+                href="/shows"
+                class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                data-testid="nav-shows-link"
+              >
                 Wystawy
               </a>
-              <a href="/dogs" class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium" data-testid="nav-dogs-link">Psy</a>
+              <a
+                href="/dogs"
+                class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                data-testid="nav-dogs-link"
+              >
+                Psy
+              </a>
             </nav>
 
             <!-- User menu -->
             <div class="flex items-center space-x-4" data-testid="user-menu">
-              {user ? (
-                <>
-                  <div class="hidden sm:block text-sm text-gray-600" data-testid="user-email">
-                    {user.email}
-                  </div>
-                  <form
-                    method="POST"
-                    action="/api/auth/logout"
-                    class="hidden md:block"
-                    onsubmit="this.querySelector('button')?.setAttribute('disabled','true')"
-                    data-testid="logout-form"
-                  >
-                    <button
-                      type="submit"
-                      class="px-3 py-1.5 rounded-md border border-gray-300 text-sm text-gray-700 hover:bg-gray-50"
-                      data-testid="logout-button"
+              {
+                user ? (
+                  <>
+                    <div class="hidden sm:block text-sm text-gray-600" data-testid="user-email">
+                      {user.email}
+                    </div>
+                    <form
+                      method="POST"
+                      action="/api/auth/logout"
+                      class="hidden md:block"
+                      onsubmit="this.querySelector('button')?.setAttribute('disabled','true')"
+                      data-testid="logout-form"
                     >
-                      Wyloguj
-                    </button>
-                  </form>
-                </>
-              ) : (
-                <div class="hidden md:flex items-center space-x-3" data-testid="auth-buttons">
-                  <a
-                    href="/auth/login"
-                    class="px-3 py-1.5 rounded-md border border-gray-300 text-sm text-gray-700 hover:bg-gray-50"
-                    data-testid="login-link"
-                  >
-                    Zaloguj
-                  </a>
-                  <a
-                    href="/auth/signup"
-                    class="px-3 py-1.5 rounded-md bg-amber-600 text-white text-sm rounded hover:bg-amber-700"
-                    data-testid="register-link"
-                  >
-                    Rejestracja
-                  </a>
-                </div>
-              )}
+                      <button
+                        type="submit"
+                        class="px-3 py-1.5 rounded-md border border-gray-300 text-sm text-gray-700 hover:bg-gray-50"
+                        data-testid="logout-button"
+                      >
+                        Wyloguj
+                      </button>
+                    </form>
+                  </>
+                ) : (
+                  <div class="hidden md:flex items-center space-x-3" data-testid="auth-buttons">
+                    <a
+                      href="/auth/login"
+                      class="px-3 py-1.5 rounded-md border border-gray-300 text-sm text-gray-700 hover:bg-gray-50"
+                      data-testid="login-link"
+                    >
+                      Zaloguj
+                    </a>
+                    <a
+                      href="/auth/signup"
+                      class="px-3 py-1.5 rounded-md bg-amber-600 text-white text-sm rounded hover:bg-amber-700"
+                      data-testid="register-link"
+                    >
+                      Rejestracja
+                    </a>
+                  </div>
+                )
+              }
 
               <!-- Mobile menu button -->
               <button
@@ -111,43 +127,57 @@ const user = auth?.user ?? null;
         <!-- Mobile menu -->
         <div class="md:hidden hidden" id="mobile-menu" data-testid="mobile-menu">
           <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-200">
-            <a href="/" class="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium" data-testid="mobile-nav-dashboard-link">
+            <a
+              href="/"
+              class="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium"
+              data-testid="mobile-nav-dashboard-link"
+            >
               Dashboard
             </a>
-            <a href="/shows" class="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium" data-testid="mobile-nav-shows-link">
+            <a
+              href="/shows"
+              class="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium"
+              data-testid="mobile-nav-shows-link"
+            >
               Wystawy
             </a>
-            <a href="/dogs" class="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium" data-testid="mobile-nav-dogs-link">
+            <a
+              href="/dogs"
+              class="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium"
+              data-testid="mobile-nav-dogs-link"
+            >
               Psy
             </a>
-            {user ? (
-              <form method="POST" action="/api/auth/logout" class="px-3 py-2" data-testid="mobile-logout-form">
-                <button
-                  type="submit"
-                  class="w-full px-3 py-2 rounded-md border border-gray-300 text-sm text-gray-700 hover:bg-gray-50"
-                  data-testid="mobile-logout-button"
-                >
-                  Wyloguj
-                </button>
-              </form>
-            ) : (
-              <div class="flex space-x-2 px-3 py-2" data-testid="mobile-auth-buttons">
-                <a
-                  href="/auth/login"
-                  class="flex-1 text-center px-3 py-2 rounded-md border border-gray-300 text-sm text-gray-700 hover:bg-gray-50"
-                  data-testid="mobile-login-link"
-                >
-                  Zaloguj
-                </a>
-                <a
-                  href="/auth/signup"
-                  class="flex-1 text-center px-3 py-2 rounded-md bg-amber-600 text-white text-sm hover:bg-amber-700"
-                  data-testid="mobile-register-link"
-                >
-                  Rejestracja
-                </a>
-              </div>
-            )}
+            {
+              user ? (
+                <form method="POST" action="/api/auth/logout" class="px-3 py-2" data-testid="mobile-logout-form">
+                  <button
+                    type="submit"
+                    class="w-full px-3 py-2 rounded-md border border-gray-300 text-sm text-gray-700 hover:bg-gray-50"
+                    data-testid="mobile-logout-button"
+                  >
+                    Wyloguj
+                  </button>
+                </form>
+              ) : (
+                <div class="flex space-x-2 px-3 py-2" data-testid="mobile-auth-buttons">
+                  <a
+                    href="/auth/login"
+                    class="flex-1 text-center px-3 py-2 rounded-md border border-gray-300 text-sm text-gray-700 hover:bg-gray-50"
+                    data-testid="mobile-login-link"
+                  >
+                    Zaloguj
+                  </a>
+                  <a
+                    href="/auth/signup"
+                    class="flex-1 text-center px-3 py-2 rounded-md bg-amber-600 text-white text-sm hover:bg-amber-700"
+                    data-testid="mobile-register-link"
+                  >
+                    Rejestracja
+                  </a>
+                </div>
+              )
+            }
           </div>
         </div>
       </header>

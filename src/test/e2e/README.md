@@ -9,16 +9,19 @@ Ten katalog zawiera end-to-end (E2E) testy dla aplikacji 10x Dog Show. Testy są
 ### ✅ **Zaimplementowane najlepsze praktyki:**
 
 1. **Hybrydowe podejście środowiskowe**
+
    - Development: Lokalne Supabase
    - Testy: Dedykowana baza testowa + projekt chmurowy
    - Staging/Produkcja: Projekty chmurowe
 
 2. **Page Object Model (POM)**
+
    - `BasePage` - bazowa klasa dla wszystkich stron
    - `HomePage` - przykład implementacji POM
    - Centralne selektory w `selectors.ts`
 
 3. **Centralne zarządzanie selektorami**
+
    - Wszystkie selektory w jednym pliku
    - Hierarchiczna organizacja
    - Funkcje pomocnicze do tworzenia selektorów
@@ -35,19 +38,25 @@ Ten katalog zawiera end-to-end (E2E) testy dla aplikacji 10x Dog Show. Testy są
 #### 1. **Selektory wewnątrz komponentów (NIE na zewnątrz)**
 
 **✅ DOBRZE - selektor w komponencie:**
+
 ```tsx
 // Topbar.tsx
 return (
   <header data-testid="topbar">
     <nav data-testid="navigation">
-      <a href="/auth/login" data-testid="login-link">Zaloguj</a>
-      <a href="/auth/register" data-testid="register-link">Zarejestruj</a>
+      <a href="/auth/login" data-testid="login-link">
+        Zaloguj
+      </a>
+      <a href="/auth/register" data-testid="register-link">
+        Zarejestruj
+      </a>
     </nav>
   </header>
 );
 ```
 
 **❌ ŹLE - selektor w komponencie nadrzędnym:**
+
 ```tsx
 // Layout.tsx
 <Topbar client:load data-testid="topbar" />
@@ -60,8 +69,8 @@ Używaj hierarchicznych selektorów dla lepszej organizacji:
 ```tsx
 // Komponent formularza
 <form data-testid="dog-form">
-  <input 
-    type="text" 
+  <input
+    type="text"
     data-testid="dog-form-name-input"
     placeholder="Nazwa psa"
   />
@@ -96,7 +105,7 @@ export function LoginForm() {
   return (
     <form data-testid="auth-login-form">
       <h1 data-testid="auth-login-title">Zaloguj się</h1>
-      
+
       <div>
         <label htmlFor="email">Email</label>
         <input
@@ -106,7 +115,7 @@ export function LoginForm() {
           required
         />
       </div>
-      
+
       <div>
         <label htmlFor="password">Hasło</label>
         <input
@@ -116,12 +125,15 @@ export function LoginForm() {
           required
         />
       </div>
-      
+
       <button type="submit" data-testid="auth-login-submit-button">
         Zaloguj
       </button>
-      
-      <a href="/auth/forgot-password" data-testid="auth-login-forgot-password-link">
+
+      <a
+        href="/auth/forgot-password"
+        data-testid="auth-login-forgot-password-link"
+      >
         Zapomniałeś hasła?
       </a>
     </form>
@@ -134,18 +146,16 @@ export function LoginForm() {
 ```astro
 ---
 // pages/shows/index.astro
-import ShowsListView from '../../components/shows/ShowsListView.astro';
+import ShowsListView from "../../components/shows/ShowsListView.astro";
 ---
 
 <main data-testid="shows-page">
   <h1 data-testid="shows-page-title">Wystawy</h1>
-  
+
   <div data-testid="shows-page-actions">
-    <a href="/shows/new" data-testid="shows-page-add-button">
-      Dodaj wystawę
-    </a>
+    <a href="/shows/new" data-testid="shows-page-add-button"> Dodaj wystawę </a>
   </div>
-  
+
   <ShowsListView />
 </main>
 ```
@@ -158,7 +168,7 @@ Po dodaniu nowych selektorów, zaktualizuj plik `selectors.ts`:
 // selectors.ts
 export const TestSelectors = {
   // ... istniejące selektory ...
-  
+
   // Nowe selektory
   shows: {
     pageTitle: '[data-testid="shows-page-title"]',
@@ -168,7 +178,7 @@ export const TestSelectors = {
     showDate: '[data-testid="show-card-date"]',
     showStatus: '[data-testid="show-card-status"]',
   },
-  
+
   // ... więcej selektorów ...
 };
 ```
@@ -181,12 +191,18 @@ export const TestSelectors = {
 // W testach
 test("formularz logowania jest widoczny", async ({ page }) => {
   await page.goto("/auth/login");
-  
+
   // Sprawdź czy wszystkie elementy są widoczne
   await expect(page.locator('[data-testid="auth-login-form"]')).toBeVisible();
-  await expect(page.locator('[data-testid="auth-login-email-input"]')).toBeVisible();
-  await expect(page.locator('[data-testid="auth-login-password-input"]')).toBeVisible();
-  await expect(page.locator('[data-testid="auth-login-submit-button"]')).toBeVisible();
+  await expect(
+    page.locator('[data-testid="auth-login-email-input"]'),
+  ).toBeVisible();
+  await expect(
+    page.locator('[data-testid="auth-login-password-input"]'),
+  ).toBeVisible();
+  await expect(
+    page.locator('[data-testid="auth-login-submit-button"]'),
+  ).toBeVisible();
 });
 ```
 
@@ -194,8 +210,12 @@ test("formularz logowania jest widoczny", async ({ page }) => {
 
 ```typescript
 // Wypełnianie formularza
-await page.locator('[data-testid="auth-login-email-input"]').fill("test@example.com");
-await page.locator('[data-testid="auth-login-password-input"]').fill("password123");
+await page
+  .locator('[data-testid="auth-login-email-input"]')
+  .fill("test@example.com");
+await page
+  .locator('[data-testid="auth-login-password-input"]')
+  .fill("password123");
 await page.locator('[data-testid="auth-login-submit-button"]').click();
 ```
 
@@ -239,9 +259,7 @@ export function DogsTable({ dogs }: { dogs: Dog[] }) {
         <tbody>
           {dogs.map((dog) => (
             <tr key={dog.id} data-testid={`dogs-table-row-${dog.id}`}>
-              <td data-testid={`dogs-table-cell-name-${dog.id}`}>
-                {dog.name}
-              </td>
+              <td data-testid={`dogs-table-cell-name-${dog.id}`}>{dog.name}</td>
               <td data-testid={`dogs-table-cell-breed-${dog.id}`}>
                 {dog.breed}
               </td>
@@ -266,29 +284,26 @@ export function DogsTable({ dogs }: { dogs: Dog[] }) {
 
 ```tsx
 // ConfirmDialog.tsx
-export function ConfirmDialog({ 
-  isOpen, 
-  onConfirm, 
-  onCancel, 
-  title, 
-  message 
+export function ConfirmDialog({
+  isOpen,
+  onConfirm,
+  onCancel,
+  title,
+  message,
 }: ConfirmDialogProps) {
   if (!isOpen) return null;
-  
+
   return (
     <div data-testid="confirm-dialog-overlay">
       <div data-testid="confirm-dialog">
         <h2 data-testid="confirm-dialog-title">{title}</h2>
         <p data-testid="confirm-dialog-message">{message}</p>
-        
+
         <div data-testid="confirm-dialog-actions">
-          <button 
-            onClick={onCancel}
-            data-testid="confirm-dialog-cancel-button"
-          >
+          <button onClick={onCancel} data-testid="confirm-dialog-cancel-button">
             Anuluj
           </button>
-          <button 
+          <button
             onClick={onConfirm}
             data-testid="confirm-dialog-confirm-button"
           >
@@ -307,7 +322,7 @@ export function ConfirmDialog({
 
 ```typescript
 // W konsoli przeglądarki
-document.querySelector('[data-testid="auth-login-form"]')
+document.querySelector('[data-testid="auth-login-form"]');
 ```
 
 #### 2. **Testowanie selektorów**
@@ -316,11 +331,11 @@ document.querySelector('[data-testid="auth-login-form"]')
 // W testach Playwright
 test("sprawdź selektory", async ({ page }) => {
   await page.goto("/auth/login");
-  
+
   // Sprawdź czy selektor istnieje
   const form = page.locator('[data-testid="auth-login-form"]');
   console.log("Form count:", await form.count());
-  
+
   // Sprawdź czy element jest widoczny
   console.log("Form visible:", await form.isVisible());
 });
@@ -345,31 +360,37 @@ src/test/e2e/
 ## Uruchamianie testów
 
 ### Wszystkie testy E2E
+
 ```bash
 npm run test:e2e
 ```
 
 ### Testy z dedykowaną bazą testową
+
 ```bash
 npm run test:e2e:test
 ```
 
 ### Testy z interfejsem UI
+
 ```bash
 npm run test:e2e:ui
 ```
 
 ### Testy w trybie debug
+
 ```bash
 npm run test:e2e:debug
 ```
 
 ### Testy przeciwko chmurze
+
 ```bash
 npm run test:e2e:cloud
 ```
 
 ### **NOWY: Uruchomienie aplikacji w trybie testowym**
+
 ```bash
 npm run dev:e2e
 ```
@@ -392,6 +413,7 @@ npm run test:e2e:test
 ```
 
 **Zalety bazy testowej:**
+
 - Izolacja od danych deweloperskich
 - Przewidywalny stan danych
 - Możliwość resetowania przed każdym uruchomieniem
@@ -434,6 +456,7 @@ Plik `playwright.config.ts` definiuje 3 projekty:
 ### Zmienne środowiskowe
 
 #### Dla bazy testowej (.env.test)
+
 ```bash
 TEST_ENVIRONMENT=test
 NODE_ENV=test
@@ -450,6 +473,7 @@ TEST_USER_ID=00000000-0000-0000-0000-000000000001
 ```
 
 #### Dla bazy lokalnej (.env)
+
 ```bash
 SUPABASE_URL=http://127.0.0.1:54321
 SUPABASE_ANON_KEY=your-local-anon-key
@@ -457,6 +481,7 @@ SUPABASE_SERVICE_ROLE_KEY=your-local-service-key
 ```
 
 #### Dla bazy chmurowej
+
 ```bash
 VITE_SUPABASE_URL_CLOUD=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY_CLOUD=your-cloud-anon-key
@@ -523,26 +548,27 @@ private readonly selectors = {
 ## Zasady pisania testów E2E
 
 ### 1. **Struktura testu**
-```typescript
-import { test, expect } from '@playwright/test';
-import { HomePage } from './page-objects/HomePage';
 
-test.describe('Nazwa funkcjonalności', () => {
+```typescript
+import { test, expect } from "@playwright/test";
+import { HomePage } from "./page-objects/HomePage";
+
+test.describe("Nazwa funkcjonalności", () => {
   let homePage: HomePage;
 
   test.beforeEach(async ({ page }) => {
     homePage = new HomePage(page);
   });
 
-  test('opis testu', async ({ page }) => {
+  test("opis testu", async ({ page }) => {
     // Przygotowanie
     await homePage.gotoHome();
-    
+
     // Działanie
     await homePage.gotoLogin();
-    
+
     // Sprawdzenie
-    await expect(page.getByText('Zaloguj się')).toBeVisible();
+    await expect(page.getByText("Zaloguj się")).toBeVisible();
   });
 });
 ```
@@ -550,51 +576,54 @@ test.describe('Nazwa funkcjonalności', () => {
 ### 2. **Lokatory (Selectors)**
 
 **Preferowane lokatory (w kolejności):**
+
 ```typescript
 // 1. data-testid (najbardziej stabilne)
 await page.locator('[data-testid="login-button"]').click();
 
 // 2. Role + accessible name
-await page.getByRole('button', { name: 'Zapisz' }).click();
+await page.getByRole("button", { name: "Zapisz" }).click();
 
 // 3. Text content
-await page.getByText('Wystawa Klubowa').click();
+await page.getByText("Wystawa Klubowa").click();
 
 // 4. Placeholder
-await page.getByPlaceholder('Wprowadź nazwę').fill('Nazwa');
+await page.getByPlaceholder("Wprowadź nazwę").fill("Nazwa");
 ```
 
 **Unikaj:**
+
 ```typescript
 // ❌ Zbyt ogólne
-await page.locator('div').click();
+await page.locator("div").click();
 
 // ❌ Zależne od struktury DOM
-await page.locator('body > div > div > button').click();
+await page.locator("body > div > div > button").click();
 ```
 
 ### 3. **Czekanie na elementy**
 
 ```typescript
 // Czekanie na załadowanie strony
-await page.waitForLoadState('networkidle');
+await page.waitForLoadState("networkidle");
 
 // Czekanie na konkretny element
 await page.waitForSelector('[data-testid="dog-card"]', { timeout: 10000 });
 
 // Czekanie na tekst
-await expect(page.locator('h1')).toContainText('Oczekiwany tekst');
+await expect(page.locator("h1")).toContainText("Oczekiwany tekst");
 
 // Czekanie na zniknięcie
-await expect(page.locator('.loading')).not.toBeVisible();
+await expect(page.locator(".loading")).not.toBeVisible();
 ```
 
 ### 4. **Obsługa asynchroniczności**
 
 ```typescript
 // Czekanie na API call
-await page.waitForResponse(response => 
-  response.url().includes('/api/shows') && response.status() === 200
+await page.waitForResponse(
+  (response) =>
+    response.url().includes("/api/shows") && response.status() === 200,
 );
 
 // Czekanie na timeout (ostateczność)
@@ -608,21 +637,25 @@ await page.waitForTimeout(2000);
 #### ✅ Testy przechodzące (7/7)
 
 **Nawigacja i dostępność:**
+
 - `niezalogowany użytkownik może przejść do strony głównej`
 - `niezalogowany użytkownik może przejść do strony logowania`
 - `niezalogowany użytkownik może przejść do strony rejestracji`
 
 **Przeglądanie list:**
+
 - `niezalogowany użytkownik może przeglądać listę wystaw`
 - `niezalogowany użytkownik może przeglądać listę psów`
 - `niezalogowany użytkownik może przeglądać listę właścicieli`
 
 **Bezpieczeństwo:**
+
 - `niezalogowany użytkownik nie może dodawać nowych elementów`
 
 #### 🔧 Dostosowania do rzeczywistych danych
 
 Testy są dostosowane do rzeczywistej zawartości bazy testowej:
+
 - **Wystawy**: 1 wystawa ("Wystawa Klubowa Hovawartów 2024")
 - **Psy**: 2 psy (sprawdzanie obecności elementów)
 - **Właściciele**: 1 właściciel (sprawdzanie obecności elementów)
@@ -630,6 +663,7 @@ Testy są dostosowane do rzeczywistej zawartości bazy testowej:
 ### 2. **Połączenie z chmurą**
 
 **Testy podstawowe:**
+
 - Sprawdzenie dostępności dashboardu
 - Weryfikacja połączenia z bazą chmurową
 
@@ -640,7 +674,7 @@ Testy są dostosowane do rzeczywistej zawartości bazy testowej:
 Plik `test-utils.ts` zawiera funkcje pomocnicze:
 
 ```typescript
-import { TestUtils } from './test-utils';
+import { TestUtils } from "./test-utils";
 
 // Sprawdzenie środowiska testowego
 TestUtils.logTestEnvironment();
@@ -683,7 +717,7 @@ await homePage.gotoLogin();
 
 ```typescript
 // ❌ Problem: element nie jest widoczny
-await expect(page.locator('.dog-card')).toBeVisible();
+await expect(page.locator(".dog-card")).toBeVisible();
 
 // ✅ Rozwiązanie: czekaj na załadowanie danych
 await TestUtils.waitForStableState(page);
@@ -718,26 +752,31 @@ supabase stop --config-file=supabase.test.toml
 ## Najlepsze praktyki
 
 ### 1. **Izolacja testów**
+
 - Każdy test powinien być niezależny
 - Używaj `test.beforeEach()` do resetowania stanu
 - Nie polegaj na kolejności testów
 
 ### 2. **Stabilność testów**
+
 - Czekaj na stabilny stan aplikacji
 - Używaj `TestUtils.waitForStableState()`
 - Dodaj timeouty dla wolniejszych operacji
 
 ### 3. **Czytelność testów**
+
 - Używaj opisowych nazw testów w języku polskim
 - Grupuj powiązane testy w `test.describe()`
 - Używaj Page Objects dla lepszej organizacji
 
 ### 4. **Obsługa błędów**
+
 - Używaj `TestUtils` do sprawdzania błędów
 - Rob zrzuty ekranu w przypadku niepowodzenia
 - Loguj informacje diagnostyczne
 
 ### 5. **Selektory testowe**
+
 - Używaj `data-testid` zamiast klas CSS
 - Dodawaj selektory wewnątrz komponentów
 - Aktualizuj centralne selektory w `selectors.ts`
@@ -745,32 +784,36 @@ supabase stop --config-file=supabase.test.toml
 ## Debugowanie testów
 
 ### 1. **Tryb debug**
+
 ```bash
 npm run test:e2e:debug
 ```
 
 ### 2. **Zrzuty ekranu**
+
 ```typescript
 // Automatyczny zrzut w przypadku błędu
-await page.screenshot({ path: 'debug-screenshot.png' });
+await page.screenshot({ path: "debug-screenshot.png" });
 
 // Zrzut przez Page Object
-await homePage.takeScreenshot('nazwa-testu');
+await homePage.takeScreenshot("nazwa-testu");
 ```
 
 ### 3. **Logowanie**
+
 ```typescript
 // Logowanie do konsoli
-console.log('Stan aplikacji:', await page.title());
+console.log("Stan aplikacji:", await page.title());
 
 // Logowanie do Playwright
 test.info().annotations.push({
-  type: 'info',
-  description: 'Wartość zmiennej: ' + value
+  type: "info",
+  description: "Wartość zmiennej: " + value,
 });
 ```
 
 ### 4. **Tryb headed**
+
 ```typescript
 // W playwright.config.ts
 use: {
@@ -812,18 +855,21 @@ use: {
 ## Planowane rozszerzenia
 
 ### Funkcjonalności podstawowe
+
 - [ ] `auth-flow.spec.ts` - pełne przepływy autoryzacji
 - [ ] `crud-operations.spec.ts` - operacje CRUD dla psów, wystaw, właścicieli
 - [ ] `form-validation.spec.ts` - walidacja formularzy
 - [ ] `navigation.spec.ts` - nawigacja między stronami
 
 ### Funkcjonalności zaawansowane
+
 - [ ] `evaluation-system.spec.ts` - system oceniania psów
 - [ ] `registration-flow.spec.ts` - przepływ rejestracji na wystawy
 - [ ] `statistics.spec.ts` - statystyki i raporty
 - [ ] `mobile-responsive.spec.ts` - responsywność na urządzeniach mobilnych
 
 ### Testy wydajnościowe
+
 - [ ] `performance.spec.ts` - czasy ładowania stron
 - [ ] `memory-leaks.spec.ts` - wycieki pamięci
 - [ ] `database-performance.spec.ts` - wydajność zapytań

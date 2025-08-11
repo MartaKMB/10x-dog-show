@@ -14,15 +14,15 @@ const ResetPasswordForm: React.FC = () => {
   const validate = (): boolean => {
     const newErrors: ValidationErrors = {};
     if (!password) {
-      newErrors.password = ["Hasło jest wymagane"]; 
+      newErrors.password = ["Hasło jest wymagane"];
     } else if (password.length < 8) {
-      newErrors.password = ["Hasło musi mieć co najmniej 8 znaków"]; 
+      newErrors.password = ["Hasło musi mieć co najmniej 8 znaków"];
     }
 
     if (!confirmPassword) {
-      newErrors.confirmPassword = ["Potwierdź hasło"]; 
+      newErrors.confirmPassword = ["Potwierdź hasło"];
     } else if (confirmPassword !== password) {
-      newErrors.confirmPassword = ["Hasła muszą być zgodne"]; 
+      newErrors.confirmPassword = ["Hasła muszą być zgodne"];
     }
 
     setErrors(newErrors);
@@ -49,7 +49,9 @@ const ResetPasswordForm: React.FC = () => {
 
   return (
     <div className="max-w-md mx-auto">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Ustaw nowe hasło</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">
+        Ustaw nowe hasło
+      </h1>
 
       {serverError && (
         <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800">
@@ -64,7 +66,10 @@ const ResetPasswordForm: React.FC = () => {
 
       <form onSubmit={onSubmit} className="space-y-4">
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Nowe hasło
           </label>
           <input
@@ -83,7 +88,10 @@ const ResetPasswordForm: React.FC = () => {
         </div>
 
         <div>
-          <label htmlFor="confirm_password" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="confirm_password"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Powtórz hasło
           </label>
           <input
@@ -97,7 +105,9 @@ const ResetPasswordForm: React.FC = () => {
             autoComplete="new-password"
           />
           {errors.confirmPassword && (
-            <p className="text-red-600 text-sm mt-1">{errors.confirmPassword[0]}</p>
+            <p className="text-red-600 text-sm mt-1">
+              {errors.confirmPassword[0]}
+            </p>
           )}
         </div>
 
@@ -112,5 +122,3 @@ const ResetPasswordForm: React.FC = () => {
 };
 
 export default ResetPasswordForm;
-
-

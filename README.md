@@ -72,14 +72,14 @@ The project supports both local and cloud testing environments:
 
 #### Test Scripts
 
-| Script                    | Description                                    |
-| ------------------------- | ---------------------------------------------- |
-| `npm run test:run`       | Run unit and integration tests                 |
-| `npm run test:watch`     | Run tests in watch mode                        |
-| `npm run test:coverage`  | Run tests with coverage report                 |
-| `npm run test:e2e:cloud` | Run e2e tests against cloud environment        |
-| `npm run test:e2e:ui`    | Run e2e tests with UI                          |
-| `npm run test:all`       | Run all tests (unit + e2e)                    |
+| Script                   | Description                             |
+| ------------------------ | --------------------------------------- |
+| `npm run test:run`       | Run unit and integration tests          |
+| `npm run test:watch`     | Run tests in watch mode                 |
+| `npm run test:coverage`  | Run tests with coverage report          |
+| `npm run test:e2e:cloud` | Run e2e tests against cloud environment |
+| `npm run test:e2e:ui`    | Run e2e tests with UI                   |
+| `npm run test:all`       | Run all tests (unit + e2e)              |
 
 ### External Services
 
@@ -118,12 +118,12 @@ The project supports both local and cloud testing environments:
    PUBLIC_SUPABASE_URL=your_supabase_url
    PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
    SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-   
+
    # Cloud Testing Environment (Optional)
    VITE_SUPABASE_URL_CLOUD=your_cloud_supabase_url
    VITE_SUPABASE_ANON_KEY_CLOUD=your_cloud_anon_key
    VITE_SUPABASE_SERVICE_ROLE_KEY_CLOUD=your_cloud_service_role_key
-   
+
    # Test Environment Selection
    TEST_ENVIRONMENT=local  # or 'cloud'
    ```
@@ -156,7 +156,7 @@ The project supports both local and cloud testing environments:
 | `npm run astro`    | Run Astro CLI commands               |
 | `npm run test`     | Run unit and integration tests       |
 | `npm run test:e2e` | Run end-to-end tests with Playwright |
-| `npm run test:ui`  | Run tests with Vitest UI              |
+| `npm run test:ui`  | Run tests with Vitest UI             |
 
 ## 🎯 Project Scope
 

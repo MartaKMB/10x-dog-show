@@ -24,13 +24,15 @@ const { showId } = Astro.params;
     </div>
 
     {/* Preview banner for guests */}
-    { /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */ }
-    { /* @ts-ignore Astro typing */ }
-    { !Astro.locals.auth?.user && (
-      <div class="bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-4">
-        To jest tryb podglądu. Zaloguj się, aby edytować dane wystawy i listę psów.
-      </div>
-    ) }
+    {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+    {/* @ts-ignore Astro typing */}
+    {
+      !Astro.locals.auth?.user && (
+        <div class="bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-4">
+          To jest tryb podglądu. Zaloguj się, aby edytować dane wystawy i listę psów.
+        </div>
+      )
+    }
 
     <!-- Show Details -->
     <div class="bg-white shadow rounded-lg">

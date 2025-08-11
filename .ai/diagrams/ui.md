@@ -1,5 +1,7 @@
 <architecture_analysis>
-1) Komponenty (wg PRD i spec):
+
+1. Komponenty (wg PRD i spec):
+
 - Strony: "Strona Logowania", "Strona Rejestracji",
   "Przypomnienie Hasła", "Reset Hasła".
 - Layout: `src/layouts/Layout.astro` (nagłówek z Login/Logout,
@@ -17,29 +19,32 @@
 - API (Astro): Auth: Login/Logout/Register/ResetRequest/Me (nowe),
   istniejące: Users/Shows/Dogs/Owners.
 
-2) Główne strony i komponenty:
+2. Główne strony i komponenty:
+
 - Layout + Nawigacja (Login/Logout).
 - Strony auth montujące odpowiednie formularze React.
 - Strony publiczne przekazujące `isAuthenticated`, `userRole` do
   komponentów edycyjnych i stosujące `AuthGuard`/`PermissionDenied`.
 
-3) Przepływ danych:
+3. Przepływ danych:
+
 - Formularze auth -> `supabase-js` (client-first) lub API (SSR-first).
 - Middleware (SSR) wypełnia `locals.auth`; Layout i strony czytają
   stan i renderują odpowiedni UI.
 - Strony publiczne korzystają z API domenowych (shows/dogs/owners),
   a akcje edycyjne są chronione przez `AuthGuard` i stan sesji.
 
-4) Opisy funkcjonalności:
+4. Opisy funkcjonalności:
+
 - `LoginForm`/`RegisterForm`/`ForgotPasswordForm`/`ResetPasswordForm`:
   walidacja Zod, obsługa błędów UX, integracja auth.
 - `AuthGuard`: defensywna ochrona akcji edycyjnych.
 - `Layout.astro`: przełącznik Login/Logout, pokazuje użytkownika.
 - `middleware` + `supabase.server`: spójna sesja SSR dla UI.
-</architecture_analysis>
-
+  </architecture_analysis>
 
 <mermaid_diagram>
+
 ```mermaid
 flowchart TD
 
@@ -141,4 +146,5 @@ NAV -- "stan sesji" --> LAYOUT
 classDef new fill:#DFF7DF,stroke:#2E7D32,stroke-width:1px;
 classDef updated fill:#FFF4E5,stroke:#E65100,stroke-width:1px;
 ```
+
 </mermaid_diagram>

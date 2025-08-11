@@ -87,6 +87,7 @@ Przy każdej ścieżce uwzględnić testy: happy-path, walidacje, uprawnienia, b
 - Raportowanie: JUnit/HTML reporter dla CI, coverage lcov.
 
 Zasady dla testów jednostkowych (wyciąg):
+
 - Struktura `describe/test`, setup/teardown `beforeEach/afterEach`, unikać nadmiernych snapshotów, używać precyzyjnych matcherów, mockować IO i czas, raportować coverage z sensownymi celami.
 
 ### 7. Harmonogram testów
@@ -113,5 +114,3 @@ Zasady dla testów jednostkowych (wyciąg):
 
 - Przegląd co sprint/release; aktualizacja scenariuszy wraz ze zmianami PRD (`.ai/prd-hov.md`) i specyfikacji auth (`.ai/auth-spec.md`).
 - Dodawanie testów przy każdej nowej funkcjonalności, w szczególności w obszarach wysokiego ryzyka (auth, zapisy, agregacje statystyczne).
-
-

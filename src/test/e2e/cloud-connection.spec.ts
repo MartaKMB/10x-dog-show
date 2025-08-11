@@ -43,7 +43,7 @@ test.describe("Cloud Connection Tests", () => {
     // Sprawdzenie czy dashboard się załadował
     const h1Element = page.locator("h1").first();
     await expect(h1Element).toBeVisible();
-    
+
     const titleText = await h1Element.textContent();
     console.log(`📄 Dashboard title: ${titleText}`);
 
