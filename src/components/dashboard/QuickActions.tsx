@@ -53,7 +53,10 @@ const QuickActions: React.FC<QuickActionsProps> = ({ userRole }) => {
   });
 
   return (
-    <div className="bg-white shadow rounded-lg p-6">
+    <div
+      className="bg-white shadow rounded-lg p-6"
+      data-testid="quick-actions-container"
+    >
       <h2 className="text-lg font-semibold text-gray-900 mb-4">
         Szybkie akcje
       </h2>
@@ -63,10 +66,21 @@ const QuickActions: React.FC<QuickActionsProps> = ({ userRole }) => {
             key={action.id}
             href={action.href}
             className={`${action.color} text-white p-4 rounded-lg text-center transition-colors hover:shadow-md`}
+            data-testid={`quick-action-${action.id}`}
           >
             <div className="text-2xl mb-2">{action.icon}</div>
-            <div className="font-medium text-sm">{action.title}</div>
-            <div className="text-xs opacity-90 mt-1">{action.description}</div>
+            <div
+              className="font-medium text-sm"
+              data-testid={`quick-action-title-${action.id}`}
+            >
+              {action.title}
+            </div>
+            <div
+              className="text-xs opacity-90 mt-1"
+              data-testid={`quick-action-description-${action.id}`}
+            >
+              {action.description}
+            </div>
           </a>
         ))}
       </div>

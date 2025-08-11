@@ -44,7 +44,10 @@ const RecentShows: React.FC<RecentShowsProps> = ({
 
   if (isLoading) {
     return (
-      <div className="bg-white shadow rounded-lg p-6">
+      <div
+        className="bg-white shadow rounded-lg p-6"
+        data-testid="recent-shows-loading"
+      >
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
           Ostatnie wystawy
         </h2>
@@ -68,7 +71,10 @@ const RecentShows: React.FC<RecentShowsProps> = ({
 
   if (filteredShows.length === 0) {
     return (
-      <div className="bg-white shadow rounded-lg p-6">
+      <div
+        className="bg-white shadow rounded-lg p-6"
+        data-testid="recent-shows-empty"
+      >
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
           Ostatnie wystawy
         </h2>
@@ -86,7 +92,10 @@ const RecentShows: React.FC<RecentShowsProps> = ({
   }
 
   return (
-    <div className="bg-white shadow rounded-lg p-6">
+    <div
+      className="bg-white shadow rounded-lg p-6"
+      data-testid="recent-shows-container"
+    >
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-gray-900">
           Ostatnie wystawy
@@ -94,6 +103,7 @@ const RecentShows: React.FC<RecentShowsProps> = ({
         <a
           href="/shows"
           className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+          data-testid="recent-shows-view-all-link"
         >
           Zobacz wszystkie →
         </a>
@@ -110,22 +120,36 @@ const RecentShows: React.FC<RecentShowsProps> = ({
                 onShowClick?.(show.id);
               }
             }}
+            data-testid={`recent-show-card-${show.id}`}
           >
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <h3 className="font-medium text-gray-900 mb-1">{show.name}</h3>
-                <p className="text-sm text-gray-600 mb-2">
+                <h3
+                  className="font-medium text-gray-900 mb-1"
+                  data-testid={`recent-show-name-${show.id}`}
+                >
+                  {show.name}
+                </h3>
+                <p
+                  className="text-sm text-gray-600 mb-2"
+                  data-testid={`recent-show-details-${show.id}`}
+                >
                   {formatDate(show.show_date)} • {show.location}
                 </p>
                 <div className="flex items-center space-x-4 text-xs text-gray-500">
-                  <span>Sędzia: {show.judge_name}</span>
-                  <span>Psy: {show.registered_dogs}</span>
+                  <span data-testid={`recent-show-judge-${show.id}`}>
+                    Sędzia: {show.judge_name}
+                  </span>
+                  <span data-testid={`recent-show-dogs-${show.id}`}>
+                    Psy: {show.registered_dogs}
+                  </span>
                 </div>
               </div>
               <span
                 className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
                   show.status,
                 )}`}
+                data-testid={`recent-show-status-${show.id}`}
               >
                 {getStatusLabel(show.status)}
               </span>

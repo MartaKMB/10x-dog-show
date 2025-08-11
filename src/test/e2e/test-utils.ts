@@ -20,6 +20,39 @@ export const TestUtils = {
   },
 
   /**
+   * Sprawdza czy testy są uruchamiane w dedykowanym środowisku testowym
+   */
+  isTestEnvironment(): boolean {
+    return this.getTestEnvironment() === "test";
+  },
+
+  /**
+   * Pobiera dane testowego użytkownika
+   */
+  getTestUserCredentials() {
+    return {
+      email: process.env.TEST_USER_EMAIL || "test@example.com",
+      password: process.env.TEST_USER_PASSWORD || "testpassword123",
+      id: process.env.TEST_USER_ID || "00000000-0000-0000-0000-000000000001",
+    };
+  },
+
+  /**
+   * Pobiera ID testowych danych
+   */
+  getTestDataIds() {
+    return {
+      showId:
+        process.env.TEST_SHOW_ID || "550e8400-e29b-41d4-a716-446655440001",
+      dogId: process.env.TEST_DOG_ID || "550e8400-e29b-41d4-a716-446655440002",
+      judgeId:
+        process.env.TEST_JUDGE_ID || "550e8400-e29b-41d4-a716-446655440003",
+      secretaryId:
+        process.env.TEST_SECRETARY_ID || "00000000-0000-0000-0000-000000000001",
+    };
+  },
+
+  /**
    * Czeka na załadowanie strony i sprawdza połączenie z chmurą
    */
   async waitForCloudConnection(page: Page): Promise<void> {
@@ -76,13 +109,13 @@ export const TestUtils = {
     console.log("🧪 Test Environment Info:");
     console.log(`📍 Environment: ${env}`);
     console.log(`📍 NODE_ENV: ${process.env.NODE_ENV}`);
-    console.log(
-      `📍 SUPABASE_URL_CLOUD: ${process.env.VITE_SUPABASE_URL_CLOUD}`,
-    );
+    console.log(`📍 SUPABASE_URL: ${process.env.SUPABASE_URL}`);
     console.log(`📍 TEST_BASE_URL: ${process.env.TEST_BASE_URL}`);
 
     if (env === "cloud") {
       console.log("☁️  Using Supabase cloud for testing");
+    } else if (env === "test") {
+      console.log("🧪 Using dedicated test database");
     } else {
       console.log("🏠 Using local development environment");
     }
@@ -136,5 +169,27 @@ export const TestUtils = {
     const filename = `${name}-${timestamp}.png`;
     await page.screenshot({ path: `test-results/${filename}` });
     console.log(`📸 Screenshot saved: ${filename}`);
+  },
+
+  /**
+   * Sprawdza czy aplikacja jest w trybie testowym
+   */
+  isTestMode(): boolean {
+    return (
+      process.env.NODE_ENV === "test" || process.env.TEST_ENVIRONMENT === "test"
+    );
+  },
+
+  /**
+   * Czeka na stabilny stan aplikacji (dla testów)
+   */
+  async waitForStableState(page: Page): Promise<void> {
+    // Czeka na załadowanie
+    await page.waitForLoadState("networkidle");
+
+    // Dodatkowe opóźnienie dla testów
+    if (this.isTestMode()) {
+      await page.waitForTimeout(1000);
+    }
   },
 };
