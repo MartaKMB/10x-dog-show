@@ -1,0 +1,56 @@
+# Test Environment Supabase Configuration
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54323
+shadow_port = 54324
+major_version = 15
+
+[db.pooler]
+enabled = false
+port = 54325
+pool_mode = "transaction"
+default_pool_size = 15
+
+[realtime]
+enabled = false
+port = 54326
+
+[studio]
+enabled = false
+port = 54327
+external_url = "http://127.0.0.1:54327"
+
+[inbucket]
+enabled = false
+port = 54328
+smtp_port = 54329
+pop3_port = 54330
+
+[storage]
+enabled = false
+port = 54331
+file_size_limit = "50MiB"
+
+[auth]
+enabled = true
+port = 54332
+site_url = "http://127.0.0.1:3000"
+additional_redirect_urls = ["https://127.0.0.1:3000"]
+jwt_expiry = 3600
+refresh_token_rotation_enabled = true
+security_update_password_require_reauthentication = true
+
+[edge_functions]
+enabled = false
+port = 54333
+
+[analytics]
+enabled = false
+port = 54334
+vector_port = 54335

@@ -39,6 +39,13 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"] },
     },
     {
+      name: "test",
+      use: {
+        ...devices["Desktop Chrome"],
+        baseURL: process.env.TEST_BASE_URL || "http://localhost:3000",
+      },
+    },
+    {
       name: "cloud",
       use: {
         ...devices["Desktop Chrome"],

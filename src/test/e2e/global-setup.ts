@@ -12,6 +12,10 @@ async function globalSetup(config: FullConfig) {
   if (testEnvironment === "cloud") {
     console.log("☁️  Using Supabase cloud for testing");
     console.log(`🔗 Cloud URL: ${process.env.VITE_SUPABASE_URL_CLOUD}`);
+  } else if (testEnvironment === "test") {
+    console.log("🧪 Using dedicated test database");
+    console.log(`🔗 Test DB URL: ${process.env.SUPABASE_URL}`);
+    console.log(`🔗 Test DB Port: ${process.env.SUPABASE_DB_PORT}`);
   } else {
     console.log("🏠 Using local development environment");
   }
