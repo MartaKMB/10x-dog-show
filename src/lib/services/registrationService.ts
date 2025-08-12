@@ -9,7 +9,6 @@ import type {
   PaginatedResponseDto,
   DogClass,
   DogGender,
-  FCIGroup,
   ShowStatus,
 } from "../../types";
 
@@ -504,7 +503,7 @@ export class RegistrationService {
   // =============================================================================
 
   private validateShowAcceptsRegistrations(status: ShowStatus): void {
-    if (status !== "draft" && status !== "open_for_registration") {
+    if (status !== "draft") {
       throw new Error(
         "BUSINESS_RULE_ERROR: Show is not accepting registrations",
       );
@@ -512,9 +511,9 @@ export class RegistrationService {
   }
 
   private validateShowEditable(status: ShowStatus, action: string): void {
-    if (status === "in_progress" || status === "completed") {
+    if (status === "completed") {
       throw new Error(
-        `BUSINESS_RULE_ERROR: Cannot ${action} for started shows`,
+        `BUSINESS_RULE_ERROR: Cannot ${action} for completed shows`,
       );
     }
   }
@@ -597,7 +596,6 @@ export class RegistrationService {
       total_registrations: registrations.length,
       by_class: {} as Record<DogClass, number>,
       by_gender: {} as Record<DogGender, number>,
-      by_breed_group: {} as Record<FCIGroup, number>,
     };
 
     registrations.forEach((reg) => {
@@ -609,13 +607,6 @@ export class RegistrationService {
       if (gender) {
         stats.by_gender[gender] = (stats.by_gender[gender] || 0) + 1;
       }
-
-      // Grupa FCI - removed for Hovawart Club MVP (only Hovawarts)
-      // const fciGroup = reg.dog?.breed?.fci_group;
-      // if (fciGroup) {
-      //   stats.by_breed_group[fciGroup] =
-      //     (stats.by_breed_group[fciGroup] || 0) + 1;
-      // }
     });
 
     return stats;

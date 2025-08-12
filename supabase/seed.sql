@@ -65,7 +65,7 @@ ON CONFLICT (dog_id, owner_id) DO NOTHING;
 -- =============================================================================
 
 INSERT INTO public.shows (name, status, show_date, registration_deadline, location, judge_name, description, max_participants) VALUES
-('Wystawa Klubowa Hovawartów 2024', 'open_for_registration', '2024-06-15', '2024-06-01', 'Warszawa, ul. Wystawowa 1', 'dr Jan Sędzia', 'Doroczna wystawa klubowa hovawartów', 100),
+('Wystawa Klubowa Hovawartów 2024', 'draft', '2024-06-15', '2024-06-01', 'Warszawa, ul. Wystawowa 1', 'dr Jan Sędzia', 'Doroczna wystawa klubowa hovawartów', 100),
 ('Wystawa Klubowa Hovawartów 2024 - Jesień', 'draft', '2024-09-20', '2024-09-10', 'Kraków, ul. Wystawowa 5', 'dr Anna Sędzia', 'Jesienna wystawa klubowa hovawartów', 80),
 ('Wystawa Klubowa Hovawartów 2023', 'completed', '2023-06-10', '2023-06-01', 'Poznań, ul. Wystawowa 10', 'dr Piotr Sędzia', 'Doroczna wystawa klubowa hovawartów 2023', 120);
 
@@ -74,7 +74,7 @@ INSERT INTO public.shows (name, status, show_date, registration_deadline, locati
 -- =============================================================================
 
 INSERT INTO public.show_registrations (show_id, dog_id, dog_class, catalog_number) VALUES
--- Registrations for the first show (Warszawa 2024)
+-- Registrations for the first show (Warszawa 2024) - draft status
 ((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2024' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawart z Przykładu' LIMIT 1), 'open', 1),
 ((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2024' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawartka z Przykładu' LIMIT 1), 'open', 2),
 ((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2024' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawart Max' LIMIT 1), 'champion', 3),
@@ -116,7 +116,7 @@ ON CONFLICT (show_id, dog_id) DO NOTHING;
 -- - 5 owners with GDPR consent
 -- - 10 hovawart dogs with various ages and genders
 -- - 10 dog-owner relationships
--- - 3 shows (different statuses: draft, open_for_registration, completed)
+-- - 3 shows (different statuses: draft, draft, completed)
 -- - 15 show registrations (10 for Warszawa, 2 for Kraków, 3 for Poznań)
 -- - 3 evaluations for the completed show
 -- ============================================================================= 

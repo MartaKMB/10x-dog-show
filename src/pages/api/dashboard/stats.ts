@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { supabaseClient } from "../../../db/supabase.client";
+import { supabaseServerClient } from "../../../db/supabase.server";
 import type { ErrorResponseDto } from "../../../types";
 
 interface DashboardStats {
@@ -11,7 +11,7 @@ interface DashboardStats {
 export const GET: APIRoute = async () => {
   try {
     // Get total shows
-    const { count: totalShows, error: showsError } = await supabaseClient
+    const { count: totalShows, error: showsError } = await supabaseServerClient
       .from("shows")
       .select("*", { count: "exact", head: true })
       .is("deleted_at", null);
@@ -20,7 +20,7 @@ export const GET: APIRoute = async () => {
 
     // Get completed shows
     const { count: completedShows, error: completedShowsError } =
-      await supabaseClient
+      await supabaseServerClient
         .from("shows")
         .select("*", { count: "exact", head: true })
         .is("deleted_at", null)
@@ -29,7 +29,7 @@ export const GET: APIRoute = async () => {
     if (completedShowsError) throw completedShowsError;
 
     // Get total dogs
-    const { count: totalDogs, error: dogsError } = await supabaseClient
+    const { count: totalDogs, error: dogsError } = await supabaseServerClient
       .from("dogs")
       .select("*", { count: "exact", head: true })
       .is("deleted_at", null);

@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { supabaseClient } from "../../../db/supabase.client";
+import { supabaseServerClient } from "../../../db/supabase.server";
 import type { ErrorResponseDto } from "../../../types";
 
 // Schema dla aktualizacji użytkownika
@@ -31,7 +31,7 @@ export const GET: APIRoute = async ({ params }) => {
       );
     }
 
-    const { data: user, error } = await supabaseClient
+    const { data: user, error } = await supabaseServerClient
       .from("users")
       .select("*")
       .eq("id", id)
@@ -108,7 +108,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
     const validatedData = updateUserSchema.parse(body);
 
     // Sprawdź czy użytkownik istnieje
-    const { data: existingUser } = await supabaseClient
+    const { data: existingUser } = await supabaseServerClient
       .from("users")
       .select("id")
       .eq("id", id)
@@ -214,7 +214,7 @@ export const DELETE: APIRoute = async ({ params }) => {
     }
 
     // Soft delete - oznacz jako usunięty
-    const { error } = await supabaseClient
+    const { error } = await supabaseServerClient
       .from("users")
       .update({ deleted_at: new Date().toISOString() })
       .eq("id", id);

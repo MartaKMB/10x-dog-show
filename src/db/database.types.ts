@@ -406,13 +406,7 @@ export type Database = {
         | "zdyskwalifikowana"
         | "nieobecna";
       placement: "1st" | "2nd" | "3rd" | "4th";
-      show_status:
-        | "draft"
-        | "open_for_registration"
-        | "registration_closed"
-        | "in_progress"
-        | "completed"
-        | "cancelled";
+      show_status: "draft" | "completed";
       user_role: "club_board";
     };
     CompositeTypes: {
@@ -566,14 +560,7 @@ export const Constants = {
         "nieobecna",
       ],
       placement: ["1st", "2nd", "3rd", "4th"],
-      show_status: [
-        "draft",
-        "open_for_registration",
-        "registration_closed",
-        "in_progress",
-        "completed",
-        "cancelled",
-      ],
+      show_status: ["draft", "completed"],
       user_role: ["club_board"],
     },
   },

@@ -5,7 +5,7 @@ import {
   createEvaluationSchema,
   evaluationQuerySchema,
 } from "../../../../../lib/validation/evaluationSchemas";
-import { supabaseClient } from "../../../../../db/supabase.client";
+import { supabaseServerClient } from "../../../../../db/supabase.server";
 import type { ErrorResponseDto } from "../../../../../types";
 
 export const GET: APIRoute = async ({ params, request }) => {
@@ -46,7 +46,7 @@ export const GET: APIRoute = async ({ params, request }) => {
     const validatedParams = evaluationQuerySchema.parse(queryParams);
 
     // Get evaluations using service
-    const evaluationService = new EvaluationService(supabaseClient);
+    const evaluationService = new EvaluationService(supabaseServerClient);
     const evaluations = await evaluationService.getEvaluations(
       showId,
       validatedParams,
@@ -155,7 +155,7 @@ export const POST: APIRoute = async ({ params, request }) => {
     const validatedData = createEvaluationSchema.parse(body);
 
     // Create evaluation using service
-    const evaluationService = new EvaluationService(supabaseClient);
+    const evaluationService = new EvaluationService(supabaseServerClient);
     const evaluation = await evaluationService.create(showId, validatedData);
 
     return new Response(JSON.stringify(evaluation), {

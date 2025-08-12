@@ -1,5 +1,6 @@
 import type { AstroCookies } from "astro";
 import { createServerClient, type CookieOptionsWithName } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./database.types";
 
 export const cookieOptions: CookieOptionsWithName = {
@@ -44,3 +45,34 @@ export const createSupabaseServerInstance = (context: {
 
   return supabase;
 };
+
+// New client for API routes that doesn't require auth in local development
+const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_KEY;
+
+// Check if we're in local development environment
+const isLocalDevelopment =
+  supabaseUrl?.includes("127.0.0.1") || supabaseUrl?.includes("localhost");
+
+export const supabaseServerClient = createClient<Database>(
+  supabaseUrl,
+  supabaseAnonKey,
+  {
+    // In local development, disable auth completely for server-side API calls
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+      detectSessionInUrl: false,
+    },
+    // In local development, use empty headers to avoid auth issues
+    global: {
+      headers: isLocalDevelopment ? {} : undefined,
+    },
+    // In local development, don't require any auth
+    db: {
+      schema: "public",
+    },
+  },
+);
+
+export type { Database } from "./database.types";

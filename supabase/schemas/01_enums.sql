@@ -8,8 +8,8 @@
 -- simplified user role (only club board)
 create type public.user_role as enum ('club_board');
 
--- show statuses
-create type public.show_status as enum ('draft', 'open_for_registration', 'registration_closed', 'in_progress', 'completed', 'cancelled');
+-- show statuses (simplified for Hovawart MVP)
+create type public.show_status as enum ('draft', 'completed');
 
 -- dog gender
 create type public.dog_gender as enum ('male', 'female');

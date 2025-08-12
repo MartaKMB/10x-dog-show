@@ -13,13 +13,13 @@ export async function checkDescriptionPermissions(
   userRole: UserRole,
 ): Promise<PermissionCheck> {
   try {
-    // Sprawdź uprawnienia użytkownika
-    if (userRole !== "secretary") {
+    // Sprawdź uprawnienia użytkownika - tylko club_board może edytować
+    if (userRole !== "club_board") {
       return {
         canEdit: false,
         canFinalize: false,
         showStatus: "completed",
-        reason: "Tylko sekretarze mogą edytować opisy",
+        reason: "Tylko członkowie zarządu klubu mogą edytować opisy",
       };
     }
 
@@ -31,47 +31,18 @@ export async function checkDescriptionPermissions(
 
     const show = await showResponse.json();
 
-    if (show.status === "completed" || show.status === "cancelled") {
+    if (show.status === "completed") {
       return {
         canEdit: false,
         canFinalize: false,
         showStatus: show.status,
-        reason: "Wystawa została zakończona lub anulowana",
+        reason: "Wystawa została zakończona",
       };
     }
 
-    // Sprawdź czy sekretarz ma uprawnienia do rasy psa na tej wystawie
-    const dogResponse = await fetch(`/api/dogs/${dogId}`);
-    if (!dogResponse.ok) {
-      throw new Error("Nie można pobrać informacji o psie");
-    }
-
-    const dog = await dogResponse.json();
-
-    // Sprawdź uprawnienia sekretarza do rasy
-    const permissionsResponse = await fetch(`/api/shows/${showId}/permissions`);
-    if (!permissionsResponse.ok) {
-      throw new Error("Nie można sprawdzić uprawnień");
-    }
-
-    const permissions = await permissionsResponse.json();
-
-    const hasBreedPermission = permissions.allowed_breeds?.includes(
-      dog.breed.id,
-    );
-
-    if (!hasBreedPermission) {
-      return {
-        canEdit: false,
-        canFinalize: false,
-        showStatus: show.status,
-        reason:
-          "Nie masz uprawnień do edycji opisów dla tej rasy psów na tej wystawie",
-      };
-    }
-
+    // Dla MVP Hovawart Club - wszystkie psy to Hovawarty, więc nie ma potrzeby sprawdzania rasy
     // Sprawdź czy można finalizować (wystawa w trakcie)
-    const canFinalize = show.status === "in_progress";
+    const canFinalize = show.status === "draft";
 
     return {
       canEdit: true,
@@ -100,14 +71,49 @@ export async function checkShowStatus(showId: string): Promise<ShowStatus> {
     return show.status;
   } catch (error) {
     console.error("Error checking show status:", error);
-    return "completed"; // Domyślnie zakończona jeśli błąd
+    return "completed";
   }
 }
 
-export function isShowEditable(status: ShowStatus): boolean {
-  return status === "in_progress" || status === "open_for_registration";
+export async function isShowEditable(showId: string): Promise<boolean> {
+  try {
+    const status = await checkShowStatus(showId);
+    return status === "draft";
+  } catch (error) {
+    console.error("Error checking if show is editable:", error);
+    return false;
+  }
 }
 
-export function isShowCompleted(status: ShowStatus): boolean {
-  return status === "completed" || status === "cancelled";
+export async function canUserEditShow(
+  showId: string,
+  userRole: UserRole,
+): Promise<boolean> {
+  try {
+    if (userRole !== "club_board") {
+      return false;
+    }
+
+    return await isShowEditable(showId);
+  } catch (error) {
+    console.error("Error checking user edit permissions:", error);
+    return false;
+  }
+}
+
+export async function canUserDeleteShow(
+  showId: string,
+  userRole: UserRole,
+): Promise<boolean> {
+  try {
+    if (userRole !== "club_board") {
+      return false;
+    }
+
+    const status = await checkShowStatus(showId);
+    return status === "draft";
+  } catch (error) {
+    console.error("Error checking user delete permissions:", error);
+    return false;
+  }
 }

@@ -286,7 +286,7 @@ export class EvaluationService {
       throw new Error("NOT_FOUND: Show not found");
     }
 
-    if (show.status === "draft" || show.status === "open_for_registration") {
+    if (show.status === "draft") {
       throw new Error(
         "BUSINESS_RULE_ERROR: Cannot create evaluations for shows that are not in progress or completed",
       );

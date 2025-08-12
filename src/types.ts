@@ -41,22 +41,6 @@ export type BabyPuppyGrade = Enums<"baby_puppy_grade">;
 export type ClubTitle = Enums<"club_title">;
 export type Placement = Enums<"placement">;
 
-// Legacy enum types for backward compatibility
-export type ShowType = "national" | "international";
-export type FCIGroup =
-  | "G1"
-  | "G2"
-  | "G3"
-  | "G4"
-  | "G5"
-  | "G6"
-  | "G7"
-  | "G8"
-  | "G9"
-  | "G10";
-export type Language = "pl" | "en";
-export type TitleType = "CWC" | "CACIB" | "res_CWC" | "res_CACIB";
-
 // =============================================================================
 // COMMON DTO TYPES
 // =============================================================================
@@ -462,18 +446,11 @@ export interface DescriptionResponseDto {
     id: string;
     name: string;
     show_date: string;
-    show_type: ShowType;
     status: ShowStatus;
   };
   dog: {
     id: string;
     name: string;
-    breed: {
-      id: string;
-      name_pl: string;
-      name_en: string;
-      fci_group: FCIGroup;
-    };
     gender: DogGender;
     birth_date: string;
     microchip_number: string;
@@ -527,7 +504,6 @@ export interface DescriptionQueryParams {
   judge_id?: string;
   secretary_id?: string;
   is_final?: boolean;
-  language?: Language;
   page?: number;
   limit?: number;
 }
@@ -570,7 +546,6 @@ export interface RegistrationStats {
   total_registrations: number;
   by_class: Record<DogClass, number>;
   by_gender: Record<DogGender, number>;
-  by_breed_group: Record<FCIGroup, number>;
 }
 
 export interface EvaluationStats {
@@ -608,9 +583,7 @@ export interface Judge {
   deleted_at: string | null;
 }
 
-export interface JudgeResponseDto extends Judge {
-  specializations: FCIGroup[];
-}
+// JudgeResponseDto removed - no specializations needed for Hovawart Club MVP
 
 // =============================================================================
 // BRANCHES DTOs (Legacy support)
@@ -703,22 +676,7 @@ export interface DogHistoryQueryParams {
   limit?: number;
 }
 
-// Legacy query params for backward compatibility
-export interface BreedQueryParams {
-  fci_group?: FCIGroup;
-  is_active?: boolean;
-  search?: string;
-  page?: number;
-  limit?: number;
-}
-
-export interface JudgeQueryParams {
-  fci_group?: FCIGroup;
-  is_active?: boolean;
-  search?: string;
-  page?: number;
-  limit?: number;
-}
+// Legacy query params removed - not needed for Hovawart Club MVP
 
 // =============================================================================
 // COMMAND MODELS - Business Logic Commands
@@ -875,7 +833,6 @@ export interface FilterState {
   search?: string;
   gender?: DogGender;
   breedId?: string;
-  fciGroup?: FCIGroup;
 }
 
 export interface DogCardViewModel {
@@ -921,13 +878,13 @@ export interface DogsListViewModel {
 }
 
 export interface HierarchyNode {
-  type: "fci_group" | "breed" | "class" | "dog";
+  type: "class" | "dog";
   id: string;
   name: string;
   children: HierarchyNode[];
   isExpanded: boolean;
   count: number;
-  data?: DogResponseDto | FCIGroup | DogClass;
+  data?: DogResponseDto | DogClass;
 }
 
 export interface DogsFilterState {

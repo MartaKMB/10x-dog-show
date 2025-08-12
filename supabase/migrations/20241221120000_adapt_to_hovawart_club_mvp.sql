@@ -1,71 +1,27 @@
 -- =============================================================================
--- Migration: Adapt Database to Hovawart Club Show MVP
+-- Migration: Create Hovawart Club Show MVP Database
 -- =============================================================================
--- Purpose: Transform existing multi-breed system to simplified Hovawart Club MVP
--- Affected: All tables, enums, functions, triggers, and RLS policies
+-- Purpose: Create simplified database schema for Hovawart Club Show MVP
+-- Affected: Creates all tables, enums, functions, triggers, and RLS policies
 -- Author: System Migration
 -- Date: 2024-12-21
 -- Special Considerations: 
--- - Removes FCI groups and multi-breed support
--- - Simplifies to single breed (Hovawart only)
--- - Removes multi-language support (Polish only)
--- - Simplifies user roles to 'club_board' only
--- - Removes description system (phase 2 feature)
--- - Adds Hovawart-specific club titles
--- - Moves everything to public schema
--- - Removes complex audit system
+-- - Single breed system (Hovawart only)
+-- - Polish language only
+-- - Single user role (club_board)
+-- - Club shows only (no international/national)
+-- - Simplified structure for MVP
 -- =============================================================================
 
 -- =============================================================================
--- 1. DROP EXISTING COMPLEX STRUCTURES
--- =============================================================================
-
--- drop complex audit tables and functions
-drop trigger if exists audit_shows_trigger on dog_shows.shows;
-drop trigger if exists audit_dogs_trigger on dog_shows.dogs;
-drop trigger if exists audit_owners_trigger on dog_shows.owners;
-drop trigger if exists audit_descriptions_trigger on dog_shows.descriptions;
-drop trigger if exists create_description_version_trigger on dog_shows.descriptions;
-
-drop function if exists audit.log_activity();
-drop function if exists dog_shows.create_description_version();
-
--- drop complex tables that are not needed for MVP
-drop table if exists dog_shows.pdf_documents cascade;
-drop table if exists dog_shows.description_versions cascade;
-drop table if exists dog_shows.descriptions cascade;
-drop table if exists dog_shows.secretary_assignments cascade;
-drop table if exists dog_shows.show_judge_assignments cascade;
-drop table if exists audit.gdpr_requests cascade;
-drop table if exists audit.data_retention_schedule cascade;
-drop table if exists audit.activity_log cascade;
-drop table if exists dictionary.judge_specializations cascade;
-drop table if exists dictionary.judges cascade;
-drop table if exists dictionary.breeds cascade;
-drop table if exists dictionary.branches cascade;
-
--- drop complex enums
-drop type if exists audit.action_type cascade;
-drop type if exists audit.entity_type cascade;
-drop type if exists dog_shows.title_type cascade;
-drop type if exists dog_shows.fci_group cascade;
-drop type if exists dog_shows.show_type cascade;
-drop type if exists dog_shows.language cascade;
-
--- drop schemas
-drop schema if exists audit cascade;
-drop schema if exists dictionary cascade;
-drop schema if exists dog_shows cascade;
-
--- =============================================================================
--- 2. CREATE NEW SIMPLIFIED ENUMS
+-- 1. CREATE NEW SIMPLIFIED ENUMS
 -- =============================================================================
 
 -- simplified user role (only club board)
 create type public.user_role as enum ('club_board');
 
--- show statuses
-create type public.show_status as enum ('draft', 'open_for_registration', 'registration_closed', 'in_progress', 'completed', 'cancelled');
+-- show statuses (simplified for Hovawart MVP)
+create type public.show_status as enum ('draft', 'completed');
 
 -- dog gender
 create type public.dog_gender as enum ('male', 'female');
@@ -98,7 +54,7 @@ create type public.club_title as enum (
 create type public.placement as enum ('1st', '2nd', '3rd', '4th');
 
 -- =============================================================================
--- 3. CREATE SIMPLIFIED TABLES
+-- 2. CREATE SIMPLIFIED TABLES
 -- =============================================================================
 
 -- users table (club board members)
@@ -233,7 +189,7 @@ create table public.evaluations (
 comment on table public.evaluations is 'Oceny psów z wystaw klubowych z tytułami klubowymi';
 
 -- =============================================================================
--- 4. CREATE PERFORMANCE INDEXES
+-- 3. CREATE PERFORMANCE INDEXES
 -- =============================================================================
 
 -- basic indexes for users
@@ -270,7 +226,7 @@ create index idx_dog_owners_owner on public.dog_owners(owner_id);
 create index idx_dog_owners_primary on public.dog_owners(owner_id, is_primary) where is_primary = true;
 
 -- =============================================================================
--- 5. CREATE HELPER FUNCTIONS
+-- 4. CREATE HELPER FUNCTIONS
 -- =============================================================================
 
 -- function to generate catalog numbers
@@ -318,32 +274,32 @@ begin
 end;
 $$ language plpgsql;
 
--- function to schedule data deletion after 3 years (gdpr compliance)
+-- function to automatically delete data after 3 years (GDPR compliance)
 create or replace function public.schedule_data_deletion()
 returns void as $$
 begin
     -- mark shows older than 3 years for deletion
-    update public.shows 
+    update public.shows
     set deleted_at = now()
     where deleted_at is null
     and show_date < current_date - interval '3 years';
-    
+
     -- mark evaluations from shows older than 3 years for deletion
-    update public.evaluations 
+    update public.evaluations
     set deleted_at = now()
     where deleted_at is null
     and show_id in (
-        select id from public.shows 
+        select id from public.shows
         where show_date < current_date - interval '3 years'
     );
 end;
 $$ language plpgsql;
 
 -- =============================================================================
--- 6. CREATE TRIGGERS
+-- 5. CREATE TRIGGERS
 -- =============================================================================
 
--- function to update updated_at timestamp
+-- trigger to update updated_at column
 create or replace function update_updated_at_column()
 returns trigger as $$
 begin
@@ -369,7 +325,7 @@ create trigger update_evaluations_updated_at before update on public.evaluations
     for each row execute function update_updated_at_column();
 
 -- =============================================================================
--- 7. CREATE ROW LEVEL SECURITY (RLS) POLICIES
+-- 6. CREATE ROW LEVEL SECURITY (RLS) POLICIES
 -- =============================================================================
 
 -- enable rls on all tables
@@ -431,32 +387,18 @@ create policy hide_deleted_owners on public.owners
     for select using (deleted_at is null);
 
 -- =============================================================================
--- 8. INSERT SEED DATA
+-- 7. INSERT SEED DATA - REMOVED TO AVOID DUPLICATES WITH seed.sql
 -- =============================================================================
 
--- default admin user (club board)
-insert into public.users (email, password_hash, first_name, last_name, role) values
-('admin@klub-hovawarta.pl', '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewvYPcGvIjZxNe5.', 'Admin', 'Klubu Hovawarta', 'club_board');
-
--- example hovawart dogs
-insert into public.dogs (name, gender, birth_date, microchip_number, kennel_name) values
-('Hovawart z Przykładu', 'male', '2020-03-15', '123456789012345', 'Hodowla Przykładowa'),
-('Hovawartka z Przykładu', 'female', '2019-07-22', '987654321098765', 'Hodowla Przykładowa');
-
--- example owner
-insert into public.owners (first_name, last_name, email, phone, address, city, postal_code, kennel_name, gdpr_consent, gdpr_consent_date) values
-('Jan', 'Kowalski', 'jan.kowalski@example.com', '+48123456789', 'ul. Przykładowa 1', 'Warszawa', '00-001', 'Hodowla Przykładowa', true, now());
-
--- example show
-insert into public.shows (name, status, show_date, registration_deadline, location, judge_name, description) values
-('Wystawa Klubowa Hovawartów 2024', 'draft', '2024-06-15', '2024-06-01', 'Warszawa, ul. Wystawowa 1', 'dr Jan Sędzia', 'Doroczna wystawa klubowa hovawartów');
+-- Seed data is now handled by supabase/seed.sql
+-- This prevents duplicate data insertion
 
 -- =============================================================================
 -- END OF MIGRATION
 -- =============================================================================
 
 -- migration completed successfully
--- transformed complex multi-breed system to simplified hovawart club mvp
+-- created simplified hovawart club mvp database
 -- all tables, indexes, functions, triggers, and rls policies created
--- seed data inserted for testing purposes
+-- seed data will be inserted by supabase/seed.sql
 -- system ready for hovawart club show mvp deployment 

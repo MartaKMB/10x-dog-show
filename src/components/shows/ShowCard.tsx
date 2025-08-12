@@ -10,8 +10,6 @@ const ShowCard: React.FC<ShowCardProps> = ({ show }) => {
     switch (status) {
       case "draft":
         return "bg-gray-100 text-gray-800";
-      case "open_for_registration":
-        return "bg-gray-100 text-gray-800";
       case "completed":
         return "bg-green-100 text-green-800";
       default:
@@ -22,8 +20,6 @@ const ShowCard: React.FC<ShowCardProps> = ({ show }) => {
   const getStatusText = (status: string) => {
     switch (status) {
       case "draft":
-        return "Szkic";
-      case "open_for_registration":
         return "Szkic";
       case "completed":
         return "Opisana";

@@ -21,11 +21,8 @@ const useDogsList = (
     pagination: { page: 1, limit: 20, total: 0, pages: 0 },
     isLoading: false,
     error: null,
-    canEdit:
-      userRole === "department_representative" ||
-      (userRole === "secretary" && showStatus !== "in_progress"),
-    canDelete:
-      userRole === "department_representative" && showStatus !== "in_progress",
+    canEdit: userRole === "club_board" && showStatus === "draft",
+    canDelete: userRole === "club_board" && showStatus === "draft",
     userRole,
   });
 
@@ -33,66 +30,23 @@ const useDogsList = (
     (registrations: RegistrationResponseDto[]): HierarchyNode[] => {
       const hierarchy: Record<string, HierarchyNode> = {};
 
-      // Group by FCI Group
+      // Group by dog class only (no FCI groups or breeds in MVP)
       registrations.forEach((registration) => {
-        const fciGroup = registration.dog.breed.fci_group;
-        const breedId = registration.dog.breed.name_pl; // Use name_pl as id since id is not available in Pick type
         const dogClass = registration.dog_class;
 
-        // Create FCI Group node if not exists
-        if (!hierarchy[fciGroup]) {
-          hierarchy[fciGroup] = {
-            type: "fci_group",
-            id: fciGroup,
-            name: fciGroup,
-            children: [],
-            isExpanded: true,
-            count: 0,
-            data: fciGroup,
-          };
-        }
-
-        // Find or create breed node
-        let breedNode = hierarchy[fciGroup].children.find(
-          (child) => child.id === breedId,
-        );
-        if (!breedNode) {
-          breedNode = {
-            type: "breed",
-            id: breedId,
-            name: registration.dog.breed.name_pl,
-            children: [],
-            isExpanded: true,
-            count: 0,
-            data: {
-              id: breedId,
-              name_pl: registration.dog.breed.name_pl,
-              name_en: registration.dog.breed.name_en,
-              fci_group: registration.dog.breed.fci_group,
-              fci_number: null,
-              is_active: true,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-            },
-          };
-          hierarchy[fciGroup].children.push(breedNode);
-        }
-
         // Find or create class node
-        let classNode = breedNode.children.find(
-          (child) => child.id === `${breedId}-${dogClass}`,
-        );
+        let classNode = hierarchy[dogClass];
         if (!classNode) {
           classNode = {
             type: "class",
-            id: `${breedId}-${dogClass}`,
+            id: dogClass,
             name: dogClass,
             children: [],
             isExpanded: true,
             count: 0,
             data: dogClass,
           };
-          breedNode.children.push(classNode);
+          hierarchy[dogClass] = classNode;
         }
 
         // Add dog node
@@ -101,101 +55,77 @@ const useDogsList = (
           id: registration.dog.id,
           name: registration.dog.name,
           children: [],
-          isExpanded: false,
+          isExpanded: true,
           count: 1,
           data: {
             ...registration.dog,
-            registration,
-            descriptionStatus: { status: "none" }, // Will be fetched separately
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          } as any, // Type assertion for complex data structure
+            created_at: new Date().toISOString(),
+          },
         };
 
         classNode.children.push(dogNode);
+        classNode.count += 1;
       });
 
-      // Calculate counts
-      Object.values(hierarchy).forEach((fciGroup) => {
-        fciGroup.count = fciGroup.children.reduce((sum, breed) => {
-          breed.count = breed.children.reduce((sum, classNode) => {
-            classNode.count = classNode.children.length;
-            return sum + classNode.count;
-          }, 0);
-          return sum + breed.count;
-        }, 0);
+      // Convert to array and sort by class name
+      const result = Object.values(hierarchy).sort((a, b) =>
+        a.name.localeCompare(b.name),
+      );
+
+      // Update counts for all nodes
+      result.forEach((node) => {
+        if (node.type === "class") {
+          node.count = node.children.reduce(
+            (sum, child) => sum + child.count,
+            0,
+          );
+        }
       });
 
-      return Object.values(hierarchy);
+      return result;
     },
     [],
   );
 
   const fetchDogs = useCallback(async () => {
-    setState((prev) => ({ ...prev, isLoading: true, error: null }));
-
     try {
-      // Build query parameters
-      const params = new URLSearchParams();
-      params.append("show_id", showId);
-
-      if (state.filters.breedId)
-        params.append("breed_id", state.filters.breedId);
-      if (state.filters.gender) params.append("gender", state.filters.gender);
-      if (state.filters.dogClass)
-        params.append("dog_class", state.filters.dogClass);
-      if (state.search) params.append("search", state.search);
-      params.append("page", state.pagination.page.toString());
-      params.append("limit", state.pagination.limit.toString());
+      setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
       const response = await fetch(
-        `/api/shows/${showId}/registrations-mock?${params}`,
+        `/api/shows/${showId}/registrations?limit=1000`,
       );
-
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
-      const registrations = data.data || data;
-      const pagination = data.pagination || {
-        page: 1,
-        limit: 20,
-        total: registrations.length,
-        pages: 1,
-      };
-
-      // Transform to hierarchy
-      const hierarchy = transformToHierarchy(registrations);
+      const hierarchyNodes = transformToHierarchy(data.data || []);
 
       setState((prev) => ({
         ...prev,
-        dogs: hierarchy,
-        pagination,
+        dogs: hierarchyNodes,
+        pagination: {
+          ...prev.pagination,
+          total: hierarchyNodes.length,
+          pages: Math.ceil(hierarchyNodes.length / prev.pagination.limit),
+        },
         isLoading: false,
       }));
     } catch (error) {
-      console.error("Failed to fetch dogs:", error);
+      console.error("Error fetching dogs:", error);
       setState((prev) => ({
         ...prev,
-        error:
-          error instanceof Error ? error.message : "Nie udało się pobrać psów",
+        error: error instanceof Error ? error.message : "Unknown error",
         isLoading: false,
       }));
     }
-  }, [
-    showId,
-    state.filters,
-    state.search,
-    state.pagination.page,
-    state.pagination.limit,
-    transformToHierarchy,
-  ]);
+  }, [showId, transformToHierarchy]);
 
   const updateFilters = useCallback((newFilters: Partial<DogsFilterState>) => {
     setState((prev) => ({
       ...prev,
       filters: { ...prev.filters, ...newFilters },
-      pagination: { ...prev.pagination, page: 1 }, // Reset to first page
+      pagination: { ...prev.pagination, page: 1 },
     }));
   }, []);
 
@@ -203,7 +133,7 @@ const useDogsList = (
     setState((prev) => ({
       ...prev,
       search: searchTerm,
-      pagination: { ...prev.pagination, page: 1 }, // Reset to first page
+      pagination: { ...prev.pagination, page: 1 },
     }));
   }, []);
 
@@ -223,7 +153,6 @@ const useDogsList = (
     }));
   }, []);
 
-  // Fetch dogs when dependencies change
   useEffect(() => {
     fetchDogs();
   }, [fetchDogs]);

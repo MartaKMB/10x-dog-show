@@ -2,7 +2,7 @@ import type { APIRoute } from "astro";
 import { z } from "zod";
 import { ShowService } from "../../../lib/services/showService";
 import { updateShowSchema } from "../../../lib/validation/showSchemas";
-import { supabaseClient } from "../../../db/supabase.client";
+import { supabaseServerClient } from "../../../db/supabase.server";
 import type { ErrorResponseDto } from "../../../types";
 
 export const GET: APIRoute = async ({ params }) => {
@@ -27,7 +27,7 @@ export const GET: APIRoute = async ({ params }) => {
     }
 
     // Get show by ID using service
-    const showService = new ShowService(supabaseClient);
+    const showService = new ShowService(supabaseServerClient);
     const show = await showService.getShowById(id);
 
     return new Response(JSON.stringify(show), {
@@ -108,7 +108,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
     const validatedData = updateShowSchema.parse(body);
 
     // Update show using service
-    const showService = new ShowService(supabaseClient);
+    const showService = new ShowService(supabaseServerClient);
     const show = await showService.update(id, validatedData);
 
     return new Response(JSON.stringify(show), {
@@ -207,7 +207,7 @@ export const DELETE: APIRoute = async ({ params }) => {
     }
 
     // Delete show using service
-    const showService = new ShowService(supabaseClient);
+    const showService = new ShowService(supabaseServerClient);
     await showService.delete(id);
 
     return new Response(

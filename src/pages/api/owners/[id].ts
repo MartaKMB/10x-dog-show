@@ -5,7 +5,7 @@ import {
   ownerIdSchema,
   updateOwnerSchema,
 } from "../../../lib/validation/ownerSchemas";
-import { supabaseClient } from "../../../db/supabase.client";
+import { supabaseServerClient } from "../../../db/supabase.server";
 import type { ErrorResponseDto } from "../../../types";
 
 export const GET: APIRoute = async ({ params }) => {
@@ -14,7 +14,7 @@ export const GET: APIRoute = async ({ params }) => {
     const validatedId = ownerIdSchema.parse(params.id);
 
     // Get owner using service
-    const ownerService = new OwnerService(supabaseClient);
+    const ownerService = new OwnerService(supabaseServerClient);
     const owner = await ownerService.getById(validatedId);
 
     return new Response(JSON.stringify(owner), {
@@ -103,7 +103,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
     const validatedData = updateOwnerSchema.parse(body);
 
     // Update owner using service
-    const ownerService = new OwnerService(supabaseClient);
+    const ownerService = new OwnerService(supabaseServerClient);
     const owner = await ownerService.update(validatedId, validatedData);
 
     return new Response(JSON.stringify(owner), {
@@ -186,7 +186,7 @@ export const DELETE: APIRoute = async ({ params }) => {
     const validatedId = ownerIdSchema.parse(params.id);
 
     // Delete owner using service
-    const ownerService = new OwnerService(supabaseClient);
+    const ownerService = new OwnerService(supabaseServerClient);
     await ownerService.delete(validatedId);
 
     return new Response(

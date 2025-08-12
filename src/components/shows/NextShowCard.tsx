@@ -66,20 +66,12 @@ const NextShowCard: React.FC<NextShowCardProps> = ({ userRole }) => {
     });
   };
 
-  const getStatusColor = (status: string): string => {
+  const getStatusColor = (status: string) => {
     switch (status) {
       case "draft":
         return "bg-gray-100 text-gray-800";
-      case "open_for_registration":
-        return "bg-green-100 text-green-800";
-      case "registration_closed":
-        return "bg-yellow-100 text-yellow-800";
-      case "in_progress":
-        return "bg-blue-100 text-blue-800";
       case "completed":
         return "bg-purple-100 text-purple-800";
-      case "cancelled":
-        return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -89,16 +81,8 @@ const NextShowCard: React.FC<NextShowCardProps> = ({ userRole }) => {
     switch (status) {
       case "draft":
         return "Szkic";
-      case "open_for_registration":
-        return "Otwarta rejestracja";
-      case "registration_closed":
-        return "Zamknięta rejestracja";
-      case "in_progress":
-        return "W trakcie";
       case "completed":
-        return "Zakończona";
-      case "cancelled":
-        return "Anulowana";
+        return "Opisana";
       default:
         return status;
     }

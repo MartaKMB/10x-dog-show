@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { supabaseClient } from "../../db/supabase.client";
+import { supabaseServerClient } from "../../db/supabase.server";
 import type { ErrorResponseDto } from "../../types";
 
 // Schema dla tworzenia użytkownika
@@ -26,7 +26,7 @@ export const GET: APIRoute = async ({ request }) => {
       data: users,
       error,
       count,
-    } = await supabaseClient
+    } = await supabaseServerClient
       .from("users")
       .select("*", { count: "exact" })
       .is("deleted_at", null)
@@ -78,7 +78,7 @@ export const POST: APIRoute = async ({ request }) => {
     const validatedData = createUserSchema.parse(body);
 
     // Sprawdź czy użytkownik już istnieje
-    const { data: existingUser } = await supabaseClient
+    const { data: existingUser } = await supabaseServerClient
       .from("users")
       .select("id")
       .eq("email", validatedData.email)
@@ -111,7 +111,7 @@ export const POST: APIRoute = async ({ request }) => {
           .join(""),
       );
 
-    const { data: user, error } = await supabaseClient
+    const { data: user, error } = await supabaseServerClient
       .from("users")
       .insert({
         email: validatedData.email,

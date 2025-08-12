@@ -5,7 +5,7 @@ import {
   createOwnerSchema,
   ownerQuerySchema,
 } from "../../../lib/validation/ownerSchemas";
-import { supabaseClient } from "../../../db/supabase.client";
+import { supabaseServerClient } from "../../../db/supabase.server";
 import type { ErrorResponseDto } from "../../../types";
 
 export const GET: APIRoute = async ({ request }) => {
@@ -21,7 +21,7 @@ export const GET: APIRoute = async ({ request }) => {
     });
 
     // Get owners using service
-    const ownerService = new OwnerService(supabaseClient);
+    const ownerService = new OwnerService(supabaseServerClient);
     const owners = await ownerService.getMany(validatedParams);
 
     return new Response(JSON.stringify(owners), {
@@ -109,7 +109,7 @@ export const POST: APIRoute = async ({ request }) => {
     const validatedData = createOwnerSchema.parse(body);
 
     // Create owner using service
-    const ownerService = new OwnerService(supabaseClient);
+    const ownerService = new OwnerService(supabaseServerClient);
     const owner = await ownerService.create(validatedData);
 
     return new Response(JSON.stringify(owner), {

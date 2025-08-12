@@ -5,7 +5,7 @@ import {
   updateRegistrationSchema,
   updatePaymentStatusSchema,
 } from "../../../../../lib/validation/registrationSchemas";
-import { supabaseClient } from "../../../../../db/supabase.client";
+import { supabaseServerClient } from "../../../../../db/supabase.server";
 import type { ErrorResponseDto } from "../../../../../types";
 
 export const GET: APIRoute = async ({ params }) => {
@@ -30,7 +30,7 @@ export const GET: APIRoute = async ({ params }) => {
     }
 
     // Get registration details using service
-    const registrationService = new RegistrationService(supabaseClient);
+    const registrationService = new RegistrationService(supabaseServerClient);
     const registration = await registrationService.getRegistrations(showId, {
       page: 1,
       limit: 1,
@@ -122,7 +122,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
     const validatedData = updateRegistrationSchema.parse(body);
 
     // Update registration using service
-    const registrationService = new RegistrationService(supabaseClient);
+    const registrationService = new RegistrationService(supabaseServerClient);
     const registration = await registrationService.updateRegistration(
       showId,
       registrationId,
@@ -231,7 +231,7 @@ export const PATCH: APIRoute = async ({ params, request }) => {
     const validatedData = updatePaymentStatusSchema.parse(body);
 
     // Update payment status using service
-    const registrationService = new RegistrationService(supabaseClient);
+    const registrationService = new RegistrationService(supabaseServerClient);
     const registration = await registrationService.updatePaymentStatus(
       showId,
       registrationId,
@@ -334,7 +334,7 @@ export const DELETE: APIRoute = async ({ params }) => {
     }
 
     // Delete registration using service
-    const registrationService = new RegistrationService(supabaseClient);
+    const registrationService = new RegistrationService(supabaseServerClient);
     await registrationService.deleteRegistration(showId, registrationId);
 
     return new Response(null, {

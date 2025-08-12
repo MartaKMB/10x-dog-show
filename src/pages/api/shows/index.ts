@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { createSupabaseServerInstance } from "../../../db/supabase.server.ts";
+import { supabaseServerClient } from "../../../db/supabase.server";
 import { ShowService } from "../../../lib/services/showService";
 import { createShowSchema } from "../../../lib/validation/showSchemas";
 import type { ErrorResponseDto } from "../../../types";
@@ -14,19 +14,16 @@ const showsQuerySchema = z.object({
   limit: z.string().transform(Number).default("20"),
 });
 
-export const GET: APIRoute = async ({ request, cookies }) => {
+export const GET: APIRoute = async ({ request }) => {
   try {
     const url = new URL(request.url);
     const queryParams = showsQuerySchema.parse(
       Object.fromEntries(url.searchParams),
     );
 
-    const supabase = createSupabaseServerInstance({
-      headers: request.headers,
-      cookies,
-    });
+    const supabase = supabaseServerClient;
 
-    // Build the base query
+    // Build the base query with registration count
     let query = supabase
       .from("shows")
       .select(
@@ -41,7 +38,8 @@ export const GET: APIRoute = async ({ request, cookies }) => {
         description,
         max_participants,
         created_at,
-        updated_at
+        updated_at,
+        registered_dogs:show_registrations(count)
       `,
       )
       .is("deleted_at", null)
@@ -49,16 +47,7 @@ export const GET: APIRoute = async ({ request, cookies }) => {
 
     // Apply filters
     if (queryParams.status) {
-      query = query.eq(
-        "status",
-        queryParams.status as
-          | "draft"
-          | "open_for_registration"
-          | "registration_closed"
-          | "in_progress"
-          | "completed"
-          | "cancelled",
-      );
+      query = query.eq("status", queryParams.status as "draft" | "completed");
     }
 
     if (queryParams.from_date) {
@@ -83,16 +72,7 @@ export const GET: APIRoute = async ({ request, cookies }) => {
 
     // Apply same filters to count query
     if (queryParams.status) {
-      countQuery.eq(
-        "status",
-        queryParams.status as
-          | "draft"
-          | "open_for_registration"
-          | "registration_closed"
-          | "in_progress"
-          | "completed"
-          | "cancelled",
-      );
+      countQuery.eq("status", queryParams.status as "draft" | "completed");
     }
 
     if (queryParams.from_date) {
@@ -129,13 +109,20 @@ export const GET: APIRoute = async ({ request, cookies }) => {
       );
     }
 
+    // Process shows to extract registration count
+    const processedShows =
+      shows?.map((show) => ({
+        ...show,
+        registered_dogs: show.registered_dogs?.[0]?.count || 0,
+      })) || [];
+
     // Calculate pagination info
     const total = count || 0;
     const pages = Math.ceil(total / queryParams.limit);
 
     return new Response(
       JSON.stringify({
-        data: shows || [],
+        data: processedShows,
         pagination: {
           page: queryParams.page,
           limit: queryParams.limit,
@@ -178,7 +165,7 @@ export const GET: APIRoute = async ({ request, cookies }) => {
   }
 };
 
-export const POST: APIRoute = async ({ request, cookies }) => {
+export const POST: APIRoute = async ({ request }) => {
   try {
     // Parse request body
     const body = await request.json();
@@ -187,10 +174,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     const validatedData = createShowSchema.parse(body);
 
     // Create show using service with server instance
-    const supabase = createSupabaseServerInstance({
-      headers: request.headers,
-      cookies,
-    });
+    const supabase = supabaseServerClient;
 
     const showService = new ShowService(supabase);
     const show = await showService.create(validatedData);

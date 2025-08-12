@@ -149,7 +149,7 @@ export const validateDogClassByAge = (
  * Walidacja statusu wystawy dla rejestracji
  */
 export const validateShowAcceptsRegistrations = (status: string): boolean => {
-  return status === "draft" || status === "open_for_registration";
+  return status === "draft";
 };
 
 /**

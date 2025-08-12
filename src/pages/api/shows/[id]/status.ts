@@ -2,7 +2,7 @@ import type { APIRoute } from "astro";
 import { z } from "zod";
 import { ShowService } from "../../../../lib/services/showService";
 import { updateShowStatusSchema } from "../../../../lib/validation/showSchemas";
-import { supabaseClient } from "../../../../db/supabase.client";
+import { supabaseServerClient } from "../../../../db/supabase.server";
 import type { ErrorResponseDto } from "../../../../types";
 
 export const PATCH: APIRoute = async ({ params, request }) => {
@@ -42,7 +42,7 @@ async function handleStatusUpdate(params: any, request: Request) {
     const validatedData = updateShowStatusSchema.parse(body);
 
     // Update show status using service
-    const showService = new ShowService(supabaseClient);
+    const showService = new ShowService(supabaseServerClient);
     const show = await showService.updateStatus(id, validatedData.status);
 
     return new Response(JSON.stringify(show), {

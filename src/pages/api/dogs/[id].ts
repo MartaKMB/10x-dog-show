@@ -2,7 +2,7 @@ import type { APIRoute } from "astro";
 import { z } from "zod";
 import { DogService } from "../../../lib/services/dogService";
 import { updateDogSchema } from "../../../lib/validation/dogSchemas";
-import { supabaseClient } from "../../../db/supabase.client";
+import { supabaseServerClient } from "../../../db/supabase.server";
 import type { ErrorResponseDto } from "../../../types";
 
 export const GET: APIRoute = async ({ params }) => {
@@ -27,7 +27,7 @@ export const GET: APIRoute = async ({ params }) => {
     }
 
     // Get dog by ID using service
-    const dogService = new DogService(supabaseClient);
+    const dogService = new DogService(supabaseServerClient);
     const dog = await dogService.getDogById(id);
 
     return new Response(JSON.stringify(dog), {
@@ -108,7 +108,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
     const validatedData = updateDogSchema.parse(body);
 
     // Update dog using service
-    const dogService = new DogService(supabaseClient);
+    const dogService = new DogService(supabaseServerClient);
     const dog = await dogService.update(id, validatedData);
 
     return new Response(JSON.stringify(dog), {
@@ -207,7 +207,7 @@ export const DELETE: APIRoute = async ({ params }) => {
     }
 
     // Delete dog using service
-    const dogService = new DogService(supabaseClient);
+    const dogService = new DogService(supabaseServerClient);
     await dogService.delete(id);
 
     return new Response(

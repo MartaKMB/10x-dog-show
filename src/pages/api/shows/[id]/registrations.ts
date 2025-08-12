@@ -5,7 +5,7 @@ import {
   createRegistrationSchema,
   registrationQuerySchema,
 } from "../../../../lib/validation/registrationSchemas";
-import { supabaseClient } from "../../../../db/supabase.client";
+import { supabaseServerClient } from "../../../../db/supabase.server";
 import type { ErrorResponseDto } from "../../../../types";
 
 export const GET: APIRoute = async ({ params, request }) => {
@@ -48,7 +48,7 @@ export const GET: APIRoute = async ({ params, request }) => {
     const validatedParams = registrationQuerySchema.parse(queryParams);
 
     // Get registrations using service
-    const registrationService = new RegistrationService(supabaseClient);
+    const registrationService = new RegistrationService(supabaseServerClient);
     const registrations = await registrationService.getRegistrations(
       showId,
       validatedParams,
@@ -132,7 +132,7 @@ export const POST: APIRoute = async ({ params, request }) => {
     const validatedData = createRegistrationSchema.parse(body);
 
     // Create registration using service
-    const registrationService = new RegistrationService(supabaseClient);
+    const registrationService = new RegistrationService(supabaseServerClient);
     const registration = await registrationService.createRegistration(
       showId,
       validatedData,

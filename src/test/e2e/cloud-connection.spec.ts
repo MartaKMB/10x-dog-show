@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 import { TestUtils } from "./test-utils";
 
 test.describe("Cloud Connection Tests", () => {
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async () => {
     TestUtils.logTestEnvironment();
   });
 

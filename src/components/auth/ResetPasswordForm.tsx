@@ -40,7 +40,7 @@ const ResetPasswordForm: React.FC = () => {
       // Miejsce na integrację z Supabase updateUser
       await new Promise((resolve) => setTimeout(resolve, 700));
       setSuccessMessage("Hasło zostało zaktualizowane (placeholder)");
-    } catch (err) {
+    } catch {
       setServerError("Nie udało się zaktualizować hasła");
     } finally {
       setIsSubmitting(false);

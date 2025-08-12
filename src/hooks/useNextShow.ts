@@ -1,13 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
-import type { ShowResponseDto } from "../types";
+import type { Show } from "../types";
 
-export const useNextShow = (userRole: string = "secretary") => {
-  const [nextShow, setNextShow] = useState<ShowResponseDto | null>(null);
+export const useNextShow = (userRole: string = "club_board") => {
+  const [nextShow, setNextShow] = useState<Show | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const loadNextShow = useCallback(async () => {
-    if (userRole !== "secretary") {
+    if (userRole !== "club_board") {
       setIsLoading(false);
       return;
     }
@@ -16,24 +16,20 @@ export const useNextShow = (userRole: string = "secretary") => {
       setIsLoading(true);
       setError(null);
 
-      // Mock data dla najbliższej wystawy sekretarza
-      const mockNextShow: ShowResponseDto = {
+      // Mock data dla najbliższej wystawy klubu
+      const mockNextShow: Show = {
         id: "550e8400-e29b-41d4-a716-446655440001",
-        name: "National Dog Show Warsaw 2024",
-        show_type: "national",
-        status: "open_for_registration",
+        name: "Wystawa Klubowa Hovawartów 2024",
+        status: "draft",
         show_date: "2025-08-05",
         registration_deadline: "2025-07-25",
-        branch_id: "550e8400-e29b-41d4-a716-446655440201",
-        organizer_id: "00000000-0000-0000-0000-000000000002",
-        max_participants: 500,
-        description: "Międzynarodowa wystawa psów rasowych",
-        entry_fee: 150.0,
-        language: "pl",
+        location: "Warszawa",
+        judge_name: "Jan Kowalski",
+        description: "Wystawa klubowa psów rasy Hovawart",
+        max_participants: 100,
         created_at: "2024-01-01T00:00:00Z",
         updated_at: "2024-01-01T00:00:00Z",
         deleted_at: null,
-        scheduled_for_deletion: false,
       };
 
       // Symulacja opóźnienia API

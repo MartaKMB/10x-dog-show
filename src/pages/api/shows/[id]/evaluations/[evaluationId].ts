@@ -2,7 +2,7 @@ import type { APIRoute } from "astro";
 import { z } from "zod";
 import { EvaluationService } from "../../../../../lib/services/evaluationService";
 import { updateEvaluationSchema } from "../../../../../lib/validation/evaluationSchemas";
-import { supabaseClient } from "../../../../../db/supabase.client";
+import { supabaseServerClient } from "../../../../../db/supabase.server";
 import type { ErrorResponseDto } from "../../../../../types";
 
 export const GET: APIRoute = async ({ params }) => {
@@ -26,7 +26,7 @@ export const GET: APIRoute = async ({ params }) => {
     }
 
     // Get evaluation using service
-    const evaluationService = new EvaluationService(supabaseClient);
+    const evaluationService = new EvaluationService(supabaseServerClient);
     const evaluations = await evaluationService.getEvaluations(showId, {
       page: 1,
       limit: 1000, // Get all to find the specific one
@@ -131,7 +131,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
     const validatedData = updateEvaluationSchema.parse(body);
 
     // Update evaluation using service
-    const evaluationService = new EvaluationService(supabaseClient);
+    const evaluationService = new EvaluationService(supabaseServerClient);
     const evaluation = await evaluationService.update(
       showId,
       evaluationId,
@@ -235,7 +235,7 @@ export const DELETE: APIRoute = async ({ params }) => {
     }
 
     // Delete evaluation using service
-    const evaluationService = new EvaluationService(supabaseClient);
+    const evaluationService = new EvaluationService(supabaseServerClient);
     await evaluationService.delete(showId, evaluationId);
 
     return new Response(

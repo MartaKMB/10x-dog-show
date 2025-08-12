@@ -23,7 +23,7 @@ interface DogsListViewProps {
 const DogsListView: React.FC<DogsListViewProps> = ({
   showId,
   userRole = "secretary",
-  showStatus = "open_for_registration",
+  showStatus = "draft",
 }) => {
   const { state, fetchDogs, updateFilters, searchDogs, clearFilters } =
     useDogsList(showId, userRole, showStatus);
