@@ -136,10 +136,6 @@ function DogInfo({ dog }: DogInfoProps) {
           <span className="text-sm font-medium">{dog.name}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-sm text-gray-600">Rasa:</span>
-          <span className="text-sm font-medium">{dog.breed.name_pl}</span>
-        </div>
-        <div className="flex justify-between">
           <span className="text-sm text-gray-600">Płeć:</span>
           <span className="text-sm font-medium">
             {dog.gender === "male" ? "Samiec" : "Suczka"}
@@ -184,12 +180,6 @@ function ShowInfo({ show }: ShowInfoProps) {
             {new Date(show.show_date).toLocaleDateString("pl-PL")}
           </span>
         </div>
-        <div className="flex justify-between">
-          <span className="text-sm text-gray-600">Typ:</span>
-          <span className="text-sm font-medium">
-            {show.show_type === "national" ? "Krajowa" : "Międzynarodowa"}
-          </span>
-        </div>
       </div>
     </div>
   );
@@ -209,35 +199,11 @@ function ShowStatusIndicator({ status }: ShowStatusIndicatorProps) {
           color: "bg-gray-100 text-gray-800",
           icon: "📝",
         };
-      case "open_for_registration":
-        return {
-          label: "Rejestracja otwarta",
-          color: "bg-green-100 text-green-800",
-          icon: "✅",
-        };
-      case "registration_closed":
-        return {
-          label: "Rejestracja zamknięta",
-          color: "bg-yellow-100 text-yellow-800",
-          icon: "⏰",
-        };
-      case "in_progress":
-        return {
-          label: "W trakcie",
-          color: "bg-blue-100 text-blue-800",
-          icon: "🏆",
-        };
       case "completed":
         return {
           label: "Zakończona",
           color: "bg-purple-100 text-purple-800",
           icon: "🏁",
-        };
-      case "cancelled":
-        return {
-          label: "Anulowana",
-          color: "bg-red-100 text-red-800",
-          icon: "❌",
         };
       default:
         return {

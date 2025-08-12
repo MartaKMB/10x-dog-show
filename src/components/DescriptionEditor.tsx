@@ -222,7 +222,7 @@ export function DescriptionEditor({
 
     try {
       // Mock user role - w rzeczywistej aplikacji pobierane z kontekstu użytkownika
-      const userRole = "secretary" as const;
+      const userRole = "club_board" as const;
 
       const permissions = await checkDescriptionPermissions(
         showId,

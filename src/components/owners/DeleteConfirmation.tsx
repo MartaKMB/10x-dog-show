@@ -82,13 +82,6 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
               </div>
 
               <div className="flex justify-between">
-                <span className="text-gray-600">Kraj:</span>
-                <span className="font-medium text-gray-900">
-                  {owner.country}
-                </span>
-              </div>
-
-              <div className="flex justify-between">
                 <span className="text-gray-600">Data utworzenia:</span>
                 <span className="font-medium text-gray-900">
                   {formatDate(owner.created_at)}

@@ -52,19 +52,6 @@ const OwnerFilters: React.FC<OwnerFiltersProps> = ({
     { value: false, label: "Bez zgody RODO" },
   ];
 
-  const countryOptions = [
-    { value: "", label: "Wszystkie kraje" },
-    { value: "Polska", label: "Polska" },
-    { value: "Niemcy", label: "Niemcy" },
-    { value: "Czechy", label: "Czechy" },
-    { value: "Słowacja", label: "Słowacja" },
-    { value: "Ukraina", label: "Ukraina" },
-    { value: "Białoruś", label: "Białoruś" },
-    { value: "Litwa", label: "Litwa" },
-    { value: "Łotwa", label: "Łotwa" },
-    { value: "Estonia", label: "Estonia" },
-  ];
-
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -131,30 +118,6 @@ const OwnerFilters: React.FC<OwnerFiltersProps> = ({
 
       {/* Additional Filters Row */}
       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Country Filter */}
-        <div>
-          <label
-            htmlFor="country"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Kraj
-          </label>
-          <select
-            id="country"
-            value={filters.country || ""}
-            onChange={(e) =>
-              handleFilterChange("country", e.target.value || undefined)
-            }
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            {countryOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
         {/* GDPR Consent Filter */}
         <div>
           <label
