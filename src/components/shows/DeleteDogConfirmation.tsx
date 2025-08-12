@@ -92,13 +92,6 @@ const DeleteDogConfirmation: React.FC<DeleteDogConfirmationProps> = ({
               </div>
 
               <div className="flex justify-between">
-                <span className="text-gray-600">Rasa:</span>
-                <span className="font-medium text-gray-900">
-                  {registration.dog.breed.name_pl}
-                </span>
-              </div>
-
-              <div className="flex justify-between">
                 <span className="text-gray-600">Klasa:</span>
                 <span className="font-medium text-gray-900">
                   {getClassLabel(registration.dog_class)}
@@ -116,15 +109,6 @@ const DeleteDogConfirmation: React.FC<DeleteDogConfirmationProps> = ({
                 <span className="text-gray-600">Nr katalogowy:</span>
                 <span className="font-medium text-gray-900">
                   {registration.catalog_number || "Nie przypisano"}
-                </span>
-              </div>
-
-              <div className="flex justify-between">
-                <span className="text-gray-600">Status płatności:</span>
-                <span
-                  className={`font-medium ${registration.is_paid ? "text-green-600" : "text-red-600"}`}
-                >
-                  {registration.is_paid ? "Opłacone" : "Nieopłacone"}
                 </span>
               </div>
             </div>

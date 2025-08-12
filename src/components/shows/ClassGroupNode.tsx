@@ -108,18 +108,16 @@ const ClassGroupNode: React.FC<ClassGroupNodeProps> = ({
                 >
                   <DogCard
                     dog={{
-                      dog: dogData,
                       registration: dogData.registration || {},
                       descriptionStatus: dogData.descriptionStatus || {
                         status: "none",
                       },
                       canEdit,
                       canDelete,
-                      canCreateDescription: true,
                       isExpanded: false,
                       isProcessing: false,
                     }}
-                    onAction={onDogAction}
+                    onAction={(action) => onDogAction(action, childNode.id)}
                     userRole={userRole}
                     showStatus={showStatus}
                   />

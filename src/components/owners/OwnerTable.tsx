@@ -120,34 +120,25 @@ const OwnerTable: React.FC<OwnerTableProps> = ({
                 {getSortIcon("email")}
               </div>
             </th>
-            <th
-              scope="col"
-              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-              onClick={() => handleSort("city")}
-            >
-              <div className="flex items-center space-x-1">
+            <th scope="col" className="relative px-6 py-3">
+              <div
+                className="flex items-center cursor-pointer"
+                onClick={() => handleSort("city")}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    handleSort("city");
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+              >
                 <span>Miasto</span>
                 {getSortIcon("city")}
               </div>
             </th>
-            <th
-              scope="col"
-              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-              onClick={() => handleSort("country")}
-            >
-              <div className="flex items-center space-x-1">
-                <span>Kraj</span>
-                {getSortIcon("country")}
-              </div>
-            </th>
-            <th
-              scope="col"
-              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-              onClick={() => handleSort("gdpr_consent")}
-            >
-              <div className="flex items-center space-x-1">
+            <th scope="col" className="relative px-6 py-3">
+              <div className="flex items-center">
                 <span>Status RODO</span>
-                {getSortIcon("gdpr_consent")}
               </div>
             </th>
             <th
@@ -202,9 +193,6 @@ const OwnerTable: React.FC<OwnerTableProps> = ({
                     {owner.postal_code}
                   </div>
                 )}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{owner.country}</div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <GDPRStatusBadge

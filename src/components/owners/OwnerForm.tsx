@@ -24,7 +24,6 @@ interface FormData {
   address: string;
   city: string;
   postal_code: string;
-  country: string;
   kennel_name: string;
   gdpr_consent: boolean;
 }
@@ -48,7 +47,6 @@ const OwnerForm: React.FC<OwnerFormProps> = ({
     address: "",
     city: "",
     postal_code: "",
-    country: "Polska",
     kennel_name: "",
     gdpr_consent: false,
   });
@@ -67,7 +65,6 @@ const OwnerForm: React.FC<OwnerFormProps> = ({
           address: owner.address,
           city: owner.city,
           postal_code: owner.postal_code || "",
-          country: owner.country,
           kennel_name: owner.kennel_name || "",
           gdpr_consent: owner.gdpr_consent,
         });
@@ -80,7 +77,6 @@ const OwnerForm: React.FC<OwnerFormProps> = ({
           address: "",
           city: "",
           postal_code: "",
-          country: "Polska",
           kennel_name: "",
           gdpr_consent: false,
         });
@@ -135,11 +131,6 @@ const OwnerForm: React.FC<OwnerFormProps> = ({
       newErrors.city = ["Miasto nie może przekraczać 50 znaków"];
     }
 
-    // Country validation
-    if (!formData.country.trim()) {
-      newErrors.country = ["Kraj jest wymagany"];
-    }
-
     // GDPR consent validation (only for new owners)
     if (!isEdit && !formData.gdpr_consent) {
       newErrors.gdpr_consent = ["Zgoda RODO jest wymagana"];
@@ -175,7 +166,6 @@ const OwnerForm: React.FC<OwnerFormProps> = ({
       address: formData.address.trim(),
       city: formData.city.trim(),
       postal_code: formData.postal_code.trim() || undefined,
-      country: formData.country.trim(),
       kennel_name: formData.kennel_name.trim() || undefined,
       language: "pl" as const,
       gdpr_consent: formData.gdpr_consent,
@@ -387,28 +377,6 @@ const OwnerForm: React.FC<OwnerFormProps> = ({
                 }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-            </div>
-
-            {/* Country */}
-            <div className="md:col-span-2">
-              <label
-                htmlFor="country"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Kraj *
-              </label>
-              <input
-                id="country"
-                type="text"
-                value={formData.country}
-                onChange={(e) => handleFieldChange("country", e.target.value)}
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.country ? "border-red-300" : "border-gray-300"
-                }`}
-              />
-              {errors.country && (
-                <p className="text-red-600 text-sm mt-1">{errors.country[0]}</p>
-              )}
             </div>
 
             {/* GDPR Consent */}
