@@ -32,9 +32,9 @@ export function useEvaluationValidation(
         return {
           allowedGrades: [],
           allowedBabyPuppyGrades: [
-            "very_promising",
-            "promising",
-            "quite_promising",
+            "bardzo_obiecujący",
+            "obiecujący",
+            "dość_obiecujący",
           ],
           canHaveTitle: false,
           canHavePlacement: false,
@@ -47,12 +47,12 @@ export function useEvaluationValidation(
       case "champion":
         return {
           allowedGrades: [
-            "excellent",
-            "very_good",
-            "good",
-            "satisfactory",
-            "disqualified",
-            "absent",
+            "doskonała",
+            "bardzo_dobra",
+            "dobra",
+            "zadowalająca",
+            "zdyskwalifikowana",
+            "nieobecna",
           ],
           allowedBabyPuppyGrades: [],
           canHaveTitle: true,
@@ -62,12 +62,12 @@ export function useEvaluationValidation(
       case "veteran":
         return {
           allowedGrades: [
-            "excellent",
-            "very_good",
-            "good",
-            "satisfactory",
-            "disqualified",
-            "absent",
+            "doskonała",
+            "bardzo_dobra",
+            "dobra",
+            "zadowalająca",
+            "zdyskwalifikowana",
+            "nieobecna",
           ],
           allowedBabyPuppyGrades: [],
           canHaveTitle: false,
@@ -125,23 +125,24 @@ export function useEvaluationValidation(
   const validateTitle = useMemo((): string[] => {
     const errors: string[] = [];
 
-    if (!validationRules.canHaveTitle && evaluation.title) {
+    if (!validationRules.canHaveTitle) {
       errors.push(`Klasa ${dogClass} nie może otrzymać tytułu`);
-    }
-
-    if (validationRules.canHaveTitle && evaluation.title) {
-      // Sprawdzenie czy ocena pozwala na tytuł
-      const titleGrades: EvaluationGrade[] = ["excellent", "very_good"];
-      if (evaluation.grade && !titleGrades.includes(evaluation.grade)) {
+    } else if (evaluation.club_title) {
+      // Sprawdź czy ocena jest wystarczająco dobra dla tytułu
+      if (
+        evaluation.grade &&
+        evaluation.grade !== "doskonała" &&
+        evaluation.grade !== "bardzo_dobra"
+      ) {
         errors.push(
-          `Tytuł może być przyznany tylko dla ocen: ${titleGrades.join(", ")}`,
+          "Tytuł może być przyznany tylko dla ocen doskonała lub bardzo dobra",
         );
       }
     }
 
     return errors;
   }, [
-    evaluation.title,
+    evaluation.club_title,
     evaluation.grade,
     dogClass,
     validationRules.canHaveTitle,
@@ -155,66 +156,80 @@ export function useEvaluationValidation(
       errors.push(`Klasa ${dogClass} nie może otrzymać lokaty`);
     }
 
-    if (evaluation.placement && evaluation.points === undefined) {
-      errors.push("Lokata wymaga podania punktów");
-    }
-
-    if (
-      evaluation.points !== undefined &&
-      evaluation.points > validationRules.maxPoints
-    ) {
-      errors.push(
-        `Maksymalna liczba punktów dla klasy ${dogClass} to ${validationRules.maxPoints}`,
-      );
-    }
-
     return errors;
-  }, [evaluation.placement, evaluation.points, dogClass, validationRules]);
+  }, [evaluation.placement, dogClass, validationRules.canHavePlacement]);
 
   // Walidacja punktów
   const validatePoints = useMemo((): string[] => {
     const errors: string[] = [];
 
-    if (evaluation.points !== undefined) {
-      if (evaluation.points < 0) {
-        errors.push("Punkty nie mogą być ujemne");
-      }
-      if (evaluation.points > validationRules.maxPoints) {
-        errors.push(
-          `Maksymalna liczba punktów to ${validationRules.maxPoints}`,
-        );
-      }
-      if (evaluation.points > 0 && !evaluation.placement) {
-        errors.push("Punkty wymagają podania lokaty");
+    if (evaluation.placement && evaluation.placement !== "4th") {
+      if (evaluation.placement === "1st" && validationRules.maxPoints < 4) {
+        errors.push("1. lokata wymaga maksymalnej liczby punktów");
+      } else if (
+        evaluation.placement === "2nd" &&
+        validationRules.maxPoints < 3
+      ) {
+        errors.push("2. lokata wymaga co najmniej 3 punktów");
+      } else if (
+        evaluation.placement === "3rd" &&
+        validationRules.maxPoints < 2
+      ) {
+        errors.push("3. lokata wymaga co najmniej 2 punktów");
       }
     }
 
     return errors;
-  }, [evaluation.points, validationRules.maxPoints, evaluation.placement]);
+  }, [evaluation.placement, validationRules.maxPoints]);
 
   // Walidacja best in group/show
-  const validateBestAwards = useMemo((): string[] => {
+  const validateBestInGroupShow = useMemo((): string[] => {
     const errors: string[] = [];
 
-    if (evaluation.is_best_in_show && !evaluation.is_best_in_group) {
+    // Sprawdź czy best in show wymaga best in group
+    if (evaluation.club_title === "zwycięzca_klubu" && !evaluation.club_title) {
       errors.push("Best in Show wymaga Best in Group");
     }
 
+    // Sprawdź czy best in group/show wymaga odpowiedniej oceny
     if (
-      (evaluation.is_best_in_group || evaluation.is_best_in_show) &&
-      evaluation.grade !== "excellent"
+      (evaluation.club_title === "zwycięzca_klubu" ||
+        evaluation.club_title === "zwycięzca_rasy") &&
+      evaluation.grade !== "doskonała"
     ) {
-      errors.push(
-        "Best in Group/Show może być przyznane tylko dla oceny Excellent",
-      );
+      errors.push("Best in Group/Show wymaga oceny doskonała");
     }
 
     return errors;
-  }, [
-    evaluation.is_best_in_group,
-    evaluation.is_best_in_show,
-    evaluation.grade,
-  ]);
+  }, [evaluation.club_title, evaluation.grade]);
+
+  // Walidacja oceny dla zdyskwalifikowanych
+  const validateDisqualified = useMemo((): string[] => {
+    const errors: string[] = [];
+
+    if (
+      evaluation.grade === "zdyskwalifikowana" &&
+      (evaluation.placement || evaluation.club_title)
+    ) {
+      errors.push("Zdyskwalifikowane psy nie mogą otrzymać lokaty ani tytułu");
+    }
+
+    return errors;
+  }, [evaluation.grade, evaluation.placement, evaluation.club_title]);
+
+  // Walidacja oceny dla nieobecnych
+  const validateAbsent = useMemo((): string[] => {
+    const errors: string[] = [];
+
+    if (
+      evaluation.grade === "nieobecna" &&
+      (evaluation.placement || evaluation.club_title)
+    ) {
+      errors.push("Nieobecne psy nie mogą otrzymać lokaty ani tytułu");
+    }
+
+    return errors;
+  }, [evaluation.grade, evaluation.placement, evaluation.club_title]);
 
   // Kompletna walidacja
   const validationResult = useMemo((): ValidationResult => {
@@ -223,28 +238,28 @@ export function useEvaluationValidation(
       ...validateTitle,
       ...validatePlacement,
       ...validatePoints,
-      ...validateBestAwards,
+      ...validateBestInGroupShow,
+      ...validateDisqualified,
+      ...validateAbsent,
     ];
 
     const warnings: string[] = [];
 
     // Ostrzeżenia
     if (
-      evaluation.grade === "disqualified" &&
-      (evaluation.title || evaluation.placement || evaluation.points)
+      evaluation.grade === "zdyskwalifikowana" &&
+      (evaluation.placement || evaluation.club_title)
     ) {
       warnings.push(
-        "Pies zdyskwalifikowany nie może otrzymać tytułu, lokaty ani punktów",
+        "Pies zdyskwalifikowany nie może otrzymać lokaty ani tytułu",
       );
     }
 
     if (
-      evaluation.grade === "absent" &&
-      (evaluation.title || evaluation.placement || evaluation.points)
+      evaluation.grade === "nieobecna" &&
+      (evaluation.placement || evaluation.club_title)
     ) {
-      warnings.push(
-        "Nieobecny pies nie może otrzymać tytułu, lokaty ani punktów",
-      );
+      warnings.push("Nieobecny pies nie może otrzymać lokaty ani tytułu");
     }
 
     return {
@@ -257,7 +272,9 @@ export function useEvaluationValidation(
     validateTitle,
     validatePlacement,
     validatePoints,
-    validateBestAwards,
+    validateBestInGroupShow,
+    validateDisqualified,
+    validateAbsent,
     evaluation,
   ]);
 
@@ -268,6 +285,8 @@ export function useEvaluationValidation(
     validateTitle,
     validatePlacement,
     validatePoints,
-    validateBestAwards,
+    validateBestInGroupShow,
+    validateDisqualified,
+    validateAbsent,
   };
 }

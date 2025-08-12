@@ -4,7 +4,6 @@ import type {
   DogClass,
   EvaluationGrade,
   BabyPuppyGrade,
-  TitleType,
   Placement,
 } from "../../types";
 
@@ -16,73 +15,66 @@ interface EvaluationFormProps {
   errors?: string[];
 }
 
-const gradeOptions: Record<
+const gradeOptionsByClass: Record<
   DogClass,
   { label: string; value: EvaluationGrade | "" }[]
 > = {
   baby: [],
   puppy: [],
   junior: [
-    { label: "Excellent", value: "excellent" },
-    { label: "Very Good", value: "very_good" },
-    { label: "Good", value: "good" },
-    { label: "Satisfactory", value: "satisfactory" },
-    { label: "Disqualified", value: "disqualified" },
-    { label: "Absent", value: "absent" },
+    { label: "Doskonała", value: "doskonała" },
+    { label: "Bardzo dobra", value: "bardzo_dobra" },
+    { label: "Dobra", value: "dobra" },
+    { label: "Zadowalająca", value: "zadowalająca" },
+    { label: "Zdyskwalifikowana", value: "zdyskwalifikowana" },
+    { label: "Nieobecna", value: "nieobecna" },
   ],
   intermediate: [
-    { label: "Excellent", value: "excellent" },
-    { label: "Very Good", value: "very_good" },
-    { label: "Good", value: "good" },
-    { label: "Satisfactory", value: "satisfactory" },
-    { label: "Disqualified", value: "disqualified" },
-    { label: "Absent", value: "absent" },
+    { label: "Doskonała", value: "doskonała" },
+    { label: "Bardzo dobra", value: "bardzo_dobra" },
+    { label: "Dobra", value: "dobra" },
+    { label: "Zadowalająca", value: "zadowalająca" },
+    { label: "Zdyskwalifikowana", value: "zdyskwalifikowana" },
+    { label: "Nieobecna", value: "nieobecna" },
   ],
   open: [
-    { label: "Excellent", value: "excellent" },
-    { label: "Very Good", value: "very_good" },
-    { label: "Good", value: "good" },
-    { label: "Satisfactory", value: "satisfactory" },
-    { label: "Disqualified", value: "disqualified" },
-    { label: "Absent", value: "absent" },
+    { label: "Doskonała", value: "doskonała" },
+    { label: "Bardzo dobra", value: "bardzo_dobra" },
+    { label: "Dobra", value: "dobra" },
+    { label: "Zadowalająca", value: "zadowalająca" },
+    { label: "Zdyskwalifikowana", value: "zdyskwalifikowana" },
+    { label: "Nieobecna", value: "nieobecna" },
   ],
   working: [
-    { label: "Excellent", value: "excellent" },
-    { label: "Very Good", value: "very_good" },
-    { label: "Good", value: "good" },
-    { label: "Satisfactory", value: "satisfactory" },
-    { label: "Disqualified", value: "disqualified" },
-    { label: "Absent", value: "absent" },
+    { label: "Doskonała", value: "doskonała" },
+    { label: "Bardzo dobra", value: "bardzo_dobra" },
+    { label: "Dobra", value: "dobra" },
+    { label: "Zadowalająca", value: "zadowalająca" },
+    { label: "Zdyskwalifikowana", value: "zdyskwalifikowana" },
+    { label: "Nieobecna", value: "nieobecna" },
   ],
   champion: [
-    { label: "Excellent", value: "excellent" },
-    { label: "Very Good", value: "very_good" },
-    { label: "Good", value: "good" },
-    { label: "Satisfactory", value: "satisfactory" },
-    { label: "Disqualified", value: "disqualified" },
-    { label: "Absent", value: "absent" },
+    { label: "Doskonała", value: "doskonała" },
+    { label: "Bardzo dobra", value: "bardzo_dobra" },
+    { label: "Dobra", value: "dobra" },
+    { label: "Zadowalająca", value: "zadowalająca" },
+    { label: "Zdyskwalifikowana", value: "zdyskwalifikowana" },
+    { label: "Nieobecna", value: "nieobecna" },
   ],
   veteran: [
-    { label: "Excellent", value: "excellent" },
-    { label: "Very Good", value: "very_good" },
-    { label: "Good", value: "good" },
-    { label: "Satisfactory", value: "satisfactory" },
-    { label: "Disqualified", value: "disqualified" },
-    { label: "Absent", value: "absent" },
+    { label: "Doskonała", value: "doskonała" },
+    { label: "Bardzo dobra", value: "bardzo_dobra" },
+    { label: "Dobra", value: "dobra" },
+    { label: "Zadowalająca", value: "zadowalająca" },
+    { label: "Zdyskwalifikowana", value: "zdyskwalifikowana" },
+    { label: "Nieobecna", value: "nieobecna" },
   ],
 };
 
 const babyPuppyGradeOptions: { label: string; value: BabyPuppyGrade }[] = [
-  { label: "Very Promising", value: "very_promising" },
-  { label: "Promising", value: "promising" },
-  { label: "Quite Promising", value: "quite_promising" },
-];
-
-const titleOptions: { label: string; value: TitleType }[] = [
-  { label: "CWC", value: "CWC" },
-  { label: "CACIB", value: "CACIB" },
-  { label: "res. CWC", value: "res_CWC" },
-  { label: "res. CACIB", value: "res_CACIB" },
+  { label: "Bardzo obiecujący", value: "bardzo_obiecujący" },
+  { label: "Obiecujący", value: "obiecujący" },
+  { label: "Dość obiecujący", value: "dość_obiecujący" },
 ];
 
 const placementOptions: { label: string; value: Placement }[] = [
@@ -150,7 +142,7 @@ export function EvaluationForm({
             disabled={disabled}
           >
             <option value="">Wybierz ocenę</option>
-            {gradeOptions[dogClass].map((opt) => (
+            {gradeOptionsByClass[dogClass].map((opt) => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
               </option>
@@ -158,30 +150,6 @@ export function EvaluationForm({
           </select>
         </div>
       )}
-
-      {/* Tytuł */}
-      <div>
-        <label
-          htmlFor="title"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Tytuł
-        </label>
-        <select
-          id="title"
-          value={value.title || ""}
-          onChange={(e) => handleChange("title", e.target.value || undefined)}
-          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-          disabled={disabled}
-        >
-          <option value="">Brak</option>
-          {titleOptions.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
-      </div>
 
       {/* Lokata */}
       <div>
@@ -207,53 +175,6 @@ export function EvaluationForm({
             </option>
           ))}
         </select>
-      </div>
-
-      {/* Punkty */}
-      <div>
-        <label
-          htmlFor="points"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Punkty
-        </label>
-        <input
-          id="points"
-          type="number"
-          value={value.points ?? ""}
-          onChange={(e) =>
-            handleChange(
-              "points",
-              e.target.value ? Number(e.target.value) : undefined,
-            )
-          }
-          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-          min={0}
-          max={4}
-          disabled={disabled}
-        />
-      </div>
-
-      {/* Best in group/show */}
-      <div className="flex gap-4 items-center">
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={!!value.is_best_in_group}
-            onChange={(e) => handleChange("is_best_in_group", e.target.checked)}
-            disabled={disabled}
-          />
-          Best in Group
-        </label>
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={!!value.is_best_in_show}
-            onChange={(e) => handleChange("is_best_in_show", e.target.checked)}
-            disabled={disabled}
-          />
-          Best in Show
-        </label>
       </div>
 
       {/* Błędy */}

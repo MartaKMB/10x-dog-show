@@ -194,11 +194,6 @@ const DogsListView: React.FC<DogsListViewProps> = ({
         onClose={closeModals}
         showId={showId}
         isProcessing={isProcessing}
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        onAddDog={async (_data) => {
-          // TODO: Implement add dog logic
-          return Promise.resolve();
-        }}
         onSuccess={() => {
           closeModals();
           fetchDogs();

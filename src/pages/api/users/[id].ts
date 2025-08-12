@@ -132,7 +132,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
       );
     }
 
-    const { data: user, error } = await supabaseClient
+    const { data: user, error } = await supabaseServerClient
       .from("users")
       .update(validatedData)
       .eq("id", id)

@@ -88,17 +88,6 @@ const NextShowCard: React.FC<NextShowCardProps> = ({ userRole }) => {
     }
   };
 
-  const getShowTypeLabel = (showType: string): string => {
-    switch (showType) {
-      case "national":
-        return "Krajowa";
-      case "international":
-        return "Międzynarodowa";
-      default:
-        return showType;
-    }
-  };
-
   return (
     <div className="bg-white shadow rounded-lg p-6">
       <div className="flex items-start justify-between mb-4">
@@ -112,10 +101,10 @@ const NextShowCard: React.FC<NextShowCardProps> = ({ userRole }) => {
         </div>
         <span
           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
-            nextShow.status,
+            nextShow.status || "draft",
           )}`}
         >
-          {getStatusLabel(nextShow.status)}
+          {getStatusLabel(nextShow.status || "draft")}
         </span>
       </div>
 
@@ -125,7 +114,6 @@ const NextShowCard: React.FC<NextShowCardProps> = ({ userRole }) => {
             {nextShow.name}
           </h4>
           <p className="text-gray-600 text-sm">
-            {getShowTypeLabel(nextShow.show_type)} •{" "}
             {formatDate(nextShow.show_date)}
           </p>
         </div>

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import type {
   DogsFilterState,
-  BreedResponseDto,
   DogGender,
   DogClass,
   DescriptionStatus,
@@ -23,7 +22,8 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
   onClearFilters,
   searchValue,
 }) => {
-  const [breeds, setBreeds] = useState<BreedResponseDto[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [breeds, setBreeds] = useState<any[]>([]);
   const [isLoadingBreeds, setIsLoadingBreeds] = useState(false);
   const [localSearchValue, setLocalSearchValue] = useState(searchValue);
 

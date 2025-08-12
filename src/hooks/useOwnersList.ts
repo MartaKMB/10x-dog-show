@@ -33,9 +33,9 @@ const useOwnersList = (userRole: UserRole) => {
     search: "",
     isLoading: false,
     error: null,
-    canCreate: userRole === "department_representative",
-    canEdit: userRole === "department_representative",
-    canDelete: userRole === "department_representative",
+    canCreate: userRole === "club_board",
+    canEdit: userRole === "club_board",
+    canDelete: userRole === "club_board",
     userRole,
     sortConfig: { field: "created_at", direction: "desc" },
   });
@@ -49,8 +49,6 @@ const useOwnersList = (userRole: UserRole) => {
 
       if (state.filters.email) params.append("email", state.filters.email);
       if (state.filters.city) params.append("city", state.filters.city);
-      if (state.filters.country)
-        params.append("country", state.filters.country);
       if (state.filters.gdpr_consent !== undefined)
         params.append("gdpr_consent", state.filters.gdpr_consent.toString());
       if (state.search) params.append("search", state.search);

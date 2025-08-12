@@ -26,7 +26,28 @@ export const GET: APIRoute = async ({ params }) => {
 
     // Get registration stats using service
     const showService = new ShowService(supabaseServerClient);
-    const stats = await showService.getRegistrationStats();
+    const registrations = await showService.getRegistrations(showId);
+
+    // Calculate stats from registrations
+    const stats = {
+      total: registrations.length,
+      byClass: registrations.reduce(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (acc: Record<string, number>, reg: any) => {
+          acc[reg.dog_class] = (acc[reg.dog_class] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>,
+      ),
+      byGender: registrations.reduce(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (acc: Record<string, number>, reg: any) => {
+          acc[reg.dog.gender] = (acc[reg.dog.gender] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>,
+      ),
+    };
 
     return new Response(JSON.stringify(stats), {
       status: 200,

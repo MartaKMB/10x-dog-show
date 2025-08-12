@@ -109,9 +109,6 @@ const ClassGroupNode: React.FC<ClassGroupNodeProps> = ({
                   <DogCard
                     dog={{
                       registration: dogData.registration || {},
-                      descriptionStatus: dogData.descriptionStatus || {
-                        status: "none",
-                      },
                       canEdit,
                       canDelete,
                       isExpanded: false,

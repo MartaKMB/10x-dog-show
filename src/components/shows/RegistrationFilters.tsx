@@ -62,19 +62,6 @@ const RegistrationFilters: React.FC<RegistrationFiltersProps> = ({
     { value: "veteran" as const, label: "Weteran" },
   ];
 
-  const fciGroups = [
-    { value: "G1", label: "Grupa 1 - Owczarki i psy pasterskie" },
-    { value: "G2", label: "Grupa 2 - Pinczery, sznaucery, molosy" },
-    { value: "G3", label: "Grupa 3 - Teriery" },
-    { value: "G4", label: "Grupa 4 - Jamniki" },
-    { value: "G5", label: "Grupa 5 - Szpice i psy w typie pierwotnym" },
-    { value: "G6", label: "Grupa 6 - Psy gończe i rasy pokrewne" },
-    { value: "G7", label: "Grupa 7 - Psy wystawowe" },
-    { value: "G8", label: "Grupa 8 - Aportery, płochacze i psy wodne" },
-    { value: "G9", label: "Grupa 9 - Psy ozdobne i do towarzystwa" },
-    { value: "G10", label: "Grupa 10 - Charty" },
-  ];
-
   const breeds = [
     {
       value: "550e8400-e29b-41d4-a716-446655440101",
@@ -138,31 +125,6 @@ const RegistrationFilters: React.FC<RegistrationFiltersProps> = ({
             onChange={(e) => handleSearchChange(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
-        </div>
-
-        {/* FCI Group */}
-        <div>
-          <label
-            htmlFor="fciGroup"
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
-            Grupa FCI
-          </label>
-          <select
-            id="fciGroup"
-            value={localFilters.fciGroup || ""}
-            onChange={(e) =>
-              handleFilterChange("fciGroup", e.target.value || undefined)
-            }
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="">Wszystkie grupy</option>
-            {fciGroups.map((group) => (
-              <option key={group.value} value={group.value}>
-                {group.label}
-              </option>
-            ))}
-          </select>
         </div>
 
         {/* Breed */}
@@ -280,22 +242,6 @@ const RegistrationFilters: React.FC<RegistrationFiltersProps> = ({
                 <button
                   onClick={() => handleFilterChange("search", undefined)}
                   className="ml-2 text-blue-600 hover:text-blue-800"
-                >
-                  ×
-                </button>
-              </span>
-            )}
-
-            {localFilters.fciGroup && (
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-indigo-100 text-indigo-800">
-                Grupa:{" "}
-                {
-                  fciGroups.find((g) => g.value === localFilters.fciGroup)
-                    ?.label
-                }
-                <button
-                  onClick={() => handleFilterChange("fciGroup", undefined)}
-                  className="ml-2 text-indigo-600 hover:text-indigo-800"
                 >
                   ×
                 </button>
