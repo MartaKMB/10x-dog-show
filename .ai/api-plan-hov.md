@@ -1,4 +1,4 @@
-# REST API Plan - 10x Hovawart Show
+# REST API Plan - HovBase
 
 ## 1. Resources
 

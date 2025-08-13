@@ -5,7 +5,7 @@ interface Props {
   title?: string;
 }
 
-const { title = "Klub Hovawarta Show" } = Astro.props;
+const { title = "HovBase" } = Astro.props;
 const auth = Astro.locals.auth;
 const user = auth?.user ?? null;
 ---
@@ -32,7 +32,7 @@ const user = auth?.user ?? null;
                 <div class="w-8 h-8 bg-amber-600 rounded-lg flex items-center justify-center">
                   <span class="text-white font-bold text-sm">H</span>
                 </div>
-                <span class="text-xl font-semibold text-gray-900">Klub Hovawarta Show</span>
+                <span class="text-xl font-semibold text-gray-900">HovBase</span>
               </a>
             </div>
 

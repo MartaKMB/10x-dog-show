@@ -1,6 +1,6 @@
 # Specyfikacja modułu autentykacji (rejestracja, logowanie, odzyskiwanie hasła)
 
-Dokument projektowy dla MVP zgodny z: `prd-hov.md` (US-002 „Wgląd” i US-003 „Bezpieczny dostęp i uwierzytelnianie”) oraz `tech-stack.md` (Astro 5 + React 19 + TypeScript + Supabase). Celem jest dodanie pełnego modułu auth bez naruszania istniejącego działania aplikacji (publiczny wgląd danych, edycja tylko po zalogowaniu).
+Dokument projektowy dla MVP zgodny z: `prd-hov.md` (US-002 „Wgląd” i US-003 „Bezpieczny dostęp i uwierzytelnianie”) oraz `tech-stack.md` (Astro 5 + React 19 + TypeScript + Supabase). Celem jest dodanie pełnego modułu auth bez naruszania istniejącego działania aplikacji HovBase (publiczny wgląd danych, edycja tylko po zalogowaniu).
 
 Odwołania:
 

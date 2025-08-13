@@ -1,4 +1,4 @@
-# 10x Dog Show
+# HovBase
 
 A modern web application for managing and archiving dog show results, specifically designed for the Hovawart Club. Built with Astro, React, and Supabase to provide a comprehensive solution for show organizers, judges, and dog owners.
 
@@ -14,7 +14,7 @@ A modern web application for managing and archiving dog show results, specifical
 
 ## 🎯 Project Description
 
-10x Dog Show is a web application designed to centralize and manage dog show results for the Hovawart Club. The system provides a comprehensive platform for archiving historical show data, managing evaluations, and generating statistics for club management.
+HovBase is a web application designed to centralize and manage dog show results for the Hovawart Club. The system provides a comprehensive platform for archiving historical show data, managing evaluations, and generating statistics for club management.
 
 ### Key Features (MVP)
 
@@ -101,7 +101,7 @@ The project supports both local and cloud testing environments:
 
    ```bash
    git clone <repository-url>
-   cd 10x-dog-show
+   cd hovbase
    ```
 
 2. **Install dependencies**

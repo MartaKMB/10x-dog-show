@@ -1,4 +1,4 @@
-## Plan testów dla projektu 10x-dog-show (Klub Hovawarta Show)
+## Plan testów dla projektu HovBase (Klub Hovawarta Show)
 
 ### 1. Wprowadzenie i cele testowania
 

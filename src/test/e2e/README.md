@@ -1,8 +1,8 @@
-# End-to-End Testy - 10x Dog Show
+# End-to-End Testy - HovBase
 
 ## Przegląd
 
-Ten katalog zawiera end-to-end (E2E) testy dla aplikacji 10x Dog Show. Testy są napisane przy użyciu **Playwright** i symulują rzeczywiste interakcje użytkownika w przeglądarce, testując pełne przepływy aplikacji.
+Ten katalog zawiera end-to-end (E2E) testy dla aplikacji HovBase. Testy są napisane przy użyciu **Playwright** i symulują rzeczywiste interakcje użytkownika w przeglądarce, testując pełne przepływy aplikacji.
 
 ## 🚀 Nowe ulepszenia (2024)
 

@@ -1,8 +1,8 @@
-# Dokument techniczny - Tech Stack 10x Dog Show
+# Dokument techniczny - Tech Stack HovBase
 
 ## 1. Przegląd architektury
 
-10x Dog Show to aplikacja webowa oparta na nowoczesnym, skalowalnym tech stack, który zapewnia szybki development MVP przy zachowaniu możliwości rozbudowy w przyszłości.
+HovBase to aplikacja webowa oparta na nowoczesnym, skalowalnym tech stack, który zapewnia szybki development MVP przy zachowaniu możliwości rozbudowy w przyszłości.
 
 ### Kluczowe zasady:
 
@@ -148,7 +148,7 @@
 ### Struktura aplikacji:
 
 ```
-10x-dog-show/
+hovbase/
 ├── src/
 │   ├── pages/              # Astro pages (routing)
 │   │   ├── auth/           # Strony autentykacji
