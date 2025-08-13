@@ -36,6 +36,7 @@ interface DogRow {
   name: string;
   gender: DogGender;
   birth_date: string;
+  coat: "czarny" | "czarny_podpalany" | "blond";
   microchip_number: string | null;
   kennel_name: string | null;
   father_name: string | null;
@@ -101,6 +102,7 @@ export class RegistrationService {
             name,
             gender,
             birth_date,
+            coat,
             kennel_name
           )
         `,
@@ -118,6 +120,10 @@ export class RegistrationService {
 
       if (params?.gender) {
         query = query.eq("dog.gender", params.gender);
+      }
+
+      if (params?.coat) {
+        query = query.eq("dog.coat", params.coat);
       }
 
       if (params?.search) {
@@ -570,6 +576,7 @@ export class RegistrationService {
         name: registration.dog.name,
         gender: registration.dog.gender,
         birth_date: registration.dog.birth_date,
+        coat: registration.dog.coat,
         microchip_number: null,
         kennel_name: null,
         father_name: null,
@@ -589,6 +596,7 @@ export class RegistrationService {
       registration_fee: number | null;
       dog?: {
         gender?: DogGender;
+        coat?: "czarny" | "czarny_podpalany" | "blond";
       };
     }[],
   ): RegistrationStatsDto {
@@ -596,6 +604,7 @@ export class RegistrationService {
       total_registrations: registrations.length,
       by_class: {} as Record<DogClass, number>,
       by_gender: {} as Record<DogGender, number>,
+      by_coat: {} as Record<"czarny" | "czarny_podpalany" | "blond", number>,
     };
 
     registrations.forEach((reg) => {
@@ -606,6 +615,12 @@ export class RegistrationService {
       const gender = reg.dog?.gender;
       if (gender) {
         stats.by_gender[gender] = (stats.by_gender[gender] || 0) + 1;
+      }
+
+      // Maść psa
+      const coat = reg.dog?.coat;
+      if (coat) {
+        stats.by_coat[coat] = (stats.by_coat[coat] || 0) + 1;
       }
     });
 

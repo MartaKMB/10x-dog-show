@@ -584,7 +584,7 @@ const EditDogModal: React.FC<EditDogModalProps> = ({
             <button
               type="submit"
               disabled={isProcessing}
-              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
+              className="px-6 py-2 bg-amber-500 text-gray-900 rounded-md hover:bg-amber-400 transition-colors disabled:opacity-50"
             >
               {isProcessing ? "Zapisywanie..." : "Zapisz zmiany"}
             </button>

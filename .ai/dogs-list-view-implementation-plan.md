@@ -97,7 +97,7 @@ Widok listy psów (Dogs List) zapewnia zarządzanie psami w systemie klubu hovaw
 
 ## 5. Typy
 
-- Reużywane z `@types.ts` (`10x-dog-show/src/types.ts`):
+- Reużywane z `@types.ts` (`hovbase/src/types.ts`):
   - `DogResponse`, `DogQueryParams`, `PaginationInfo`, `PaginatedResponse<T>`.
 - Nowe (ViewModely):
   - `DogFiltersState`:
@@ -185,7 +185,7 @@ Widok listy psów (Dogs List) zapewnia zarządzanie psami w systemie klubu hovaw
 
 ---
 
-- PRD: `@prd-hov.md` (`10x-dog-show/.ai/prd-hov.md`)
+- PRD: `@prd-hov.md` (`hovbase/.ai/prd-hov.md`)
 - Opis widoku (UI plan): `@ui-plan-hov.md` → sekcja „Dogs List”
 - User Stories adresowane: US-003 (Dodawanie psa do systemu – nawigacja z listy), US-009 (Wyszukiwanie psów)
 - Endpointy: `@api-plan-hov.md` → Dogs Management

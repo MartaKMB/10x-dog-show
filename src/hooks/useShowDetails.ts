@@ -26,6 +26,7 @@ export const useShowDetails = (showId: string): UseShowDetailsReturn => {
   const [filters, setFilters] = useState<FilterState>({
     gender: undefined,
     dogClass: undefined,
+    coat: undefined,
     search: "",
   });
 
@@ -83,6 +84,14 @@ export const useShowDetails = (showId: string): UseShowDetailsReturn => {
       if (
         filters.dogClass !== undefined &&
         registration.dog_class !== filters.dogClass
+      ) {
+        return false;
+      }
+
+      // Coat filter
+      if (
+        filters.coat !== undefined &&
+        registration.dog.coat !== filters.coat
       ) {
         return false;
       }

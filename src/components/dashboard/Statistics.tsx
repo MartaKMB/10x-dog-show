@@ -17,7 +17,7 @@ const Statistics: React.FC = () => {
             <p className="text-gray-600 mb-4">{error}</p>
             <button
               onClick={refreshData}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+              className="bg-amber-500 hover:bg-amber-400 text-gray-900 px-4 py-2 rounded-lg transition-colors"
             >
               Spróbuj ponownie
             </button>

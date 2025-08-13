@@ -143,7 +143,7 @@ const DogsList: React.FC<DogsListProps> = ({
                 onClick={() => setGenderOrder("female_first")}
                 className={`px-3 py-1 text-sm border rounded-l-md ${
                   genderOrder === "female_first"
-                    ? "bg-blue-600 text-white border-blue-600"
+                    ? "bg-amber-500 text-gray-900 border-amber-600"
                     : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
                 }`}
               >
@@ -154,7 +154,7 @@ const DogsList: React.FC<DogsListProps> = ({
                 onClick={() => setGenderOrder("male_first")}
                 className={`px-3 py-1 text-sm border rounded-r-md -ml-px ${
                   genderOrder === "male_first"
-                    ? "bg-blue-600 text-white border-blue-600"
+                    ? "bg-amber-500 text-gray-900 border-amber-600"
                     : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
                 }`}
               >
@@ -167,7 +167,7 @@ const DogsList: React.FC<DogsListProps> = ({
           {canAddDogs && (
             <button
               onClick={onAddDog}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
+              className="px-4 py-2 bg-amber-500 text-gray-900 rounded-md hover:bg-amber-400 transition-colors text-sm font-medium"
             >
               + Dodaj psa do wystawy
             </button>
@@ -188,7 +188,7 @@ const DogsList: React.FC<DogsListProps> = ({
           {canAddDogs && (
             <button
               onClick={onAddDog}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 bg-amber-500 text-gray-900 rounded-md hover:bg-amber-400 transition-colors"
             >
               Dodaj pierwszego psa do wystawy
             </button>

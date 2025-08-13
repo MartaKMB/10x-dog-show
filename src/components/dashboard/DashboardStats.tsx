@@ -19,7 +19,7 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({
         {[...Array(3)].map((_, index) => (
           <div
             key={index}
-            className="bg-white shadow rounded-lg p-6 animate-pulse"
+            className="bg-white shadow-lg rounded-lg p-6 animate-pulse border border-gray-200"
           >
             <div className="h-4 bg-gray-200 rounded w-1/3 mb-2"></div>
             <div className="h-8 bg-gray-200 rounded w-1/2 mb-2"></div>
@@ -35,21 +35,21 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({
       title: "Wszystkie wystawy",
       value: stats.totalShows,
       icon: "📋",
-      color: "bg-blue-500",
+      color: "bg-amber-500",
       description: "Łączna liczba wystaw",
     },
     {
       title: "Uzupełnione wystawy",
       value: stats.completedShows,
       icon: "✅",
-      color: "bg-gray-500",
+      color: "bg-amber-500",
       description: "Uzupełnione wystawy",
     },
     {
       title: "Dodane psy",
       value: stats.totalDogs,
       icon: "🐕",
-      color: "bg-purple-500",
+      color: "bg-amber-500",
       description: "Łączna liczba psów w serwisie",
     },
   ];
@@ -59,7 +59,7 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({
       {statCards.map((card, index) => (
         <div
           key={index}
-          className="bg-white shadow rounded-lg p-6 hover:shadow-md transition-shadow"
+          className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition-all duration-300 border border-gray-200"
         >
           <div className="flex items-center justify-between">
             <div>
@@ -69,10 +69,8 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({
               </p>
               <p className="text-xs text-gray-500 mt-1">{card.description}</p>
             </div>
-            <div
-              className={`${card.color} text-white p-3 rounded-full text-2xl`}
-            >
-              {card.icon}
+            <div className="bg-amber-500 text-gray-900 p-3 rounded-full text-2xl shadow-lg">
+              <img src="/bar-icon.png" alt="Statystyki" className="w-6 h-6" />
             </div>
           </div>
         </div>

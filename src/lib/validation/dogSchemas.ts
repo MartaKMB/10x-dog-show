@@ -19,6 +19,13 @@ export const createDogSchema = z
       }),
     }),
     birth_date: dateSchema,
+    coat: z
+      .enum(["czarny", "czarny_podpalany", "blond"], {
+        errorMap: () => ({
+          message: "Coat must be 'czarny', 'czarny_podpalany', or 'blond'",
+        }),
+      })
+      .optional(),
     microchip_number: z
       .string()
       .regex(/^[0-9]{15}$/, "Microchip number must be exactly 15 digits")
@@ -52,8 +59,23 @@ export const createDogSchema = z
 
 // Schema for updating dogs
 export const updateDogSchema = z.object({
-  name: z.string().min(1).max(100).optional(),
-  kennel_name: z.string().max(200).optional(),
+  name: z
+    .string()
+    .min(1, "Name is required")
+    .max(100, "Name cannot exceed 100 characters")
+    .optional(),
+  coat: z
+    .enum(["czarny", "czarny_podpalany", "blond"], {
+      errorMap: () => ({
+        message: "Coat must be 'czarny', 'czarny_podpalany', or 'blond'",
+      }),
+    })
+    .optional(),
+  kennel_name: z
+    .string()
+    .min(1, "Kennel name is required")
+    .max(200, "Kennel name cannot exceed 200 characters")
+    .optional(),
   father_name: z.string().max(100).optional(),
   mother_name: z.string().max(100).optional(),
 });
@@ -61,6 +83,7 @@ export const updateDogSchema = z.object({
 // Schema for dog query parameters
 export const dogQuerySchema = z.object({
   gender: z.enum(["male", "female"]).optional(),
+  coat: z.enum(["czarny", "czarny_podpalany", "blond"]).optional(),
   owner_id: uuidSchema.optional(),
   microchip_number: z.string().optional(),
   kennel_name: z.string().optional(),

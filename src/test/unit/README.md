@@ -1,8 +1,8 @@
-# Unit Testy - 10x Dog Show
+# Unit Testy - HovBase
 
 ## Przegląd
 
-Ten katalog zawiera unit testy dla aplikacji 10x Dog Show. Testy są napisane przy użyciu **Vitest** i **React Testing Library** zgodnie z najlepszymi praktykami testowania.
+Ten katalog zawiera unit testy dla aplikacji HovBase. Testy są napisane przy użyciu **Vitest** i **React Testing Library** zgodnie z najlepszymi praktykami testowania.
 
 ## Struktura katalogów
 

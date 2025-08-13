@@ -28,7 +28,7 @@ const ShowHeader: React.FC<ShowHeaderProps> = ({
       case "draft":
         return "bg-gray-500 text-white";
       case "completed":
-        return "bg-green-500 text-white";
+        return "bg-amber-400 text-gray-900";
       default:
         return "bg-gray-500 text-white";
     }
@@ -74,12 +74,14 @@ const ShowHeader: React.FC<ShowHeaderProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div className="bg-gray-900 rounded-lg shadow-md p-4">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         {/* Show Info */}
         <div className="flex-1">
-          <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-3xl font-bold text-gray-900">{show.name}</h1>
+          <div className="flex items-center gap-3 mb-4">
+            <h1 className="text-2xl font-bold text-amber-400 pr-4">
+              {show.name}
+            </h1>
             <span
               className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(show.status)}`}
             >
@@ -87,26 +89,31 @@ const ShowHeader: React.FC<ShowHeaderProps> = ({
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-300">
             <div>
-              <span className="font-medium">Data wystawy:</span>{" "}
-              {formatDate(show.show_date)}
+              <span className="font-medium text-amber-400">Data wystawy:</span>{" "}
+              <span className="text-gray-200">
+                {formatDate(show.show_date)}
+              </span>
             </div>
             <div>
-              <span className="font-medium">Lokalizacja:</span> {show.location}
+              <span className="font-medium text-amber-400">Lokalizacja:</span>{" "}
+              <span className="text-gray-200">{show.location}</span>
             </div>
             <div>
-              <span className="font-medium">Sędzia:</span> {show.judge_name}
+              <span className="font-medium text-amber-400">Sędzia:</span>{" "}
+              <span className="text-gray-200">{show.judge_name}</span>
             </div>
             <div>
-              <span className="font-medium">Dodane psy:</span>{" "}
-              {show.registered_dogs}
+              <span className="font-medium text-amber-400">Dodane psy:</span>{" "}
+              <span className="text-gray-200">{show.registered_dogs}</span>
             </div>
           </div>
 
           {show.description && (
-            <div className="mt-4 text-sm text-gray-600">
-              <span className="font-medium">Opis:</span> {show.description}
+            <div className="mt-4 text-sm text-gray-300">
+              <span className="font-medium text-amber-400">Opis:</span>{" "}
+              <span className="text-gray-200">{show.description}</span>
             </div>
           )}
         </div>
@@ -118,7 +125,7 @@ const ShowHeader: React.FC<ShowHeaderProps> = ({
             <div className="flex items-center gap-2">
               <label
                 htmlFor="status-select"
-                className="text-sm font-medium text-gray-700"
+                className="text-sm font-medium text-amber-400"
               >
                 Status:
               </label>
@@ -129,7 +136,7 @@ const ShowHeader: React.FC<ShowHeaderProps> = ({
                   handleStatusChange(e.target.value as ShowStatus)
                 }
                 disabled={isUpdating || !canEdit}
-                className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white text-gray-900"
               >
                 <option value="draft">Szkic</option>
                 <option value="completed">Opisana</option>
@@ -141,7 +148,7 @@ const ShowHeader: React.FC<ShowHeaderProps> = ({
               {canEdit && (
                 <button
                   onClick={onEdit}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
+                  className="px-4 py-2 bg-amber-500 text-gray-900 rounded-md hover:bg-amber-400 transition-colors text-sm font-medium"
                 >
                   Edytuj
                 </button>

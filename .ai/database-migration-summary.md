@@ -1,4 +1,4 @@
-# Podsumowanie Migracji Bazy Danych - 10x Dog Show
+# Podsumowanie Migracji Bazy Danych - HovBase
 
 ## 📋 **Przegląd Problemów i Rozwiązań**
 
@@ -7,7 +7,7 @@
 **Główną przyczyną zmian była fundamentalna zmiana koncepcji aplikacji:**
 
 - **PRZED**: Aplikacja dla **Związku Kynologicznego** z obsługą różnych oddziałów, ras i typów wystaw
-- **TERAZ**: Aplikacja dla **Klubu Hovawarta** z MVP skupionym na **wystawach klubowych** (tylko psy rasy Hovawart)
+- **TERAZ**: Aplikacja **HovBase** dla **Klubu Hovawarta** z MVP skupionym na **wystawach klubowych** (tylko psy rasy Hovawart)
 
 **Wpływ na architekturę:**
 
@@ -18,7 +18,7 @@
 
 ### **🔍 Główny Problem**
 
-Aplikacja 10xdogshow miała **niespójność danych** między różnymi widokami:
+Aplikacja HovBase miała **niespójność danych** między różnymi widokami:
 
 - Lista psów (`/dogs`) pokazywała 2 psy
 - Widok pojedynczej wystawy (`/shows/{id}`) pokazywał 5 różnych psów
@@ -168,7 +168,7 @@ supabase/seed.sql  # 10 psów, 3 wystawy, 15 rejestracji
 
 ```bash
 # Utwórz nowy projekt Supabase dla testów
-supabase projects create --name "10x-dog-show-test"
+supabase projects create --name "hovbase-test"
 
 # Skopiuj konfigurację
 cp supabase/config.toml supabase.test.toml

@@ -10,6 +10,7 @@ import type {
 import ShowHeader from "./ShowHeader";
 import ShowStats from "./ShowStats.tsx";
 import DogsList from "./DogsList.tsx";
+import RegistrationFilters from "./RegistrationFilters.tsx";
 import AddDogModal from "./AddDogModal.tsx";
 import EditDogModal from "./EditDogModal.tsx";
 import EditShowModal from "./EditShowModal.tsx";
@@ -61,6 +62,11 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
       byGender: {
         male: 0,
         female: 0,
+      },
+      byCoat: {
+        czarny: 0,
+        czarny_podpalany: 0,
+        blond: 0,
       },
     },
     canEdit: false,
@@ -178,18 +184,25 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
       male: 0,
       female: 0,
     };
+    const byCoat: Record<string, number> = {
+      czarny: 0,
+      czarny_podpalany: 0,
+      blond: 0,
+    };
 
     registrations.forEach((registration) => {
       byClass[registration.dog_class] =
         (byClass[registration.dog_class] || 0) + 1;
       byGender[registration.dog.gender] =
         (byGender[registration.dog.gender] || 0) + 1;
+      byCoat[registration.dog.coat] = (byCoat[registration.dog.coat] || 0) + 1;
     });
 
     return {
       totalDogs: registrations.length,
       byClass,
       byGender,
+      byCoat,
     };
   };
 
@@ -285,6 +298,15 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
 
       {/* Show Stats */}
       <ShowStats stats={viewModel.stats} userRole={userRole} />
+
+      {/* Registration Filters */}
+      <RegistrationFilters
+        onFiltersChange={() => {
+          // TODO: Implement filter handling
+        }}
+        currentFilters={viewModel.filters}
+        userRole={userRole}
+      />
 
       {/* Dogs List */}
       <DogsList

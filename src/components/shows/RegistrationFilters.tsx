@@ -62,6 +62,15 @@ const RegistrationFilters: React.FC<RegistrationFiltersProps> = ({
     { value: "veteran" as const, label: "Weteran" },
   ];
 
+  const getCoatLabel = (coat: string): string => {
+    const coatLabels: Record<string, string> = {
+      czarny: "Czarny",
+      czarny_podpalany: "Czarny podpalany",
+      blond: "Blond",
+    };
+    return coatLabels[coat] || coat;
+  };
+
   const breeds = [
     {
       value: "550e8400-e29b-41d4-a716-446655440101",
@@ -199,6 +208,29 @@ const RegistrationFilters: React.FC<RegistrationFiltersProps> = ({
           </select>
         </div>
 
+        {/* Coat */}
+        <div>
+          <label
+            htmlFor="coat"
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Maść
+          </label>
+          <select
+            id="coat"
+            value={localFilters.coat || ""}
+            onChange={(e) =>
+              handleFilterChange("coat", e.target.value || undefined)
+            }
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="">Wszystkie maści</option>
+            <option value="czarny">Czarny</option>
+            <option value="czarny_podpalany">Czarny podpalany</option>
+            <option value="blond">Blond</option>
+          </select>
+        </div>
+
         {/* Payment Status - Only for department representatives */}
         {userRole === "department_representative" && (
           <div>
@@ -283,6 +315,18 @@ const RegistrationFilters: React.FC<RegistrationFiltersProps> = ({
                 <button
                   onClick={() => handleFilterChange("gender", undefined)}
                   className="ml-2 text-purple-600 hover:text-purple-800"
+                >
+                  ×
+                </button>
+              </span>
+            )}
+
+            {localFilters.coat && (
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-orange-100 text-orange-800">
+                Maść: {getCoatLabel(localFilters.coat)}
+                <button
+                  onClick={() => handleFilterChange("coat", undefined)}
+                  className="ml-2 text-orange-600 hover:text-orange-800"
                 >
                   ×
                 </button>

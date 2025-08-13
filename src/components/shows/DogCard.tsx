@@ -30,6 +30,15 @@ const DogCard: React.FC<DogCardProps> = ({ dog, onAction, userRole }) => {
     return classLabels[dogClass] || dogClass;
   };
 
+  const getCoatLabel = (coat: string): string => {
+    const coatLabels: Record<string, string> = {
+      czarny: "Czarny",
+      czarny_podpalany: "Czarny podpalany",
+      blond: "Blond",
+    };
+    return coatLabels[coat] || coat;
+  };
+
   const getGradeLabel = (grade: string | null): string => {
     if (!grade) return "Brak oceny";
     // Polish FCI grades per MVP enums
@@ -119,10 +128,10 @@ const DogCard: React.FC<DogCardProps> = ({ dog, onAction, userRole }) => {
         grade:
           dog.evaluation.dog_class === "baby" ||
           dog.evaluation.dog_class === "puppy"
-            ? dog.evaluation.baby_puppy_grade
-            : dog.evaluation.grade,
-        title: dog.evaluation.club_title,
-        placement: dog.evaluation.placement,
+            ? (dog.evaluation.baby_puppy_grade ?? null)
+            : (dog.evaluation.grade ?? null),
+        title: dog.evaluation.club_title ?? null,
+        placement: dog.evaluation.placement ?? null,
       }
     : {
         grade: null as string | null,
@@ -163,6 +172,10 @@ const DogCard: React.FC<DogCardProps> = ({ dog, onAction, userRole }) => {
                   {calculateAge(dog.registration.dog.birth_date)}
                 </p>
                 <p>
+                  <strong>Maść:</strong>{" "}
+                  {getCoatLabel(dog.registration.dog.coat)}
+                </p>
+                <p>
                   <strong>Data urodzenia:</strong>{" "}
                   {formatDate(dog.registration.dog.birth_date)}
                 </p>
@@ -200,24 +213,24 @@ const DogCard: React.FC<DogCardProps> = ({ dog, onAction, userRole }) => {
             </div>
 
             {/* Evaluation Results */}
-            <div className="mt-3 p-3 bg-blue-50 rounded-md">
-              <h4 className="font-medium text-blue-900 mb-2">Wyniki wystawy</h4>
+            <div className="mt-3 p-3 bg-amber-500/60 rounded-md">
+              <h4 className="font-medium text-gray-900 mb-2">Wyniki wystawy</h4>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
                 <div>
-                  <span className="font-medium text-blue-800">Ocena:</span>{" "}
-                  <span className="text-blue-700">
+                  <span className="font-medium text-gray-900">Ocena:</span>{" "}
+                  <span className="text-gray-900">
                     {getGradeLabel(evaluation.grade)}
                   </span>
                 </div>
                 <div>
-                  <span className="font-medium text-blue-800">Tytuł:</span>{" "}
-                  <span className="text-blue-700">
+                  <span className="font-medium text-gray-900">Tytuł:</span>{" "}
+                  <span className="text-gray-900">
                     {getTitleLabel(evaluation.title)}
                   </span>
                 </div>
                 <div>
-                  <span className="font-medium text-blue-800">Lokata:</span>{" "}
-                  <span className="text-blue-700">
+                  <span className="font-medium text-gray-900">Lokata:</span>{" "}
+                  <span className="text-gray-900">
                     {getPlacementLabel(evaluation.placement)}
                   </span>
                 </div>
@@ -261,6 +274,10 @@ const DogCard: React.FC<DogCardProps> = ({ dog, onAction, userRole }) => {
             <div>
               <h4 className="font-medium text-gray-900 mb-2">Szczegóły psa</h4>
               <div className="space-y-1 text-gray-600">
+                <p>
+                  <strong>Maść:</strong>{" "}
+                  {getCoatLabel(dog.registration.dog.coat)}
+                </p>
                 <p>
                   <strong>Numer chipa:</strong>{" "}
                   {dog.registration.dog.microchip_number || "Brak"}

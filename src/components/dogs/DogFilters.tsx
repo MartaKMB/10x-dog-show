@@ -3,7 +3,7 @@ import type { DogGender } from "../../types";
 
 export type DogFiltersState = {
   gender?: DogGender;
-  microchip_number?: string;
+  coat?: "czarny" | "czarny_podpalany" | "blond";
   kennel_name?: string;
   owner_id?: string;
 };
@@ -36,7 +36,7 @@ const DogFilters: React.FC<DogFiltersProps> = ({
   const [localSearch, setLocalSearch] = useState(searchValue || "");
   const [errors, setErrors] = useState<{
     search?: string;
-    microchip_number?: string;
+    coat?: string;
   }>({});
 
   useEffect(() => {
@@ -62,22 +62,17 @@ const DogFilters: React.FC<DogFiltersProps> = ({
     onFiltersChange({ gender: value === "" ? undefined : value });
   };
 
-  const handleKennelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onFiltersChange({ kennel_name: e.target.value || undefined });
+  const handleCoatChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value as
+      | "czarny"
+      | "czarny_podpalany"
+      | "blond"
+      | "";
+    onFiltersChange({ coat: value === "" ? undefined : value });
   };
 
-  const handleMicrochipChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    const pattern = /^[0-9]{15}$/;
-    if (value && !pattern.test(value)) {
-      setErrors((prev) => ({
-        ...prev,
-        microchip_number: "Numer chipa musi mieć 15 cyfr",
-      }));
-    } else {
-      setErrors((prev) => ({ ...prev, microchip_number: undefined }));
-    }
-    onFiltersChange({ microchip_number: value || undefined });
+  const handleKennelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onFiltersChange({ kennel_name: e.target.value || undefined });
   };
 
   const handleClear = () => {
@@ -86,7 +81,7 @@ const DogFilters: React.FC<DogFiltersProps> = ({
     onClearFilters();
   };
 
-  const hasErrors = Boolean(errors.search || errors.microchip_number);
+  const hasErrors = Boolean(errors.search || errors.coat);
 
   return (
     <div className="space-y-4">
@@ -104,7 +99,7 @@ const DogFilters: React.FC<DogFiltersProps> = ({
             value={localSearch}
             onChange={handleSearchChange}
             placeholder="Imię psa lub nazwa hodowli"
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
           />
           {errors.search && (
             <p className="mt-1 text-xs text-red-600">{errors.search}</p>
@@ -121,7 +116,7 @@ const DogFilters: React.FC<DogFiltersProps> = ({
             id="gender"
             value={filters.gender || ""}
             onChange={handleGenderChange}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
           >
             <option value="">Wszystkie</option>
             <option value="male">samiec</option>
@@ -130,26 +125,22 @@ const DogFilters: React.FC<DogFiltersProps> = ({
         </div>
         <div>
           <label
-            htmlFor="microchip"
+            htmlFor="coat"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Numer chipa
+            Maść
           </label>
-          <input
-            id="microchip"
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]{15}"
-            value={filters.microchip_number || ""}
-            onChange={handleMicrochipChange}
-            placeholder="15 cyfr"
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          {errors.microchip_number && (
-            <p className="mt-1 text-xs text-red-600">
-              {errors.microchip_number}
-            </p>
-          )}
+          <select
+            id="coat"
+            value={filters.coat || ""}
+            onChange={handleCoatChange}
+            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
+          >
+            <option value="">Wszystkie</option>
+            <option value="czarny">czarny</option>
+            <option value="czarny_podpalany">czarny_podpalany</option>
+            <option value="blond">blond</option>
+          </select>
         </div>
         <div>
           <label
@@ -164,7 +155,7 @@ const DogFilters: React.FC<DogFiltersProps> = ({
             value={filters.kennel_name || ""}
             onChange={handleKennelChange}
             placeholder="Nazwa hodowli"
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
           />
         </div>
       </div>
@@ -176,7 +167,7 @@ const DogFilters: React.FC<DogFiltersProps> = ({
         <button
           type="button"
           onClick={handleClear}
-          className="text-sm text-blue-700 hover:text-blue-800"
+          className="text-sm text-amber-600 hover:text-amber-700 font-medium"
         >
           Wyczyść filtry
         </button>

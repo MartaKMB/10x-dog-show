@@ -213,6 +213,7 @@ export interface DogCreateRequest {
   name: string;
   gender: DogGender;
   birth_date: string;
+  coat: "czarny" | "czarny_podpalany" | "blond";
   microchip_number?: string;
   kennel_name?: string;
   father_name?: string;
@@ -225,6 +226,7 @@ export interface DogCreateRequest {
 
 export interface DogUpdateRequest {
   name?: string;
+  coat?: "czarny" | "czarny_podpalany" | "blond";
   kennel_name?: string;
   father_name?: string;
   mother_name?: string;
@@ -244,6 +246,7 @@ export interface DogResponse {
   name: string;
   gender: DogGender;
   birth_date: string;
+  coat: "czarny" | "czarny_podpalany" | "blond";
   microchip_number: string | null;
   kennel_name: string | null;
   father_name: string | null;
@@ -341,6 +344,7 @@ export interface RegistrationResponse {
     name: string;
     gender: DogGender;
     birth_date: string;
+    coat: "czarny" | "czarny_podpalany" | "blond";
     microchip_number: string | null;
     kennel_name: string | null;
     father_name: string | null;
@@ -400,12 +404,18 @@ export interface EvaluationResponse {
     name: string;
     gender: DogGender;
     birth_date: string;
+    coat: "czarny" | "czarny_podpalany" | "blond";
+    microchip_number: string | null;
+    kennel_name: string | null;
+    father_name: string | null;
+    mother_name: string | null;
+    owners: DogOwnerInfo[];
   };
   dog_class: DogClass;
-  grade: EvaluationGrade | null;
-  baby_puppy_grade: BabyPuppyGrade | null;
-  club_title: ClubTitle | null;
-  placement: Placement | null;
+  grade?: EvaluationGrade;
+  baby_puppy_grade?: BabyPuppyGrade;
+  club_title?: ClubTitle;
+  placement?: Placement;
   created_at: string;
 }
 
@@ -546,6 +556,7 @@ export interface RegistrationStats {
   total_registrations: number;
   by_class: Record<DogClass, number>;
   by_gender: Record<DogGender, number>;
+  by_coat: Record<"czarny" | "czarny_podpalany" | "blond", number>;
 }
 
 export interface EvaluationStats {
@@ -633,6 +644,7 @@ export interface ShowQueryParams {
 
 export interface DogQueryParams {
   gender?: DogGender;
+  coat?: "czarny" | "czarny_podpalany" | "blond";
   owner_id?: string;
   microchip_number?: string;
   kennel_name?: string;
@@ -655,6 +667,7 @@ export interface RegistrationQueryParams {
   dog_class?: DogClass;
   is_paid?: boolean;
   gender?: DogGender;
+  coat?: "czarny" | "czarny_podpalany" | "blond";
   breed_id?: string;
   search?: string;
   page?: number;
@@ -825,6 +838,7 @@ export interface ShowStats {
   totalDogs: number;
   byClass: Record<DogClass, number>;
   byGender: Record<DogGender, number>;
+  byCoat: Record<"czarny" | "czarny_podpalany" | "blond", number>;
 }
 
 export interface FilterState {
@@ -832,6 +846,7 @@ export interface FilterState {
   isPaid?: boolean;
   search?: string;
   gender?: DogGender;
+  coat?: "czarny" | "czarny_podpalany" | "blond";
   breedId?: string;
 }
 

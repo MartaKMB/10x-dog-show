@@ -35,7 +35,13 @@ export class EvaluationService {
             id,
             name,
             gender,
-            birth_date
+            birth_date,
+            coat,
+            microchip_number,
+            kennel_name,
+            father_name,
+            mother_name,
+            owners
           )
         `,
         )
@@ -80,6 +86,12 @@ export class EvaluationService {
           name: evaluation.dogs.name,
           gender: evaluation.dogs.gender,
           birth_date: evaluation.dogs.birth_date,
+          coat: evaluation.dogs.coat,
+          microchip_number: evaluation.dogs.microchip_number,
+          kennel_name: evaluation.dogs.kennel_name,
+          father_name: evaluation.dogs.father_name,
+          mother_name: evaluation.dogs.mother_name,
+          owners: [],
         },
         dog_class: evaluation.dog_class,
         grade: evaluation.grade,
@@ -145,7 +157,12 @@ export class EvaluationService {
             id,
             name,
             gender,
-            birth_date
+            birth_date,
+            coat,
+            microchip_number,
+            kennel_name,
+            father_name,
+            mother_name
           )
         `,
         )
@@ -209,7 +226,12 @@ export class EvaluationService {
             id,
             name,
             gender,
-            birth_date
+            birth_date,
+            coat,
+            microchip_number,
+            kennel_name,
+            father_name,
+            mother_name
           )
         `,
         )
@@ -437,6 +459,12 @@ export class EvaluationService {
         name: evaluation.dogs.name,
         gender: evaluation.dogs.gender,
         birth_date: evaluation.dogs.birth_date,
+        coat: evaluation.dogs.coat,
+        microchip_number: evaluation.dogs.microchip_number,
+        kennel_name: evaluation.dogs.kennel_name,
+        father_name: evaluation.dogs.father_name,
+        mother_name: evaluation.dogs.mother_name,
+        owners: [],
       },
       dog_class: evaluation.dog_class,
       grade: evaluation.grade,

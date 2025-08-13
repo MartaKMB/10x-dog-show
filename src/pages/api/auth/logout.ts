@@ -16,5 +16,11 @@ export const POST: APIRoute = async ({ cookies, request }) => {
     );
   }
 
-  return new Response(null, { status: 200 });
+  // Po pomyślnym wylogowaniu przekieruj na dashboard
+  return new Response(null, {
+    status: 302,
+    headers: {
+      Location: "/",
+    },
+  });
 };
