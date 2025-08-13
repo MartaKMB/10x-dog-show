@@ -200,24 +200,24 @@ const DogCard: React.FC<DogCardProps> = ({ dog, onAction, userRole }) => {
             </div>
 
             {/* Evaluation Results */}
-            <div className="mt-3 p-3 bg-blue-50 rounded-md">
-              <h4 className="font-medium text-blue-900 mb-2">Wyniki wystawy</h4>
+            <div className="mt-3 p-3 bg-amber-500/60 rounded-md">
+              <h4 className="font-medium text-gray-900 mb-2">Wyniki wystawy</h4>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
                 <div>
-                  <span className="font-medium text-blue-800">Ocena:</span>{" "}
-                  <span className="text-blue-700">
+                  <span className="font-medium text-gray-900">Ocena:</span>{" "}
+                  <span className="text-gray-900">
                     {getGradeLabel(evaluation.grade)}
                   </span>
                 </div>
                 <div>
-                  <span className="font-medium text-blue-800">Tytuł:</span>{" "}
-                  <span className="text-blue-700">
+                  <span className="font-medium text-gray-900">Tytuł:</span>{" "}
+                  <span className="text-gray-900">
                     {getTitleLabel(evaluation.title)}
                   </span>
                 </div>
                 <div>
-                  <span className="font-medium text-blue-800">Lokata:</span>{" "}
-                  <span className="text-blue-700">
+                  <span className="font-medium text-gray-900">Lokata:</span>{" "}
+                  <span className="text-gray-900">
                     {getPlacementLabel(evaluation.placement)}
                   </span>
                 </div>

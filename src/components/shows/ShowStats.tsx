@@ -36,11 +36,11 @@ const ShowStats: React.FC<ShowStatsProps> = ({ stats }) => {
 
       {/* Main Stats */}
       <div className="grid gap-6 mb-8 grid-cols-1 md:grid-cols-1">
-        <div className="bg-blue-50 rounded-lg p-4 text-center">
-          <div className="text-3xl font-bold text-blue-600">
+        <div className="bg-amber-500/60 rounded-lg p-4 text-center">
+          <div className="text-3xl font-bold text-gray-900">
             {stats.totalDogs}
           </div>
-          <div className="text-sm text-blue-800 font-medium">
+          <div className="text-sm text-gray-900 font-medium">
             Łącznie dodanych psów
           </div>
         </div>
