@@ -348,6 +348,7 @@ List hovawart dogs
 
 - **Query Parameters:**
   - `gender` (optional): Filter by gender (male/female)
+  - `coat` (optional): Filter by coat color (czarny, czarny_podpalany, blond)
   - `owner_id` (optional): Filter by owner
   - `microchip_number` (optional): Search by microchip
   - `kennel_name` (optional): Search by kennel name
@@ -363,6 +364,7 @@ List hovawart dogs
         "name": "Hovawart z Przykładu",
         "gender": "male",
         "birth_date": "2020-03-15",
+        "coat": "czarny",
         "microchip_number": "123456789012345",
         "kennel_name": "Hodowla Przykładowa",
         "father_name": "Champion Max",
@@ -398,6 +400,7 @@ Get specific dog details
     "name": "Hovawart z Przykładu",
     "gender": "male",
     "birth_date": "2020-03-15",
+    "coat": "czarny",
     "microchip_number": "123456789012345",
     "kennel_name": "Hodowla Przykładowa",
     "father_name": "Champion Max",
@@ -427,6 +430,7 @@ Create new dog
     "name": "Hovawart z Przykładu",
     "gender": "male",
     "birth_date": "2020-03-15",
+    "coat": "czarny",
     "microchip_number": "123456789012345",
     "kennel_name": "Hodowla Przykładowa",
     "father_name": "Champion Max",
@@ -462,6 +466,7 @@ Update dog information
   ```json
   {
     "name": "Hovawart z Przykładu - Zaktualizowany",
+    "coat": "czarny_podpalany",
     "kennel_name": "Hodowla Nowa",
     "father_name": "Champion Max Nowy"
   }
@@ -653,7 +658,8 @@ List registrations for a show
           "id": "uuid",
           "name": "Hovawart z Przykładu",
           "gender": "male",
-          "birth_date": "2020-03-15"
+          "birth_date": "2020-03-15",
+          "coat": "czarny"
         },
         "dog_class": "open",
         "catalog_number": 45,
@@ -759,7 +765,8 @@ List evaluations for a show
           "id": "uuid",
           "name": "Hovawart z Przykładu",
           "gender": "male",
-          "birth_date": "2020-03-15"
+          "birth_date": "2020-03-15",
+          "coat": "czarny"
         },
         "dog_class": "open",
         "grade": "bardzo_dobra",
@@ -863,7 +870,8 @@ Get dog's show history
       "id": "uuid",
       "name": "Hovawart z Przykładu",
       "gender": "male",
-      "birth_date": "2020-03-15"
+      "birth_date": "2020-03-15",
+      "coat": "czarny"
     },
     "history": [
       {
@@ -1042,6 +1050,12 @@ The API implements **Row Level Security** policies at the database level:
   - Working: 15+ months
   - Champion: 15+ months
   - Veteran: 8+ years
+
+#### Coat Validation
+
+- **Required field**: Coat color is mandatory for all dogs
+- **Valid values**: Only 'czarny', 'czarny_podpalany', or 'blond' are accepted
+- **Default value**: 'czarny' is set as default for new dogs
 
 #### Microchip Validation
 
