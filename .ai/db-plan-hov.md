@@ -21,6 +21,9 @@ CREATE TYPE public.show_status AS ENUM ('draft', 'open_for_registration', 'regis
 CREATE TYPE public.dog_gender AS ENUM ('male', 'female');
 CREATE TYPE public.dog_class AS ENUM ('baby', 'puppy', 'junior', 'intermediate', 'open', 'working', 'champion', 'veteran');
 
+-- Maści hovawarta
+CREATE TYPE public.dog_coat AS ENUM ('czarny', 'czarny_podpalany', 'blond');
+
 -- Typy ocen FCI w języku polskim
 CREATE TYPE public.evaluation_grade AS ENUM ('doskonała', 'bardzo_dobra', 'dobra', 'zadowalająca', 'zdyskwalifikowana', 'nieobecna');
 CREATE TYPE public.baby_puppy_grade AS ENUM ('bardzo_obiecujący', 'obiecujący', 'dość_obiecujący');
@@ -127,6 +130,7 @@ CREATE TABLE public.dogs (
     name VARCHAR(100) NOT NULL,
     gender public.dog_gender NOT NULL,
     birth_date DATE NOT NULL,
+    coat public.dog_coat NOT NULL DEFAULT 'czarny',
     microchip_number VARCHAR(50) UNIQUE,
     kennel_name VARCHAR(200),
     father_name VARCHAR(100),
@@ -202,6 +206,7 @@ CREATE INDEX idx_shows_status ON public.shows(status) WHERE deleted_at IS NULL;
 CREATE INDEX idx_dogs_microchip ON public.dogs(microchip_number) WHERE deleted_at IS NULL;
 CREATE INDEX idx_dogs_birth_date ON public.dogs(birth_date) WHERE deleted_at IS NULL;
 CREATE INDEX idx_dogs_gender ON public.dogs(gender) WHERE deleted_at IS NULL;
+CREATE INDEX idx_dogs_coat ON public.dogs(coat) WHERE deleted_at IS NULL;
 
 -- Indeksy dla właścicieli
 CREATE INDEX idx_owners_email ON public.owners(email) WHERE deleted_at IS NULL;
@@ -394,6 +399,7 @@ SELECT
     d.name,
     d.gender,
     d.birth_date,
+    d.coat,
     d.microchip_number,
     d.kennel_name,
     d.father_name,
@@ -412,7 +418,7 @@ FROM public.dogs d
 JOIN public.dog_owners do ON d.id = do.dog_id
 JOIN public.owners o ON do.owner_id = o.id
 WHERE d.deleted_at IS NULL
-GROUP BY d.id, d.name, d.gender, d.birth_date, d.microchip_number, d.kennel_name, d.father_name, d.mother_name;
+GROUP BY d.id, d.name, d.gender, d.birth_date, d.coat, d.microchip_number, d.kennel_name, d.father_name, d.mother_name;
 
 -- Widok pełnych informacji o wystawach
 CREATE VIEW public.show_details AS
@@ -445,6 +451,7 @@ SELECT
     d.name as dog_name,
     d.gender,
     d.birth_date,
+    d.coat,
     e.dog_class,
     e.grade,
     e.baby_puppy_grade,
@@ -465,7 +472,7 @@ JOIN public.dogs d ON e.dog_id = d.id
 JOIN public.dog_owners do ON d.id = do.dog_id
 JOIN public.owners o ON do.owner_id = o.id
 WHERE s.deleted_at IS NULL AND d.deleted_at IS NULL
-GROUP BY e.id, e.show_id, s.name, s.show_date, e.dog_id, d.name, d.gender, d.birth_date, e.dog_class, e.grade, e.baby_puppy_grade, e.club_title, e.placement, e.created_at;
+GROUP BY e.id, e.show_id, s.name, s.show_date, e.dog_id, d.name, d.gender, d.birth_date, d.coat, e.dog_class, e.grade, e.baby_puppy_grade, e.club_title, e.placement, e.created_at;
 ```
 
 ## 9. Dane podstawowe (Seeds)
@@ -476,9 +483,9 @@ INSERT INTO public.users (email, password_hash, first_name, last_name, role) VAL
 ('admin@klub-hovawarta.pl', '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewvYPcGvIjZxNe5.', 'Admin', 'Klubu Hovawarta', 'club_board');
 
 -- Przykładowe psy hovawart
-INSERT INTO public.dogs (name, gender, birth_date, microchip_number, kennel_name) VALUES
-('Hovawart z Przykładu', 'male', '2020-03-15', '123456789012345', 'Hodowla Przykładowa'),
-('Hovawartka z Przykładu', 'female', '2019-07-22', '987654321098765', 'Hodowla Przykładowa');
+INSERT INTO public.dogs (name, gender, birth_date, coat, microchip_number, kennel_name) VALUES
+('Hovawart z Przykładu', 'male', '2020-03-15', 'czarny', '123456789012345', 'Hodowla Przykładowa'),
+('Hovawartka z Przykładu', 'female', '2019-07-22', 'czarny_podpalany', '987654321098765', 'Hodowla Przykładowa');
 
 -- Przykładowy właściciel
 INSERT INTO public.owners (first_name, last_name, email, phone, address, city, postal_code, kennel_name, gdpr_consent, gdpr_consent_date) VALUES

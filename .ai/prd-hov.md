@@ -47,7 +47,11 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 
 ### System zarządzania psami:
 
-- Podstawowe dane identyfikacyjne psów (imię, rasa, płeć, data urodzenia, hodowla, numer chip)
+- Podstawowe dane identyfikacyjne psów (imię, rasa, płeć, data urodzenia, hodowla, numer chip, maść)
+- Maści hovawarta:
+  - Czarny
+  - Czarny podpalany
+  - Blond
 - Dane właścicieli (imię, nazwisko, email, telefon)
 - Historia udziału w wystawach
 
