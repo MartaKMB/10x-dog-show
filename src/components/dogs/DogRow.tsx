@@ -30,6 +30,15 @@ const DogRow: React.FC<DogRowProps> = ({ dog, onClick }) => {
         {dog.gender === "male" ? "samiec" : "suka"}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+        {dog.coat === "czarny"
+          ? "Czarny"
+          : dog.coat === "czarny_podpalany"
+            ? "Czarny podpalany"
+            : dog.coat === "blond"
+              ? "Blond"
+              : String(dog.coat)}
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
         {new Date(dog.birth_date).toLocaleDateString()}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">

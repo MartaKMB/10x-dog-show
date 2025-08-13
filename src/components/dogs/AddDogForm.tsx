@@ -9,6 +9,7 @@ interface DogFormData {
   name: string;
   gender: DogGender;
   birth_date: string;
+  coat: "czarny" | "czarny_podpalany" | "blond";
   microchip_number?: string;
   kennel_name?: string;
   father_name?: string;
@@ -31,6 +32,7 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
     name: "",
     gender: "male",
     birth_date: "",
+    coat: "czarny",
     microchip_number: "",
     kennel_name: "",
     father_name: "",
@@ -147,6 +149,7 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
         name: "",
         gender: "male",
         birth_date: "",
+        coat: "czarny",
         microchip_number: "",
         kennel_name: "",
         father_name: "",
@@ -275,11 +278,36 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
               <select
                 id="dog-gender"
                 value={dogData.gender}
-                onChange={(e) => handleDogChange("gender", e.target.value)}
+                onChange={(e) =>
+                  handleDogChange("gender", e.target.value as DogGender)
+                }
                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="male">Samiec</option>
                 <option value="female">Suka</option>
+              </select>
+            </div>
+            <div>
+              <label
+                htmlFor="dog-coat"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Maść *
+              </label>
+              <select
+                id="dog-coat"
+                value={dogData.coat}
+                onChange={(e) =>
+                  handleDogChange(
+                    "coat",
+                    e.target.value as "czarny" | "czarny_podpalany" | "blond",
+                  )
+                }
+                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="czarny">Czarny</option>
+                <option value="czarny_podpalany">Czarny podpalany</option>
+                <option value="blond">Blond</option>
               </select>
             </div>
             <div>

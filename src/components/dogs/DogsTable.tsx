@@ -24,6 +24,9 @@ const DogsTable: React.FC<DogsTableProps> = ({ dogs, onRowClick }) => {
               Płeć
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">
+              Maść
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">
               Data urodzenia
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">

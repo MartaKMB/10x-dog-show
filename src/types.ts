@@ -36,6 +36,7 @@ export type UserRole = Enums<"user_role">;
 export type ShowStatus = Enums<"show_status">;
 export type DogGender = Enums<"dog_gender">;
 export type DogClass = Enums<"dog_class">;
+export type DogCoat = Enums<"dog_coat">;
 export type EvaluationGrade = Enums<"evaluation_grade">;
 export type BabyPuppyGrade = Enums<"baby_puppy_grade">;
 export type ClubTitle = Enums<"club_title">;
@@ -213,6 +214,7 @@ export interface DogCreateRequest {
   name: string;
   gender: DogGender;
   birth_date: string;
+  coat: DogCoat;
   microchip_number?: string;
   kennel_name?: string;
   father_name?: string;
@@ -225,6 +227,7 @@ export interface DogCreateRequest {
 
 export interface DogUpdateRequest {
   name?: string;
+  coat?: DogCoat;
   kennel_name?: string;
   father_name?: string;
   mother_name?: string;
@@ -244,6 +247,7 @@ export interface DogResponse {
   name: string;
   gender: DogGender;
   birth_date: string;
+  coat: DogCoat;
   microchip_number: string | null;
   kennel_name: string | null;
   father_name: string | null;
@@ -341,6 +345,7 @@ export interface RegistrationResponse {
     name: string;
     gender: DogGender;
     birth_date: string;
+    coat: DogCoat;
     microchip_number: string | null;
     kennel_name: string | null;
     father_name: string | null;
@@ -400,12 +405,18 @@ export interface EvaluationResponse {
     name: string;
     gender: DogGender;
     birth_date: string;
+    coat: DogCoat;
+    microchip_number: string | null;
+    kennel_name: string | null;
+    father_name: string | null;
+    mother_name: string | null;
+    owners: DogOwnerInfo[];
   };
   dog_class: DogClass;
-  grade: EvaluationGrade | null;
-  baby_puppy_grade: BabyPuppyGrade | null;
-  club_title: ClubTitle | null;
-  placement: Placement | null;
+  grade?: EvaluationGrade;
+  baby_puppy_grade?: BabyPuppyGrade;
+  club_title?: ClubTitle;
+  placement?: Placement;
   created_at: string;
 }
 
