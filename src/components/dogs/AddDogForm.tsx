@@ -458,7 +458,7 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 transition-colors"
+            className="px-4 py-2 bg-amber-500 text-gray-900 rounded-md hover:bg-amber-400 disabled:opacity-50 transition-colors"
           >
             {isSubmitting ? "Zapisywanie..." : "Dodaj psa"}
           </button>

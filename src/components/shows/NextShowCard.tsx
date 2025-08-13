@@ -143,7 +143,7 @@ const NextShowCard: React.FC<NextShowCardProps> = ({ userRole }) => {
         <div className="pt-4 border-t border-gray-200">
           <a
             href={`/shows/${nextShow.id}`}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center px-4 py-2 bg-amber-500 text-gray-900 text-sm font-medium rounded-lg hover:bg-amber-400 transition-colors"
           >
             Zobacz szczegóły
             <svg

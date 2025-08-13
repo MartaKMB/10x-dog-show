@@ -824,7 +824,7 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
             <button
               type="submit"
               disabled={isProcessing}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              className="px-4 py-2 bg-amber-500 text-gray-900 rounded-md hover:bg-amber-400 disabled:opacity-50 transition-colors"
             >
               {isProcessing ? "Dodawanie..." : "Dodaj psa"}
             </button>

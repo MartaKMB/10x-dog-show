@@ -12,27 +12,27 @@ const DogsTable: React.FC<DogsTableProps> = ({ dogs, onRowClick }) => {
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
+        <thead className="bg-amber-500/60">
           <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">
               Imię
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Płeć
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Data urodzenia
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Chip
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">
               Hodowla
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Właściciele
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">
+              Płeć
             </th>
-            <th className="px-6 py-3" />
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">
+              Data urodzenia
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">
+              Właściciel
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">
+              Chip
+            </th>
+            {/* <th className="px-6 py-3" /> */}
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
