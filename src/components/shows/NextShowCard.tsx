@@ -71,7 +71,7 @@ const NextShowCard: React.FC<NextShowCardProps> = ({ userRole }) => {
       case "draft":
         return "bg-gray-100 text-gray-800";
       case "completed":
-        return "bg-purple-100 text-purple-800";
+        return "bg-amber-100 text-amber-800";
       default:
         return "bg-gray-100 text-gray-800";
     }

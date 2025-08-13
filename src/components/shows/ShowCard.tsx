@@ -11,7 +11,7 @@ const ShowCard: React.FC<ShowCardProps> = ({ show }) => {
       case "draft":
         return "bg-gray-100 text-gray-800";
       case "completed":
-        return "bg-green-100 text-green-800";
+        return "bg-amber-100 text-amber-800";
       default:
         return "bg-gray-100 text-gray-800";
     }

@@ -25,7 +25,7 @@ const RecentShows: React.FC<RecentShowsProps> = ({
       case "draft":
         return "bg-gray-100 text-gray-800";
       case "completed":
-        return "bg-purple-100 text-purple-800";
+        return "bg-amber-100 text-amber-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -45,7 +45,7 @@ const RecentShows: React.FC<RecentShowsProps> = ({
   if (isLoading) {
     return (
       <div
-        className="bg-white shadow rounded-lg p-6"
+        className="bg-white shadow-lg rounded-lg p-6 border border-gray-200"
         data-testid="recent-shows-loading"
       >
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
@@ -72,7 +72,7 @@ const RecentShows: React.FC<RecentShowsProps> = ({
   if (filteredShows.length === 0) {
     return (
       <div
-        className="bg-white shadow rounded-lg p-6"
+        className="bg-white shadow-lg rounded-lg p-6 border border-gray-200"
         data-testid="recent-shows-empty"
       >
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
@@ -93,7 +93,7 @@ const RecentShows: React.FC<RecentShowsProps> = ({
 
   return (
     <div
-      className="bg-white shadow rounded-lg p-6"
+      className="bg-white shadow-lg rounded-lg p-6 border border-gray-200"
       data-testid="recent-shows-container"
     >
       <div className="flex items-center justify-between mb-4">
@@ -102,7 +102,7 @@ const RecentShows: React.FC<RecentShowsProps> = ({
         </h2>
         <a
           href="/shows"
-          className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+          className="text-sm text-amber-500 hover:text-amber-600 font-medium transition-colors"
           data-testid="recent-shows-view-all-link"
         >
           Zobacz wszystkie →
@@ -113,7 +113,7 @@ const RecentShows: React.FC<RecentShowsProps> = ({
         {filteredShows.slice(0, 5).map((show) => (
           <button
             key={show.id}
-            className="w-full text-left border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+            className="w-full text-left border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer bg-white"
             onClick={() => onShowClick?.(show.id)}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {

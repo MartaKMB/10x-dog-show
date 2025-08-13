@@ -28,7 +28,7 @@ const ShowHeader: React.FC<ShowHeaderProps> = ({
       case "draft":
         return "bg-gray-500 text-white";
       case "completed":
-        return "bg-green-500 text-white";
+        return "bg-amber-500 text-gray-900";
       default:
         return "bg-gray-500 text-white";
     }
@@ -129,7 +129,7 @@ const ShowHeader: React.FC<ShowHeaderProps> = ({
                   handleStatusChange(e.target.value as ShowStatus)
                 }
                 disabled={isUpdating || !canEdit}
-                className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
               >
                 <option value="draft">Szkic</option>
                 <option value="completed">Opisana</option>
@@ -141,7 +141,7 @@ const ShowHeader: React.FC<ShowHeaderProps> = ({
               {canEdit && (
                 <button
                   onClick={onEdit}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
+                  className="px-4 py-2 bg-amber-500 text-gray-900 rounded-md hover:bg-amber-400 transition-colors text-sm font-medium"
                 >
                   Edytuj
                 </button>

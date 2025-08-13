@@ -23,7 +23,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({ userRole }) => {
       description: "Utwórz nową wystawę klubową",
       icon: "📋",
       href: "/shows/new",
-      color: "bg-blue-600 hover:bg-blue-700",
+      color: "bg-gray-900 hover:bg-gray-800 border border-amber-500/50",
       requiredRole: ["club_board"],
     },
     {
@@ -32,7 +32,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({ userRole }) => {
       description: "Dodaj nowego psa do serwisu",
       icon: "🐕",
       href: "/dogs/new",
-      color: "bg-green-600 hover:bg-green-700",
+      color: "bg-gray-900 hover:bg-gray-800 border border-amber-500/50",
       requiredRole: ["club_board"],
     },
     {
@@ -41,7 +41,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({ userRole }) => {
       description: "Przeglądaj statystyki systemu",
       icon: "📊",
       href: "/statistics",
-      color: "bg-gray-600 hover:bg-gray-700",
+      color: "bg-gray-900 hover:bg-gray-800 border border-amber-500/50",
       requiredRole: ["club_board"],
     },
   ];
@@ -54,7 +54,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({ userRole }) => {
 
   return (
     <div
-      className="bg-white shadow rounded-lg p-6"
+      className="bg-white shadow-lg rounded-lg p-6 border border-gray-200"
       data-testid="quick-actions-container"
     >
       <h2 className="text-lg font-semibold text-gray-900 mb-4">
@@ -65,7 +65,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({ userRole }) => {
           <a
             key={action.id}
             href={action.href}
-            className={`${action.color} text-white p-4 rounded-lg text-center transition-colors hover:shadow-md`}
+            className={`${action.color} text-amber-400 p-4 rounded-lg text-center transition-all duration-300 hover:shadow-xl hover:scale-105`}
             data-testid={`quick-action-${action.id}`}
           >
             <div className="text-2xl mb-2">{action.icon}</div>

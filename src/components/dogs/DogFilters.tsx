@@ -104,7 +104,7 @@ const DogFilters: React.FC<DogFiltersProps> = ({
             value={localSearch}
             onChange={handleSearchChange}
             placeholder="Imię psa lub nazwa hodowli"
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
           />
           {errors.search && (
             <p className="mt-1 text-xs text-red-600">{errors.search}</p>
@@ -121,7 +121,7 @@ const DogFilters: React.FC<DogFiltersProps> = ({
             id="gender"
             value={filters.gender || ""}
             onChange={handleGenderChange}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
           >
             <option value="">Wszystkie</option>
             <option value="male">samiec</option>
@@ -143,7 +143,7 @@ const DogFilters: React.FC<DogFiltersProps> = ({
             value={filters.microchip_number || ""}
             onChange={handleMicrochipChange}
             placeholder="15 cyfr"
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
           />
           {errors.microchip_number && (
             <p className="mt-1 text-xs text-red-600">
@@ -164,7 +164,7 @@ const DogFilters: React.FC<DogFiltersProps> = ({
             value={filters.kennel_name || ""}
             onChange={handleKennelChange}
             placeholder="Nazwa hodowli"
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
           />
         </div>
       </div>
@@ -176,7 +176,7 @@ const DogFilters: React.FC<DogFiltersProps> = ({
         <button
           type="button"
           onClick={handleClear}
-          className="text-sm text-blue-700 hover:text-blue-800"
+          className="text-sm text-amber-600 hover:text-amber-700 font-medium"
         >
           Wyczyść filtry
         </button>

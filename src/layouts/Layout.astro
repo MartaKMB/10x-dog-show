@@ -21,9 +21,9 @@ const user = auth?.user ?? null;
     <script src="/mobile-menu.js" defer></script>
   </head>
   <body data-authenticated={user ? "true" : "false"}>
-    <div class="min-h-screen bg-gray-50">
+    <div class="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-amber-50/30">
       <!-- Header -->
-      <header class="bg-white shadow-sm border-b border-gray-200" data-testid="main-header">
+      <header class="bg-gray-900 shadow-lg border-b border-amber-600/30" data-testid="main-header">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="flex justify-between items-center h-16">
             <!-- Logo -->
@@ -32,7 +32,7 @@ const user = auth?.user ?? null;
                 <div class="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden">
                   <img src="/logo.png" alt="HovBase Logo" class="w-full h-full object-cover" />
                 </div>
-                <span class="text-xl font-semibold text-gray-900">HovBase</span>
+                <span class="text-xl font-semibold text-amber-400">HovBase</span>
               </a>
             </div>
 
@@ -40,21 +40,21 @@ const user = auth?.user ?? null;
             <nav class="hidden md:flex space-x-8" data-testid="desktop-navigation">
               <a
                 href="/"
-                class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                class="text-gray-300 hover:text-amber-400 px-3 py-2 rounded-md text-sm font-medium transition-colors"
                 data-testid="nav-dashboard-link"
               >
                 Dashboard
               </a>
               <a
                 href="/shows"
-                class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                class="text-gray-300 hover:text-amber-400 px-3 py-2 rounded-md text-sm font-medium transition-colors"
                 data-testid="nav-shows-link"
               >
                 Wystawy
               </a>
               <a
                 href="/dogs"
-                class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                class="text-gray-300 hover:text-amber-400 px-3 py-2 rounded-md text-sm font-medium transition-colors"
                 data-testid="nav-dogs-link"
               >
                 Psy
@@ -66,7 +66,7 @@ const user = auth?.user ?? null;
               {
                 user ? (
                   <>
-                    <div class="hidden sm:block text-sm text-gray-600" data-testid="user-email">
+                    <div class="hidden sm:block text-sm text-gray-300" data-testid="user-email">
                       {user.email}
                     </div>
                     <form
@@ -78,7 +78,7 @@ const user = auth?.user ?? null;
                     >
                       <button
                         type="submit"
-                        class="px-3 py-1.5 rounded-md border border-gray-300 text-sm text-gray-700 hover:bg-gray-50"
+                        class="px-3 py-1.5 rounded-md border border-amber-500 text-sm text-amber-400 hover:bg-amber-500 hover:text-gray-900 transition-colors"
                         data-testid="logout-button"
                       >
                         Wyloguj
@@ -89,14 +89,14 @@ const user = auth?.user ?? null;
                   <div class="hidden md:flex items-center space-x-3" data-testid="auth-buttons">
                     <a
                       href="/auth/login"
-                      class="px-3 py-1.5 rounded-md border border-gray-300 text-sm text-gray-700 hover:bg-gray-50"
+                      class="px-3 py-1.5 rounded-md border border-amber-500 text-sm text-amber-400 hover:bg-amber-500 hover:text-gray-900 transition-colors"
                       data-testid="login-link"
                     >
                       Zaloguj
                     </a>
                     <a
                       href="/auth/signup"
-                      class="px-3 py-1.5 rounded-md bg-amber-600 text-white text-sm rounded hover:bg-amber-700"
+                      class="px-3 py-1.5 rounded-md bg-amber-500 text-gray-900 text-sm font-medium hover:bg-amber-400 transition-colors"
                       data-testid="register-link"
                     >
                       Rejestracja
@@ -108,7 +108,7 @@ const user = auth?.user ?? null;
               <!-- Mobile menu button -->
               <button
                 type="button"
-                class="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-amber-500"
+                class="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-300 hover:text-amber-400 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-amber-500 transition-colors"
                 aria-controls="mobile-menu"
                 aria-expanded="false"
                 id="mobile-menu-button"
