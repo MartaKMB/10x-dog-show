@@ -13,6 +13,7 @@ interface DogFormData {
   name: string;
   gender: "male" | "female";
   birth_date: string;
+  coat: "czarny" | "czarny_podpalany" | "blond";
   kennel_name: string;
   father_name: string;
   mother_name: string;
@@ -45,6 +46,7 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
     name: "",
     gender: "male",
     birth_date: "",
+    coat: "czarny",
     kennel_name: "",
     father_name: "",
     mother_name: "",
@@ -195,6 +197,7 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
           name: dogData.name,
           gender: dogData.gender,
           birth_date: dogData.birth_date,
+          coat: dogData.coat,
           kennel_name: dogData.kennel_name || null,
           father_name: dogData.father_name || null,
           mother_name: dogData.mother_name || null,
@@ -268,6 +271,7 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
       name: "",
       gender: "male",
       birth_date: "",
+      coat: "czarny",
       kennel_name: "",
       father_name: "",
       mother_name: "",
@@ -389,6 +393,33 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
                       </p>
                     )}
                   </div>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="dog-coat"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Maść *
+                  </label>
+                  <select
+                    id="dog-coat"
+                    value={dogData.coat}
+                    onChange={(e) =>
+                      handleDogDataChange(
+                        "coat",
+                        e.target.value as
+                          | "czarny"
+                          | "czarny_podpalany"
+                          | "blond",
+                      )
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="czarny">Czarny</option>
+                    <option value="czarny_podpalany">Czarny podpalany</option>
+                    <option value="blond">Blond</option>
+                  </select>
                 </div>
 
                 {/* Microchip removed for now */}

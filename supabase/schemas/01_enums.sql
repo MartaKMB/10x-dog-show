@@ -17,6 +17,9 @@ create type public.dog_gender as enum ('male', 'female');
 -- dog classes
 create type public.dog_class as enum ('baby', 'puppy', 'junior', 'intermediate', 'open', 'working', 'champion', 'veteran');
 
+-- dog coat colors (maści hovawarta)
+create type public.dog_coat as enum ('czarny', 'czarny_podpalany', 'blond');
+
 -- evaluation grades in polish
 create type public.evaluation_grade as enum ('doskonała', 'bardzo_dobra', 'dobra', 'zadowalająca', 'zdyskwalifikowana', 'nieobecna');
 

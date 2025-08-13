@@ -8,7 +8,7 @@ import type {
 
 export type DogFiltersState = {
   gender?: DogGender;
-  microchip_number?: string;
+  coat?: "czarny" | "czarny_podpalany" | "blond";
   kennel_name?: string;
   owner_id?: string;
 };
@@ -43,8 +43,7 @@ export const useDogsCatalog = () => {
       try {
         const params = new URLSearchParams();
         if (filters.gender) params.append("gender", filters.gender);
-        if (filters.microchip_number)
-          params.append("microchip_number", filters.microchip_number);
+        if (filters.coat) params.append("coat", filters.coat);
         if (filters.kennel_name)
           params.append("kennel_name", filters.kennel_name);
         if (filters.owner_id) params.append("owner_id", filters.owner_id);

@@ -30,17 +30,17 @@ INSERT INTO public.owners (first_name, last_name, email, phone, address, city, p
 -- 3. INSERT DOGS (Hovawart only)
 -- =============================================================================
 
-INSERT INTO public.dogs (name, gender, birth_date, microchip_number, kennel_name, father_name, mother_name) VALUES
-('Hovawart z Przykładu', 'male', '2020-03-15', '123456789012345', 'Hodowla Przykładowa', 'Hovawart Ojciec', 'Hovawartka Matka'),
-('Hovawartka z Przykładu', 'female', '2019-07-22', '987654321098765', 'Hodowla Przykładowa', 'Hovawart Ojciec', 'Hovawartka Matka'),
-('Hovawart Max', 'male', '2021-05-10', '111111111111111', 'Hodowla Zieliński', 'Hovawart Ojciec', 'Hovawartka Matka'),
-('Hovawartka Luna', 'female', '2022-08-15', '222222222222222', 'Hodowla Kaczmarek', 'Hovawart Ojciec', 'Hovawartka Matka'),
-('Hovawart Rocky', 'male', '2020-12-03', '333333333333333', 'Hodowla Pawlak', 'Hovawart Ojciec', 'Hovawartka Matka'),
-('Hovawartka Bella', 'female', '2023-01-20', '444444444444444', 'Hodowla Michalska', 'Hovawart Ojciec', 'Hovawartka Matka'),
-('Hovawart Shadow', 'male', '2021-09-08', '555555555555555', 'Hodowla Jankowski', 'Hovawart Ojciec', 'Hovawartka Matka'),
-('Hovawartka Storm', 'female', '2018-06-12', '666666666666666', 'Hodowla Przykładowa', 'Hovawart Ojciec', 'Hovawartka Matka'),
-('Hovawart Blizzard', 'male', '2022-03-25', '777777777777777', 'Hodowla Zieliński', 'Hovawart Ojciec', 'Hovawartka Matka'),
-('Hovawartka Aurora', 'female', '2021-11-30', '888888888888888', 'Hodowla Kaczmarek', 'Hovawart Ojciec', 'Hovawartka Matka')
+INSERT INTO public.dogs (name, gender, birth_date, coat, microchip_number, kennel_name, father_name, mother_name) VALUES
+('Hovawart z Przykładu', 'male', '2020-03-15', 'czarny', '123456789012345', 'Hodowla Przykładowa', 'Hovawart Ojciec', 'Hovawartka Matka'),
+('Hovawartka z Przykładu', 'female', '2019-07-22', 'czarny_podpalany', '987654321098765', 'Hodowla Przykładowa', 'Hovawart Ojciec', 'Hovawartka Matka'),
+('Hovawart Max', 'male', '2021-05-10', 'blond', '111111111111111', 'Hodowla Zieliński', 'Hovawart Ojciec', 'Hovawartka Matka'),
+('Hovawartka Luna', 'female', '2022-08-15', 'czarny', '222222222222222', 'Hodowla Kaczmarek', 'Hovawart Ojciec', 'Hovawartka Matka'),
+('Hovawart Rocky', 'male', '2020-12-03', 'czarny_podpalany', '333333333333333', 'Hodowla Pawlak', 'Hovawart Ojciec', 'Hovawartka Matka'),
+('Hovawartka Bella', 'female', '2023-01-20', 'blond', '444444444444444', 'Hodowla Michalska', 'Hovawart Ojciec', 'Hovawartka Matka'),
+('Hovawart Shadow', 'male', '2021-09-08', 'czarny', '555555555555555', 'Hodowla Jankowski', 'Hovawart Ojciec', 'Hovawartka Matka'),
+('Hovawartka Storm', 'female', '2018-06-12', 'czarny_podpalany', '666666666666666', 'Hodowla Przykładowa', 'Hovawart Ojciec', 'Hovawartka Matka'),
+('Hovawart Blizzard', 'male', '2022-03-25', 'blond', '777777777777777', 'Hodowla Zieliński', 'Hovawart Ojciec', 'Hovawartka Matka'),
+('Hovawartka Aurora', 'female', '2021-11-30', 'czarny', '888888888888888', 'Hodowla Kaczmarek', 'Hovawart Ojciec', 'Hovawartka Matka')
 ON CONFLICT (microchip_number) DO NOTHING;
 
 -- =============================================================================

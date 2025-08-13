@@ -11,6 +11,7 @@ create table public.dogs (
     name varchar(100) not null,
     gender public.dog_gender not null,
     birth_date date not null,
+    coat public.dog_coat not null default 'czarny',
     microchip_number varchar(50) unique,
     kennel_name varchar(200),
     father_name varchar(100),

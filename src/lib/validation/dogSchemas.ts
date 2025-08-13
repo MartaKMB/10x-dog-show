@@ -83,6 +83,7 @@ export const updateDogSchema = z.object({
 // Schema for dog query parameters
 export const dogQuerySchema = z.object({
   gender: z.enum(["male", "female"]).optional(),
+  coat: z.enum(["czarny", "czarny_podpalany", "blond"]).optional(),
   owner_id: uuidSchema.optional(),
   microchip_number: z.string().optional(),
   kennel_name: z.string().optional(),

@@ -22,6 +22,7 @@ export class DogService {
       name: data.name,
       gender: data.gender,
       birth_date: data.birth_date,
+      coat: data.coat || "czarny",
       microchip_number: data.microchip_number,
       kennel_name: data.kennel_name,
       father_name: data.father_name,
@@ -58,8 +59,8 @@ export class DogService {
     if (params.gender) {
       query = query.eq("gender", params.gender);
     }
-    if (params.microchip_number) {
-      query = query.eq("microchip_number", params.microchip_number);
+    if (params.coat) {
+      query = query.eq("coat", params.coat);
     }
     if (params.kennel_name) {
       query = query.ilike("kennel_name", `%${params.kennel_name}%`);
@@ -369,6 +370,7 @@ export class DogService {
       name: dog.name,
       gender: dog.gender,
       birth_date: dog.birth_date,
+      coat: dog.coat,
       microchip_number: dog.microchip_number,
       kennel_name: dog.kennel_name,
       father_name: dog.father_name,

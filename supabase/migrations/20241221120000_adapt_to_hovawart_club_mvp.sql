@@ -29,6 +29,9 @@ create type public.dog_gender as enum ('male', 'female');
 -- dog classes
 create type public.dog_class as enum ('baby', 'puppy', 'junior', 'intermediate', 'open', 'working', 'champion', 'veteran');
 
+-- dog coat colors (maści hovawarta)
+create type public.dog_coat as enum ('czarny', 'czarny_podpalany', 'blond');
+
 -- evaluation grades in polish
 create type public.evaluation_grade as enum ('doskonała', 'bardzo_dobra', 'dobra', 'zadowalająca', 'zdyskwalifikowana', 'nieobecna');
 
@@ -124,6 +127,7 @@ create table public.dogs (
     name varchar(100) not null,
     gender public.dog_gender not null,
     birth_date date not null,
+    coat public.dog_coat not null default 'czarny',
     microchip_number varchar(50) unique,
     kennel_name varchar(200),
     father_name varchar(100),
@@ -204,6 +208,7 @@ create index idx_shows_status on public.shows(status) where deleted_at is null;
 create index idx_dogs_microchip on public.dogs(microchip_number) where deleted_at is null;
 create index idx_dogs_birth_date on public.dogs(birth_date) where deleted_at is null;
 create index idx_dogs_gender on public.dogs(gender) where deleted_at is null;
+create index idx_dogs_coat on public.dogs(coat) where deleted_at is null;
 
 -- indexes for owners
 create index idx_owners_email on public.owners(email) where deleted_at is null;
