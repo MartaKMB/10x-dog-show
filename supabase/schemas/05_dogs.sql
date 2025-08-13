@@ -30,6 +30,7 @@ comment on table public.dogs is 'Psy rasy hovawart zarejestrowane w systemie';
 create index idx_dogs_microchip on public.dogs(microchip_number) where deleted_at is null;
 create index idx_dogs_birth_date on public.dogs(birth_date) where deleted_at is null;
 create index idx_dogs_gender on public.dogs(gender) where deleted_at is null;
+create index idx_dogs_coat on public.dogs(coat) where deleted_at is null;
 
 -- enable rls
 alter table public.dogs enable row level security;
