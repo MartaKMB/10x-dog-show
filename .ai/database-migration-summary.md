@@ -31,6 +31,7 @@ Przygotowanie **czystej, spójnej bazy danych** dla MVP "Wystawa Klubowa Hovawar
 - Uproszczonymi statusami wystaw (`draft`, `completed`)
 - Spójnymi danymi między wszystkimi widokami
 - Poprawną architekturą bez starych, niepotrzebnych elementów
+- **Dodanymi maściami hovawarta** (`czarny`, `czarny_podpalany`, `blond`)
 
 ---
 
@@ -43,6 +44,7 @@ Przygotowanie **czystej, spójnej bazy danych** dla MVP "Wystawa Klubowa Hovawar
   - Usunięto sekcję `DROP EXISTING COMPLEX STRUCTURES`
   - Usunięto sekcję `INSERT SEED DATA` (zapobiega duplikacji)
   - Uproszczono enum `show_status` do `('draft', 'completed')`
+  - **Dodano enum `dog_coat` z maściami hovawarta**
 
 - **`20250812160000_disable_rls_local.sql`** (NOWY)
   - Wyłączenie RLS dla wszystkich tabel w środowisku lokalnym
@@ -53,15 +55,22 @@ Przygotowanie **czystej, spójnej bazy danych** dla MVP "Wystawa Klubowa Hovawar
 - **`01_enums.sql`**
 
   - Uproszczono `show_status` do `('draft', 'completed')`
+  - **Dodano `dog_coat` enum z wartościami: `'czarny'`, `'czarny_podpalany'`, `'blond'**
+
+- **`05_dogs.sql`**
+  - **Dodano pole `coat public.dog_coat not null default 'czarny'`**
+  - **Dodano indeks `idx_dogs_coat` dla wydajności**
 
 - **`seed.sql`**
   - Zmieniono status pierwszej wystawy z `open_for_registration` na `draft`
-  - Zawiera 10 psów Hovawart, 3 wystawy klubowe, 15 rejestracji
+  - **Zawiera 10 psów Hovawart z różnymi maściami** (czarny, czarny_podpalany, blond)
+  - 3 wystawy klubowe, 15 rejestracji
 
 ### **3. Typy TypeScript**
 
 - **`database.types.ts`**
   - Zaktualizowano enum `show_status` do `draft` i `completed`
+  - **Dodano enum `dog_coat` z maściami hovawarta**
   - Usunięto niepotrzebne statusy
 
 ### **4. Komponenty React**
@@ -130,6 +139,7 @@ Przygotowanie **czystej, spójnej bazy danych** dla MVP "Wystawa Klubowa Hovawar
 3. **Liczba psów na kafelkach** - wyświetla się poprawnie
 4. **Brak błędów 500** - API działa bez problemów z autoryzacją
 5. **Czysta baza** - 3 wystawy, 10 psów Hovawart, bez duplikatów
+6. **Maści hovawarta** - dodano obsługę 3 maści: czarny, czarny_podpalany, blond
 
 ### **🔄 Zmiany w Logice Biznesowej**
 
@@ -137,6 +147,7 @@ Przygotowanie **czystej, spójnej bazy danych** dla MVP "Wystawa Klubowa Hovawar
 - **Edycja wystaw** - możliwa tylko dla statusu `draft`
 - **Oceny** - możliwe tylko dla wystaw `completed`
 - **Uprawnienia** - uproszczone do podstawowych ról
+- **Maści psów** - obowiązkowe pole z domyślną wartością 'czarny'
 
 ---
 
@@ -146,8 +157,9 @@ Przygotowanie **czystej, spójnej bazy danych** dla MVP "Wystawa Klubowa Hovawar
 
 1. **Czysta baza danych** zgodna z lokalną
 2. **Te same migracje** co w środowisku lokalnym
-3. **Te same dane seed** (10 psów Hovawart, 3 wystawy)
+3. **Te same dane seed** (10 psów Hovawart z różnymi maściami, 3 wystawy)
 4. **Uproszczone statusy** (`draft`, `completed`)
+5. **Maści hovawarta** - enum `dog_coat` z 3 wartościami
 
 ### **🔧 Kroki do Wykonania**
 
@@ -161,7 +173,7 @@ supabase/migrations/
 └── (usunięte stare migracje)
 
 # Sprawdź seed.sql
-supabase/seed.sql  # 10 psów, 3 wystawy, 15 rejestracji
+supabase/seed.sql  # 10 psów z różnymi maściami, 3 wystawy, 15 rejestracji
 ```
 
 #### **Krok 2: Konfiguracja Środowiska Testowego**
@@ -200,6 +212,9 @@ curl "YOUR_TEST_URL/rest/v1/show_registrations?select=*"
 
 # Sprawdź psy
 curl "YOUR_TEST_URL/rest/v1/dogs?select=*"
+
+# Sprawdź maści hovawarta
+curl "YOUR_TEST_URL/rest/v1/dogs?select=name,coat"
 ```
 
 ### **⚠️ Uwagi**
@@ -208,6 +223,7 @@ curl "YOUR_TEST_URL/rest/v1/dogs?select=*"
 2. **Sprawdź** czy wszystkie API endpoints działają
 3. **Zweryfikuj** spójność danych między widokami
 4. **Testuj** wszystkie funkcjonalności (dodawanie psów, rejestracje, oceny)
+5. **Sprawdź** czy maści hovawarta są poprawnie obsługiwane
 
 ---
 
@@ -216,9 +232,10 @@ curl "YOUR_TEST_URL/rest/v1/dogs?select=*"
 ### **🏗️ Struktura**
 
 - **3 wystawy klubowe** (2 draft, 1 completed)
-- **10 psów Hovawart** z unikalnymi danymi
+- **10 psów Hovawart** z unikalnymi danymi i różnymi maściami
 - **15 rejestracji** poprawnie przypisanych do wystaw
 - **Uproszczone statusy** bez starych, niepotrzebnych wartości
+- **Maści hovawarta** - enum z 3 wartościami: czarny, czarny_podpalany, blond
 
 ### **🔐 Bezpieczeństwo**
 
@@ -232,18 +249,38 @@ curl "YOUR_TEST_URL/rest/v1/dogs?select=*"
 - **Dane spójne** między `/dogs`, `/shows`, `/shows/{id}`
 - **Kafelki wystaw** pokazują poprawną liczbę psów
 - **Brak błędów 500** w konsoli
+- **Maści hovawarta** - poprawnie wyświetlane i edytowane
 
 ---
 
 ## 🎯 **Następne Kroki**
 
 1. **✅ Baza lokalna** - gotowa i przetestowana
-2. **🔄 Środowisko testowe** - do przygotowania
+2. **🔄 Środowisko testowe** - do przygotowania z aktualnymi migracjami
 3. **🚀 Produkcja** - po weryfikacji testów
 4. **📚 Dokumentacja** - aktualizacja dla zespołu
 
 ---
 
+## 🆕 **Nowe Funkcjonalności (2025-08-12)**
+
+### **Maści Hovawarta**
+
+- **Dodano enum `dog_coat`** z wartościami: `czarny`, `czarny_podpalany`, `blond`
+- **Pole obowiązkowe** w tabeli `dogs` z domyślną wartością `czarny`
+- **Indeks wydajnościowy** `idx_dogs_coat` dla szybkiego filtrowania
+- **Dane seed** zawierają psy z różnymi maściami dla testowania
+- **Walidacja** na poziomie bazy danych
+
+### **Wpływ na Testy E2E**
+
+- **Testy muszą uwzględniać** nowe pole `coat` w formularzach psów
+- **Walidacja** - sprawdzenie czy maść jest poprawnie zapisywana
+- **Filtrowanie** - testowanie filtrowania psów według maści
+- **Edytowanie** - weryfikacja czy maść może być zmieniana
+
+---
+
 _Dokument utworzony: 2025-08-12_  
-_Ostatnia aktualizacja: Po zakończeniu migracji lokalnej_  
-_Status: ✅ Baza lokalna gotowa, środowisko testowe do przygotowania_
+_Ostatnia aktualizacja: Po dodaniu maści hovawarta_  
+_Status: ✅ Baza lokalna gotowa, środowisko testowe wymaga aktualizacji_
