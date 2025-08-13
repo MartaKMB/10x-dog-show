@@ -21,27 +21,27 @@ const QuickActions: React.FC<QuickActionsProps> = ({ userRole }) => {
       id: "new-show",
       title: "Nowa wystawa",
       description: "Utwórz nową wystawę klubową",
-      icon: "📋",
+      icon: "/add-icon.png",
       href: "/shows/new",
-      color: "bg-gray-900 hover:bg-gray-800 border border-amber-500/50",
+      color: "bg-amber-500 hover:bg-amber-400 border border-amber-600",
       requiredRole: ["club_board"],
     },
     {
       id: "new-dog",
       title: "Dodaj psa",
       description: "Dodaj nowego psa do serwisu",
-      icon: "🐕",
+      icon: "/dog-icon.svg",
       href: "/dogs/new",
-      color: "bg-gray-900 hover:bg-gray-800 border border-amber-500/50",
+      color: "bg-amber-500 hover:bg-amber-400 border border-amber-600",
       requiredRole: ["club_board"],
     },
     {
       id: "statistics",
       title: "Statystyki",
       description: "Przeglądaj statystyki systemu",
-      icon: "📊",
+      icon: "/bar-icon.png",
       href: "/statistics",
-      color: "bg-gray-900 hover:bg-gray-800 border border-amber-500/50",
+      color: "bg-amber-500 hover:bg-amber-400 border border-amber-600",
       requiredRole: ["club_board"],
     },
   ];
@@ -65,10 +65,16 @@ const QuickActions: React.FC<QuickActionsProps> = ({ userRole }) => {
           <a
             key={action.id}
             href={action.href}
-            className={`${action.color} text-amber-400 p-4 rounded-lg text-center transition-all duration-300 hover:shadow-xl hover:scale-105`}
+            className={`${action.color} text-gray-900 p-4 rounded-lg text-center transition-all duration-300 hover:shadow-xl hover:scale-105`}
             data-testid={`quick-action-${action.id}`}
           >
-            <div className="text-2xl mb-2">{action.icon}</div>
+            <div className="mb-2">
+              <img
+                src={action.icon}
+                alt={action.title}
+                className={`mx-auto ${action.id === "new-dog" ? "w-12 h-12" : "w-8 h-8"}`}
+              />
+            </div>
             <div
               className="font-medium text-sm"
               data-testid={`quick-action-title-${action.id}`}

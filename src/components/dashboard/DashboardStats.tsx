@@ -69,8 +69,8 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({
               </p>
               <p className="text-xs text-gray-500 mt-1">{card.description}</p>
             </div>
-            <div className="bg-gray-900 text-amber-400 p-3 rounded-full text-2xl shadow-lg">
-              {card.icon}
+            <div className="bg-amber-500 text-gray-900 p-3 rounded-full text-2xl shadow-lg">
+              <img src="/bar-icon.png" alt="Statystyki" className="w-6 h-6" />
             </div>
           </div>
         </div>
