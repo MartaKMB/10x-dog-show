@@ -7,7 +7,7 @@ import type { ErrorResponseDto } from "../../../../../types";
 
 export const PUT: APIRoute = async ({ params, request }) => {
   try {
-    const { showId, registrationId } = params;
+    const { id: showId, registrationId } = params;
     if (!showId || !registrationId) {
       return new Response(
         JSON.stringify({

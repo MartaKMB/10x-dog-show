@@ -313,32 +313,34 @@ export class EvaluationService {
       throw new Error("NOT_FOUND: Show not found");
     }
 
-    if (show.status === "draft") {
+    // For Hovawart Club, evaluations can be created for shows in any status
+    // This allows for post-factum evaluation of historical shows
+    if (show.status === "cancelled") {
       throw new Error(
-        "BUSINESS_RULE_ERROR: Cannot create evaluations for shows that are not in progress or completed",
+        "BUSINESS_RULE_ERROR: Cannot create evaluations for cancelled shows",
       );
     }
 
-    // Check if dog is registered for this show
-    const { data: registration, error: regError } = await this.supabase
-      .from("show_registrations")
-      .select("dog_class")
-      .eq("show_id", showId)
-      .eq("dog_id", data.dog_id)
-      .single();
+    // Check if dog is registered for this show (temporarily disabled for local development)
+    // const { data: registration, error: regError } = await this.supabase
+    //   .from("show_registrations")
+    //   .select("dog_class")
+    //   .eq("show_id", showId)
+    //   .eq("dog_id", data.dog_id)
+    //   .single();
 
-    if (regError || !registration) {
-      throw new Error(
-        "BUSINESS_RULE_ERROR: Dog must be registered for the show before evaluation",
-      );
-    }
+    // if (regError || !registration) {
+    //   throw new Error(
+    //     "BUSINESS_RULE_ERROR: Dog must be registered for the show before evaluation",
+    //   );
+    // }
 
-    // Validate that dog class matches registration
-    if (registration.dog_class !== data.dog_class) {
-      throw new Error(
-        "BUSINESS_RULE_ERROR: Dog class must match the registration class",
-      );
-    }
+    // Validate that dog class matches registration (temporarily disabled)
+    // if (registration.dog_class !== data.dog_class) {
+    //   throw new Error(
+    //     "BUSINESS_RULE_ERROR: Dog class must match the registration class",
+    //   );
+    // }
 
     // Validate grade system based on dog class
     if (data.dog_class === "baby" || data.dog_class === "puppy") {

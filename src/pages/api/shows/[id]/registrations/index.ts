@@ -10,7 +10,7 @@ import type { ErrorResponseDto } from "../../../../../types";
 
 export const GET: APIRoute = async ({ params, request }) => {
   try {
-    const { showId } = params;
+    const { id: showId } = params;
     if (!showId) {
       return new Response(
         JSON.stringify({
@@ -106,7 +106,7 @@ export const GET: APIRoute = async ({ params, request }) => {
 
 export const POST: APIRoute = async ({ params, request }) => {
   try {
-    const { showId } = params;
+    const { id: showId } = params;
     if (!showId) {
       return new Response(
         JSON.stringify({
