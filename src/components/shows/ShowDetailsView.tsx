@@ -1,198 +1,66 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import type {
   ShowResponse,
   RegistrationResponse,
-  ShowStats as ShowStatsType,
-  FilterState,
-  UserRole,
   UpdateShowDto,
 } from "../../types";
-import ShowHeader from "./ShowHeader";
-import ShowStats from "./ShowStats.tsx";
-import DogsList from "./DogsList.tsx";
-import RegistrationFilters from "./RegistrationFilters.tsx";
-import AddDogModal from "./AddDogModal.tsx";
-import EditDogModal from "./EditDogModal.tsx";
-import EditShowModal from "./EditShowModal.tsx";
-import DeleteDogConfirmation from "./DeleteDogConfirmation.tsx";
-import ErrorDisplay from "./ErrorDisplay.tsx";
-import LoadingSpinner from "./LoadingSpinner.tsx";
-import EmptyState from "./EmptyState.tsx";
-import OfflineIndicator from "./OfflineIndicator.tsx";
 import { useShowDetails } from "../../hooks/useShowDetails";
 import { useShowActions } from "../../hooks/useShowActions";
-import { useDogManagement } from "../../hooks/useDogManagement";
+import ShowHeader from "./ShowHeader";
+import ShowStats from "./ShowStats";
+import RegistrationFilters from "./RegistrationFilters";
+import DogsList from "./DogsList";
+import AddDogModal from "./AddDogModal";
+import RegisterDogModal from "./RegisterDogModal";
+import EditShowModal from "./EditShowModal";
+import EditDogModal from "./EditDogModal";
+import DeleteDogConfirmation from "./DeleteDogConfirmation";
+import LoadingSpinner from "./LoadingSpinner";
+import ErrorDisplay from "./ErrorDisplay";
+import EmptyState from "./EmptyState";
+import OfflineIndicator from "./OfflineIndicator";
 
 interface ShowDetailsViewProps {
-  showId?: string;
-  userRole?: UserRole;
+  showId: string;
 }
 
-interface ShowDetailsViewModel {
-  show: ShowResponse | null;
-  registrations: RegistrationResponse[];
-  stats: ShowStatsType;
-  canEdit: boolean;
-  canDelete: boolean;
-  canAddDogs: boolean;
-  isLoading: boolean;
-  error: string | null;
-  filters: FilterState;
-}
+const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({ showId }) => {
+  const userRole = "club_board"; // Tymczasowo hardcoded
 
-const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
-  showId,
-  userRole = "club_board",
-}) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [viewModel, setViewModel] = useState<ShowDetailsViewModel>({
-    show: null,
-    registrations: [],
-    stats: {
-      totalDogs: 0,
-      byClass: {
-        baby: 0,
-        puppy: 0,
-        junior: 0,
-        intermediate: 0,
-        open: 0,
-        working: 0,
-        champion: 0,
-        veteran: 0,
-      },
-      byGender: {
-        male: 0,
-        female: 0,
-      },
-      byCoat: {
-        czarny: 0,
-        czarny_podpalany: 0,
-        blond: 0,
-      },
-    },
-    canEdit: false,
-    canDelete: false,
-    canAddDogs: false,
-    isLoading: true,
-    error: null,
-    filters: {},
-  });
+  // Show data and loading states
+  const { show, registrations, isLoading, error, loadShowData } =
+    useShowDetails(showId);
+  const { deleteShow, updateShowStatus, isDeleting, isUpdating } =
+    useShowActions(show);
 
-  // Modal state
+  // Modal states
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [isEditShowModalOpen, setIsEditShowModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  // Selected items
   const [selectedRegistration, setSelectedRegistration] =
     useState<RegistrationResponse | null>(null);
+  const [selectedDogId, setSelectedDogId] = useState<string>("");
+  const [selectedDogName, setSelectedDogName] = useState<string>("");
 
-  const resolvedShowId = showId as string;
-  const { show, registrations, isLoading, error, loadShowData } =
-    useShowDetails(resolvedShowId);
-  const { isDeleting, isUpdating, deleteShow, updateShowStatus } =
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    useShowActions((show ?? null) as any);
-  const {
-    isAdding,
-    isEditing,
-    isDeleting: isDeletingDog,
-    deleteDog,
-  } = useDogManagement(resolvedShowId, loadShowData);
+  const resolvedShowId = showId;
 
-  useEffect(() => {
-    // detect auth from SSR body dataset (client only)
-    if (typeof document !== "undefined") {
-      const isAuth = document.body.dataset.authenticated === "true";
-      setIsAuthenticated(isAuth);
-    }
-    loadShowData();
-  }, [resolvedShowId, loadShowData]);
+  // Helper functions
+  const canUserEditShow = (): boolean => {
+    return userRole === "club_board";
+  };
 
-  useEffect(() => {
-    if (show && registrations) {
-      const stats = calculateStats(registrations);
-      const canEdit = isAuthenticated && canUserEditShow();
-      const canDelete = isAuthenticated && canUserDeleteShow(show);
-      const canAddDogs = isAuthenticated && show.status === "draft";
+  const canUserDeleteShow = (showData: ShowResponse): boolean => {
+    return userRole === "club_board" && showData.registered_dogs === 0;
+  };
 
-      setViewModel((prev) => ({
-        ...prev,
-        show,
-        registrations,
-        stats,
-        canEdit,
-        canDelete,
-        canAddDogs,
-        isLoading: false,
-        error: null,
-      }));
-
-      // Fetch evaluations for this show and build map by dog id
-      (async () => {
-        try {
-          const res = await fetch(
-            `/api/shows/${show.id}/evaluations?page=1&limit=100`,
-          );
-          if (res.ok) {
-            const data = await res.json();
-            const list = (data.data || data.evaluations || []) as Array<{
-              dog: { id: string };
-              dog_class: string;
-              grade: string | null;
-              baby_puppy_grade: string | null;
-              club_title: string | null;
-              placement: string | null;
-            }>;
-            const byDog: Record<
-              string,
-              {
-                grade: string | null;
-                baby_puppy_grade: string | null;
-                club_title: string | null;
-                placement: string | null;
-              }
-            > = {};
-            list.forEach((ev) => {
-              byDog[ev.dog.id] = {
-                grade: ev.grade ?? null,
-                baby_puppy_grade: ev.baby_puppy_grade ?? null,
-                club_title: ev.club_title ?? null,
-                placement: ev.placement ?? null,
-              };
-            });
-          }
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        } catch (_err) {
-          // ignore for now
-        }
-      })();
-    }
-    // eslint-disable-next-line react-compiler/react-compiler
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [show, registrations]);
-
-  const calculateStats = (
-    registrations: RegistrationResponse[],
-  ): ShowStatsType => {
-    const byClass: Record<string, number> = {
-      baby: 0,
-      puppy: 0,
-      junior: 0,
-      intermediate: 0,
-      open: 0,
-      working: 0,
-      champion: 0,
-      veteran: 0,
-    };
-    const byGender: Record<string, number> = {
-      male: 0,
-      female: 0,
-    };
-    const byCoat: Record<string, number> = {
-      czarny: 0,
-      czarny_podpalany: 0,
-      blond: 0,
-    };
+  function computeShowStats(registrations: RegistrationResponse[]) {
+    const byClass: Record<string, number> = {};
+    const byGender: Record<string, number> = {};
+    const byCoat: Record<string, number> = {};
 
     registrations.forEach((registration) => {
       byClass[registration.dog_class] =
@@ -208,14 +76,28 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
       byGender,
       byCoat,
     };
+  }
+
+  const deleteDog = async (registrationId: string) => {
+    // TODO: Implement deleteDog function
+    // eslint-disable-next-line no-console
+    console.log("Deleting dog with registration ID:", registrationId);
   };
 
-  const canUserEditShow = (): boolean => {
-    return userRole === "club_board";
-  };
+  useEffect(() => {
+    loadShowData();
+  }, [loadShowData]);
 
-  const canUserDeleteShow = (showData: ShowResponse): boolean => {
-    return userRole === "club_board" && showData.registered_dogs === 0;
+  // Computed properties
+  const viewModel = {
+    canEdit: canUserEditShow(),
+    canDelete: show ? canUserDeleteShow(show) : false,
+    canAddDogs: userRole === "club_board",
+    filters: {
+      // TODO: Implement filter state
+    },
+    registrations: registrations || [],
+    stats: computeShowStats(registrations || []),
   };
 
   const handleAddDog = () => {
@@ -232,8 +114,19 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
     setIsDeleteModalOpen(true);
   };
 
-  const handleAddDogSuccess = () => {
+  // Krok 1: Po dodaniu/wybraniu psa, otwórz modal rejestracji
+  const handleAddDogSuccess = (dogId: string, dogName: string) => {
     setIsAddModalOpen(false);
+    setSelectedDogId(dogId);
+    setSelectedDogName(dogName);
+    setIsRegisterModalOpen(true);
+  };
+
+  // Krok 2: Po rejestracji psa, zamknij modal i odśwież dane
+  const handleRegisterDogSuccess = () => {
+    setIsRegisterModalOpen(false);
+    setSelectedDogId("");
+    setSelectedDogName("");
     loadShowData();
   };
 
@@ -255,16 +148,20 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
       setIsEditShowModalOpen(false);
       window.location.reload();
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Error updating show:", error);
     }
   };
 
   const handleModalClose = () => {
     setIsAddModalOpen(false);
+    setIsRegisterModalOpen(false);
     setIsEditShowModalOpen(false);
     setIsEditModalOpen(false);
     setIsDeleteModalOpen(false);
     setSelectedRegistration(null);
+    setSelectedDogId("");
+    setSelectedDogName("");
   };
 
   if (isLoading) {
@@ -326,12 +223,23 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
       />
 
       {/* Modals */}
+      {/* Krok 1: Modal dodawania/wyboru psa */}
       <AddDogModal
         showId={resolvedShowId as string}
         isOpen={isAddModalOpen}
         onClose={handleModalClose}
         onSuccess={handleAddDogSuccess}
-        isProcessing={isAdding}
+        isProcessing={false}
+      />
+
+      {/* Krok 2: Modal rejestracji psa na wystawę */}
+      <RegisterDogModal
+        showId={resolvedShowId as string}
+        dogId={selectedDogId}
+        dogName={selectedDogName}
+        isOpen={isRegisterModalOpen}
+        onClose={handleModalClose}
+        onSuccess={handleRegisterDogSuccess}
       />
 
       <EditShowModal
@@ -351,7 +259,7 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
             isOpen={isEditModalOpen}
             onClose={handleModalClose}
             onSuccess={handleEditDogSuccess}
-            isProcessing={isEditing}
+            isProcessing={false}
           />
 
           <DeleteDogConfirmation
@@ -361,7 +269,7 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
             onConfirm={() =>
               selectedRegistration && deleteDog(selectedRegistration.id)
             }
-            isProcessing={isDeletingDog}
+            isProcessing={false}
             onDeleteDog={deleteDog}
           />
         </>
