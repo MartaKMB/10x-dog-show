@@ -21,17 +21,19 @@ export const createOwnerSchema = z
       .min(1, "Last name is required")
       .max(100, "Last name cannot exceed 100 characters"),
     email: emailSchema,
-    phone: z.string().max(20).optional(),
+    phone: z.string().max(20).nullable().optional(),
     address: z
       .string()
-      .min(1, "Address is required")
-      .max(500, "Address cannot exceed 500 characters"),
+      .max(500, "Address cannot exceed 500 characters")
+      .nullable()
+      .optional(),
     city: z
       .string()
-      .min(1, "City is required")
-      .max(100, "City cannot exceed 100 characters"),
-    postal_code: z.string().max(20).optional(),
-    kennel_name: z.string().max(200).optional(),
+      .max(100, "City cannot exceed 100 characters")
+      .nullable()
+      .optional(),
+    postal_code: z.string().max(20).nullable().optional(),
+    kennel_name: z.string().max(200).nullable().optional(),
     gdpr_consent: z.boolean(),
   })
   .refine(
@@ -50,8 +52,8 @@ export const createOwnerSchema = z
 // Schema for updating owners
 export const updateOwnerSchema = z.object({
   phone: z.string().max(20).optional(),
-  address: z.string().min(1).max(500).optional(),
-  city: z.string().min(1).max(100).optional(),
+  address: z.string().max(500).optional(),
+  city: z.string().max(100).optional(),
   postal_code: z.string().max(20).optional(),
   kennel_name: z.string().max(200).optional(),
 });
