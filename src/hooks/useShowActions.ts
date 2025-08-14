@@ -3,11 +3,48 @@ import type {
   ShowDetailResponseDto,
   ShowStatus,
   UpdateShowStatusDto,
+  UpdateShowDto,
 } from "../types";
 
 export const useShowActions = (show: ShowDetailResponseDto | null) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+
+  const updateShow = useCallback(
+    async (data: UpdateShowDto): Promise<ShowDetailResponseDto> => {
+      if (!show) {
+        throw new Error("No show to update");
+      }
+
+      try {
+        setIsUpdating(true);
+
+        const response = await fetch(`/api/shows/${show.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(
+            errorData.error?.message || "Błąd aktualizacji wystawy",
+          );
+        }
+
+        const updatedShow = await response.json();
+        return updatedShow;
+      } catch (error) {
+        console.error("Error updating show:", error);
+        throw error;
+      } finally {
+        setIsUpdating(false);
+      }
+    },
+    [show],
+  );
 
   const deleteShow = useCallback(async () => {
     if (!show) return;
@@ -76,6 +113,7 @@ export const useShowActions = (show: ShowDetailResponseDto | null) => {
   return {
     isDeleting,
     isUpdating,
+    updateShow,
     deleteShow,
     updateShowStatus,
   };

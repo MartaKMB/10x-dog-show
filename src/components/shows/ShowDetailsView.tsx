@@ -30,7 +30,7 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({ showId }) => {
   // Show data and loading states
   const { show, registrations, isLoading, error, loadShowData } =
     useShowDetails(showId);
-  const { deleteShow, updateShowStatus, isDeleting, isUpdating } =
+  const { deleteShow, updateShow, updateShowStatus, isDeleting, isUpdating } =
     useShowActions(show);
 
   // Modal states
@@ -140,16 +140,21 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({ showId }) => {
     setIsEditShowModalOpen(true);
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleEditShowSuccess = async (data: UpdateShowDto) => {
     try {
-      // TODO: Implement updateShow function in useShowActions
-      // For now, just close modal and reload
+      if (!show) return;
+
+      // Update show using the hook
+      await updateShow(data);
+
+      // Reload show data to reflect changes
+      await loadShowData();
+
+      // Close modal
       setIsEditShowModalOpen(false);
-      window.location.reload();
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error("Error updating show:", error);
+      // Could add error handling here
     }
   };
 
