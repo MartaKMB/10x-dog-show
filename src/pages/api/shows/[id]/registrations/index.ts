@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { supabaseServerClient } from "../../../../../db/supabase.server";
+import { createSupabaseServerClient } from "../../../../../db/supabase.server";
 import { ShowService } from "../../../../../lib/services/showService";
 import {
   createRegistrationSchema,
@@ -14,11 +14,11 @@ export const GET: APIRoute = async ({ params, request }) => {
     if (!showId) {
       return new Response(
         JSON.stringify({
-          error: { code: "400", message: "Show ID is required" },
+          error: { code: "BAD_REQUEST", message: "Show ID is required" },
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
         } as ErrorResponseDto),
-        { status: 400 },
+        { status: 400, headers: { "Content-Type": "application/json" } },
       );
     }
 
@@ -29,7 +29,7 @@ export const GET: APIRoute = async ({ params, request }) => {
     );
 
     // Get registrations using service
-    const supabase = supabaseServerClient;
+    const supabase = createSupabaseServerClient();
     const showService = new ShowService(supabase);
 
     const registrations = await showService.getRegistrations(
@@ -110,11 +110,11 @@ export const POST: APIRoute = async ({ params, request }) => {
     if (!showId) {
       return new Response(
         JSON.stringify({
-          error: { code: "400", message: "Show ID is required" },
+          error: { code: "BAD_REQUEST", message: "Show ID is required" },
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
         } as ErrorResponseDto),
-        { status: 400 },
+        { status: 400, headers: { "Content-Type": "application/json" } },
       );
     }
 
@@ -125,7 +125,7 @@ export const POST: APIRoute = async ({ params, request }) => {
     const validatedData = createRegistrationSchema.parse(body);
 
     // Create registration using service
-    const supabase = supabaseServerClient;
+    const supabase = createSupabaseServerClient();
     const showService = new ShowService(supabase);
 
     // Check if dog is already registered for this show

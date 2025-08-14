@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { supabaseServerClient } from "../../../db/supabase.server";
+import { createSupabaseServerClient } from "../../../db/supabase.server";
 import { ShowService } from "../../../lib/services/showService";
 import { updateShowSchema } from "../../../lib/validation/showSchemas";
 import type { ErrorResponseDto } from "../../../types";
@@ -11,16 +11,15 @@ export const GET: APIRoute = async ({ params }) => {
     if (!id) {
       return new Response(
         JSON.stringify({
-          error: { code: "400", message: "Show ID is required" },
+          error: { code: "BAD_REQUEST", message: "Show ID is required" },
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
         } as ErrorResponseDto),
-        { status: 400 },
+        { status: 400, headers: { "Content-Type": "application/json" } },
       );
     }
 
-    // Get show using service
-    const supabase = supabaseServerClient;
+    const supabase = createSupabaseServerClient();
     const showService = new ShowService(supabase);
 
     const show = await showService.getShowById(id);
@@ -75,22 +74,18 @@ export const PUT: APIRoute = async ({ params, request }) => {
     if (!id) {
       return new Response(
         JSON.stringify({
-          error: { code: "400", message: "Show ID is required" },
+          error: { code: "BAD_REQUEST", message: "Show ID is required" },
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
         } as ErrorResponseDto),
-        { status: 400 },
+        { status: 400, headers: { "Content-Type": "application/json" } },
       );
     }
 
-    // Parse request body
     const body = await request.json();
-
-    // Validate input data
     const validatedData = updateShowSchema.parse(body);
 
-    // Update show using service
-    const supabase = supabaseServerClient;
+    const supabase = createSupabaseServerClient();
     const showService = new ShowService(supabase);
 
     const show = await showService.update(id, validatedData);
@@ -168,16 +163,15 @@ export const DELETE: APIRoute = async ({ params }) => {
     if (!id) {
       return new Response(
         JSON.stringify({
-          error: { code: "400", message: "Show ID is required" },
+          error: { code: "BAD_REQUEST", message: "Show ID is required" },
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
         } as ErrorResponseDto),
-        { status: 400 },
+        { status: 400, headers: { "Content-Type": "application/json" } },
       );
     }
 
-    // Delete show using service
-    const supabase = supabaseServerClient;
+    const supabase = createSupabaseServerClient();
     const showService = new ShowService(supabase);
 
     await showService.delete(id);

@@ -1,8 +1,8 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
+import { createSupabaseServerClient } from "../../../db/supabase.server";
 import { DogService } from "../../../lib/services/dogService";
 import { updateDogSchema } from "../../../lib/validation/dogSchemas";
-import { supabaseServerClient } from "../../../db/supabase.server";
 import type { ErrorResponseDto } from "../../../types";
 
 export const GET: APIRoute = async ({ params }) => {
@@ -12,22 +12,16 @@ export const GET: APIRoute = async ({ params }) => {
     if (!id) {
       return new Response(
         JSON.stringify({
-          error: {
-            code: "VALIDATION_ERROR",
-            message: "Dog ID is required",
-          },
+          error: { code: "BAD_REQUEST", message: "Dog ID is required" },
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
         } as ErrorResponseDto),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
+        { status: 400, headers: { "Content-Type": "application/json" } },
       );
     }
 
-    // Get dog by ID using service
-    const dogService = new DogService(supabaseServerClient);
+    const supabase = createSupabaseServerClient();
+    const dogService = new DogService(supabase);
     const dog = await dogService.getDogById(id);
 
     return new Response(JSON.stringify(dog), {
@@ -87,28 +81,21 @@ export const PUT: APIRoute = async ({ params, request }) => {
     if (!id) {
       return new Response(
         JSON.stringify({
-          error: {
-            code: "VALIDATION_ERROR",
-            message: "Dog ID is required",
-          },
+          error: { code: "BAD_REQUEST", message: "Dog ID is required" },
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
         } as ErrorResponseDto),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
+        { status: 400, headers: { "Content-Type": "application/json" } },
       );
     }
 
-    // Parse request body
     const body = await request.json();
 
     // Validate input data
     const validatedData = updateDogSchema.parse(body);
 
-    // Update dog using service
-    const dogService = new DogService(supabaseServerClient);
+    const supabase = createSupabaseServerClient();
+    const dogService = new DogService(supabase);
     const dog = await dogService.update(id, validatedData);
 
     return new Response(JSON.stringify(dog), {
@@ -192,22 +179,16 @@ export const DELETE: APIRoute = async ({ params }) => {
     if (!id) {
       return new Response(
         JSON.stringify({
-          error: {
-            code: "VALIDATION_ERROR",
-            message: "Dog ID is required",
-          },
+          error: { code: "BAD_REQUEST", message: "Dog ID is required" },
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
         } as ErrorResponseDto),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
+        { status: 400, headers: { "Content-Type": "application/json" } },
       );
     }
 
-    // Delete dog using service
-    const dogService = new DogService(supabaseServerClient);
+    const supabase = createSupabaseServerClient();
+    const dogService = new DogService(supabase);
     await dogService.delete(id);
 
     return new Response(

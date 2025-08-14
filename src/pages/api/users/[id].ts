@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
+import { createSupabaseServerClient } from "../../../db/supabase.server";
 import { z } from "zod";
-import { supabaseServerClient } from "../../../db/supabase.server";
 import type { ErrorResponseDto } from "../../../types";
 
 // Schema dla aktualizacji użytkownika
@@ -17,21 +17,17 @@ export const GET: APIRoute = async ({ params }) => {
     if (!id) {
       return new Response(
         JSON.stringify({
-          error: {
-            code: "VALIDATION_ERROR",
-            message: "User ID is required",
-          },
+          error: { code: "BAD_REQUEST", message: "User ID is required" },
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
         } as ErrorResponseDto),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
+        { status: 400, headers: { "Content-Type": "application/json" } },
       );
     }
 
-    const { data: user, error } = await supabaseServerClient
+    const supabase = createSupabaseServerClient();
+
+    const { data: user, error } = await supabase
       .from("users")
       .select("*")
       .eq("id", id)
@@ -90,30 +86,26 @@ export const PUT: APIRoute = async ({ params, request }) => {
     if (!id) {
       return new Response(
         JSON.stringify({
-          error: {
-            code: "VALIDATION_ERROR",
-            message: "User ID is required",
-          },
+          error: { code: "BAD_REQUEST", message: "User ID is required" },
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
         } as ErrorResponseDto),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
+        { status: 400, headers: { "Content-Type": "application/json" } },
       );
     }
 
     const body = await request.json();
     const validatedData = updateUserSchema.parse(body);
 
+    const supabase = createSupabaseServerClient();
+
     // Sprawdź czy użytkownik istnieje
-    const { data: existingUser } = await supabaseServerClient
+    const { data: existingUser } = await supabase
       .from("users")
       .select("id")
       .eq("id", id)
       .is("deleted_at", null)
-      .single();
+      .maybeSingle();
 
     if (!existingUser) {
       return new Response(
@@ -132,7 +124,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
       );
     }
 
-    const { data: user, error } = await supabaseServerClient
+    const { data: user, error } = await supabase
       .from("users")
       .update(validatedData)
       .eq("id", id)
@@ -199,22 +191,18 @@ export const DELETE: APIRoute = async ({ params }) => {
     if (!id) {
       return new Response(
         JSON.stringify({
-          error: {
-            code: "VALIDATION_ERROR",
-            message: "User ID is required",
-          },
+          error: { code: "BAD_REQUEST", message: "User ID is required" },
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
         } as ErrorResponseDto),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
+        { status: 400, headers: { "Content-Type": "application/json" } },
       );
     }
 
+    const supabase = createSupabaseServerClient();
+
     // Soft delete - oznacz jako usunięty
-    const { error } = await supabaseServerClient
+    const { error } = await supabase
       .from("users")
       .update({ deleted_at: new Date().toISOString() })
       .eq("id", id);

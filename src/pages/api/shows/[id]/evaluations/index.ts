@@ -1,11 +1,11 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
+import { createSupabaseServerClient } from "../../../../../db/supabase.server";
 import { EvaluationService } from "../../../../../lib/services/evaluationService";
 import {
   createEvaluationSchema,
   evaluationQuerySchema,
 } from "../../../../../lib/validation/evaluationSchemas";
-import { supabaseServerClient } from "../../../../../db/supabase.server";
 import type { ErrorResponseDto } from "../../../../../types";
 
 export const GET: APIRoute = async ({ params, request }) => {
@@ -14,42 +14,24 @@ export const GET: APIRoute = async ({ params, request }) => {
     if (!showId) {
       return new Response(
         JSON.stringify({
-          error: {
-            code: "VALIDATION_ERROR",
-            message: "Show ID is required",
-          },
+          error: { code: "BAD_REQUEST", message: "Show ID is required" },
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
         } as ErrorResponseDto),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
+        { status: 400, headers: { "Content-Type": "application/json" } },
       );
     }
 
-    // Parse query parameters (ensure undefined, not null, for optional fields)
     const url = new URL(request.url);
-    const queryParams = {
-      dog_class: (url.searchParams.get("dog_class") || undefined) as
-        | string
-        | undefined,
-      grade: (url.searchParams.get("grade") || undefined) as string | undefined,
-      club_title: (url.searchParams.get("club_title") || undefined) as
-        | string
-        | undefined,
-      page: parseInt(url.searchParams.get("page") || "1"),
-      limit: parseInt(url.searchParams.get("limit") || "20"),
-    };
+    const queryParams = evaluationQuerySchema.parse(
+      Object.fromEntries(url.searchParams),
+    );
 
-    // Validate query parameters
-    const validatedParams = evaluationQuerySchema.parse(queryParams);
-
-    // Get evaluations using service
-    const evaluationService = new EvaluationService(supabaseServerClient);
+    const supabase = createSupabaseServerClient();
+    const evaluationService = new EvaluationService(supabase);
     const evaluations = await evaluationService.getEvaluations(
       showId,
-      validatedParams,
+      queryParams,
     );
 
     return new Response(JSON.stringify(evaluations), {
@@ -134,28 +116,19 @@ export const POST: APIRoute = async ({ params, request }) => {
     if (!showId) {
       return new Response(
         JSON.stringify({
-          error: {
-            code: "VALIDATION_ERROR",
-            message: "Show ID is required",
-          },
+          error: { code: "BAD_REQUEST", message: "Show ID is required" },
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
         } as ErrorResponseDto),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
+        { status: 400, headers: { "Content-Type": "application/json" } },
       );
     }
 
-    // Parse request body
     const body = await request.json();
-
-    // Validate input data
     const validatedData = createEvaluationSchema.parse(body);
 
-    // Create evaluation using service
-    const evaluationService = new EvaluationService(supabaseServerClient);
+    const supabase = createSupabaseServerClient();
+    const evaluationService = new EvaluationService(supabase);
     const evaluation = await evaluationService.create(showId, validatedData);
 
     return new Response(JSON.stringify(evaluation), {

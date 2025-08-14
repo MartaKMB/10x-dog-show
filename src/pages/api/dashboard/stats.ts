@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { supabaseServerClient } from "../../../db/supabase.server";
+import { createSupabaseServerClient } from "../../../db/supabase.server";
 import type { ErrorResponseDto } from "../../../types";
 
 interface DashboardStats {
@@ -10,8 +10,10 @@ interface DashboardStats {
 
 export const GET: APIRoute = async () => {
   try {
+    const supabase = createSupabaseServerClient();
+
     // Get total shows
-    const { count: totalShows, error: showsError } = await supabaseServerClient
+    const { count: totalShows, error: showsError } = await supabase
       .from("shows")
       .select("*", { count: "exact", head: true })
       .is("deleted_at", null);
@@ -19,17 +21,16 @@ export const GET: APIRoute = async () => {
     if (showsError) throw showsError;
 
     // Get completed shows
-    const { count: completedShows, error: completedShowsError } =
-      await supabaseServerClient
-        .from("shows")
-        .select("*", { count: "exact", head: true })
-        .is("deleted_at", null)
-        .eq("status", "completed");
+    const { count: completedShows, error: completedShowsError } = await supabase
+      .from("shows")
+      .select("*", { count: "exact", head: true })
+      .is("deleted_at", null)
+      .eq("status", "completed");
 
     if (completedShowsError) throw completedShowsError;
 
     // Get total dogs
-    const { count: totalDogs, error: dogsError } = await supabaseServerClient
+    const { count: totalDogs, error: dogsError } = await supabase
       .from("dogs")
       .select("*", { count: "exact", head: true })
       .is("deleted_at", null);

@@ -17,6 +17,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       cookies,
     });
 
+    // Logowanie przez Supabase Auth
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -34,13 +35,19 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       );
     }
 
-    // Optional: enforce is_active from public.users if profile exists
-    const { data: profile } = await supabase
+    // Sprawdź profil w lokalnej tabeli users
+    const { data: profile, error: profileError } = await supabase
       .from("users")
       .select("first_name,last_name,role,is_active")
       .eq("email", email)
       .maybeSingle();
 
+    if (profileError) {
+      console.error("Profile fetch error:", profileError);
+      // Kontynuuj bez profilu - użytkownik może nie mieć profilu w lokalnej tabeli
+    }
+
+    // Sprawdź czy konto jest aktywne (jeśli profil istnieje)
     if (profile && profile.is_active === false) {
       await supabase.auth.signOut();
       return new Response(
@@ -56,13 +63,33 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       );
     }
 
+    // Jeśli profil nie istnieje, utwórz go automatycznie
+    if (!profile) {
+      const { error: upsertError } = await supabase.from("users").upsert(
+        {
+          email,
+          first_name: "Użytkownik", // Domyślne wartości
+          last_name: "Systemu",
+          role: "club_board",
+          is_active: true,
+          password_hash: "", // Puste - hasło jest w Supabase Auth
+        },
+        { onConflict: "email" },
+      );
+
+      if (upsertError) {
+        console.error("Profile creation error:", upsertError);
+        // Kontynuuj bez profilu
+      }
+    }
+
     return new Response(
       JSON.stringify({
         user: {
           id: data.user?.id ?? "",
           email: data.user?.email ?? "",
-          first_name: profile?.first_name ?? "",
-          last_name: profile?.last_name ?? "",
+          first_name: profile?.first_name ?? "Użytkownik",
+          last_name: profile?.last_name ?? "Systemu",
           role: (profile?.role as "club_board") ?? "club_board",
         },
         access_token: data.session?.access_token ?? "",
@@ -72,8 +99,8 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       }),
       { status: 200 },
     );
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (err) {
+    console.error("Login error:", err);
     return new Response(
       JSON.stringify({
         error: { code: "422", message: "invalid_payload" },

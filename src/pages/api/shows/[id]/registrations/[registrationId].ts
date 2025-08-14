@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { supabaseServerClient } from "../../../../../db/supabase.server";
+import { createSupabaseServerClient } from "../../../../../db/supabase.server";
 import { ShowService } from "../../../../../lib/services/showService";
 import { updateRegistrationSchema } from "../../../../../lib/validation/showSchemas";
 import type { ErrorResponseDto } from "../../../../../types";
@@ -29,7 +29,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
     const validatedData = updateRegistrationSchema.parse(body);
 
     // Update registration using service
-    const supabase = supabaseServerClient;
+    const supabase = createSupabaseServerClient();
     const showService = new ShowService(supabase);
 
     const registration = await showService.updateRegistration(
@@ -123,7 +123,7 @@ export const DELETE: APIRoute = async ({ params }) => {
     }
 
     // Delete registration using service
-    const supabase = supabaseServerClient;
+    const supabase = createSupabaseServerClient();
     const showService = new ShowService(supabase);
 
     await showService.deleteRegistration(showId, registrationId);

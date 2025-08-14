@@ -27,7 +27,7 @@ export const createSupabaseServerInstance = (context: {
 }) => {
   const supabase = createServerClient<Database>(
     import.meta.env.SUPABASE_URL,
-    import.meta.env.SUPABASE_KEY,
+    import.meta.env.SUPABASE_ANON_KEY, // Poprawka: SUPABASE_KEY -> SUPABASE_ANON_KEY
     {
       cookieOptions,
       cookies: {
@@ -46,18 +46,23 @@ export const createSupabaseServerInstance = (context: {
   return supabase;
 };
 
-// New client for API routes that doesn't require auth in local development
-const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_KEY;
+// Funkcja do tworzenia klienta dla API routes (nie wymaga auth w lokalnym środowisku)
+export const createSupabaseServerClient = () => {
+  const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
-// Check if we're in local development environment
-const isLocalDevelopment =
-  supabaseUrl?.includes("127.0.0.1") || supabaseUrl?.includes("localhost");
+  // Sprawdź czy zmienne środowiskowe są dostępne
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error(
+      "Missing Supabase environment variables: PUBLIC_SUPABASE_URL or PUBLIC_SUPABASE_ANON_KEY",
+    );
+  }
 
-export const supabaseServerClient = createClient<Database>(
-  supabaseUrl,
-  supabaseAnonKey,
-  {
+  // Check if we're in local development environment
+  const isLocalDevelopment =
+    supabaseUrl?.includes("127.0.0.1") || supabaseUrl?.includes("localhost");
+
+  return createClient<Database>(supabaseUrl, supabaseAnonKey, {
     // In local development, disable auth completely for server-side API calls
     auth: {
       autoRefreshToken: false,
@@ -72,7 +77,7 @@ export const supabaseServerClient = createClient<Database>(
     db: {
       schema: "public",
     },
-  },
-);
+  });
+};
 
 export type { Database } from "./database.types";

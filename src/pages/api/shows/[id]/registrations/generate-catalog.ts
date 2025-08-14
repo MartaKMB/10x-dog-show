@@ -1,5 +1,5 @@
+import { createSupabaseServerClient } from "../../../../../db/supabase.server";
 import type { APIRoute } from "astro";
-import { supabaseServerClient } from "../../../../../db/supabase.server";
 import type { ErrorResponseDto } from "../../../../../types";
 
 export const POST: APIRoute = async ({ params }) => {
@@ -17,7 +17,7 @@ export const POST: APIRoute = async ({ params }) => {
     }
 
     // Generate catalog numbers using Supabase function
-    const supabase = supabaseServerClient;
+    const supabase = createSupabaseServerClient();
 
     const { error } = await supabase.rpc("generate_catalog_numbers", {
       show_id_param: showId,

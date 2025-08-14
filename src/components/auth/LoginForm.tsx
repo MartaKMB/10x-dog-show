@@ -76,8 +76,12 @@ const LoginForm: React.FC = () => {
         throw new Error(message);
       }
 
-      // SSR-first cookies are set by the server. Redirect to dashboard.
-      window.location.href = "/";
+      // Sprawdź czy jest parametr redirect w URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const redirectTo = urlParams.get("redirect") || "/";
+
+      // Przekieruj na odpowiednią stronę
+      window.location.href = redirectTo;
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Wystąpił błąd podczas logowania";

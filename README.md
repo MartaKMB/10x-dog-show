@@ -115,9 +115,13 @@ The project supports both local and cloud testing environments:
 
    ```env
    # Local Development Environment
-   PUBLIC_SUPABASE_URL=your_supabase_url
-   PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+   SUPABASE_URL=http://127.0.0.1:54321
+   SUPABASE_ANON_KEY=your_local_anon_key_here
+   SUPABASE_SERVICE_ROLE_KEY=your_local_service_role_key_here
+   
+   # Public Supabase URLs (for client-side)
+   PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+   PUBLIC_SUPABASE_ANON_KEY=your_local_anon_key_here
 
    # Cloud Testing Environment (Optional)
    VITE_SUPABASE_URL_CLOUD=your_cloud_supabase_url

@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
+import { createSupabaseServerClient } from "../../../../db/supabase.server";
 import { DogService } from "../../../../lib/services/dogService";
-import { supabaseServerClient } from "../../../../db/supabase.server";
 import type { ErrorResponseDto } from "../../../../types";
 
 export const GET: APIRoute = async ({ params, request }) => {
@@ -35,8 +35,9 @@ export const GET: APIRoute = async ({ params, request }) => {
       limit: queryParamsObj.limit ? parseInt(queryParamsObj.limit) : undefined,
     };
 
+    const supabase = createSupabaseServerClient();
     // Get dog history using service
-    const dogService = new DogService(supabaseServerClient);
+    const dogService = new DogService(supabase);
     const history = await dogService.getDogHistory(id, queryParams);
 
     return new Response(JSON.stringify(history), {
