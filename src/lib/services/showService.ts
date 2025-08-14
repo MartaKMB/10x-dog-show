@@ -151,11 +151,10 @@ export class ShowService {
   /**
    * Creates a new show
    * @param data Show creation data
-   * @param organizerId Organizer user ID
    * @returns Created show
    */
   async create(data: CreateShowInput): Promise<ShowResponseDto> {
-    await this.validateBusinessRules();
+    await this.validateBusinessRules(data);
 
     const showData = {
       ...data,
@@ -236,11 +235,46 @@ export class ShowService {
   }
 
   /**
-   * Validates business rules for show creation
+   * Validates business rules for show creation with overlap check
    */
-  private async validateBusinessRules(): Promise<void> {
-    // No specific business rules for Hovawart Club shows
-    // Shows are created after the fact, so no date validation needed
+  private async validateBusinessRules(
+    data?: any,
+    excludeShowId?: string,
+  ): Promise<void> {
+    // If no data provided, skip validation (for backward compatibility)
+    if (!data) {
+      return;
+    }
+
+    // Check for overlapping show dates (same day)
+    const showDate = new Date(data.show_date);
+    const showDateOnly = showDate.toISOString().split("T")[0]; // Get date part only
+
+    let query = this.supabase
+      .from("shows")
+      .select("id, name, show_date")
+      .eq("show_date", showDateOnly)
+      .is("deleted_at", null);
+
+    // Exclude current show if editing
+    if (excludeShowId) {
+      query = query.neq("id", excludeShowId);
+    }
+
+    const { data: overlappingShows, error } = await query;
+
+    if (error) {
+      throw new Error(
+        `INTERNAL_ERROR: Failed to check for overlapping shows: ${error.message}`,
+      );
+    }
+
+    if (overlappingShows && overlappingShows.length > 0) {
+      const existingShow = overlappingShows[0];
+      throw new Error(
+        `BUSINESS_RULE_ERROR: Another show "${existingShow.name}" is already scheduled for ${showDateOnly}. Please choose a different date.`,
+      );
+    }
   }
 
   /**
@@ -274,6 +308,17 @@ export class ShowService {
   async update(id: string, data: UpdateShowInput): Promise<ShowResponseDto> {
     const currentShow = await this.getShowById(id);
     this.validateShowEditable(currentShow.status, "update");
+
+    // Check for overlapping dates if show_date is being updated
+    if (data.show_date) {
+      await this.validateBusinessRules(
+        {
+          show_date: data.show_date,
+          name: data.name || currentShow.name,
+        },
+        id,
+      );
+    }
 
     const updateData = {
       ...data,
@@ -401,7 +446,6 @@ export class ShowService {
       id: reg.id,
       dog: reg.dogs,
       dog_class: reg.dog_class,
-      catalog_number: reg.catalog_number,
       registered_at: reg.created_at,
     }));
 
@@ -480,7 +524,6 @@ export class ShowService {
       id: registration.id,
       dog: registration.dogs,
       dog_class: registration.dog_class,
-      catalog_number: registration.catalog_number,
       registered_at: registration.created_at,
     };
   }
@@ -563,7 +606,6 @@ export class ShowService {
       id: registration.id,
       dog: registration.dogs,
       dog_class: registration.dog_class,
-      catalog_number: registration.catalog_number,
       registered_at: registration.created_at,
     };
   }

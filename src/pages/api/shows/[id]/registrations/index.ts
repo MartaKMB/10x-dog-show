@@ -1,14 +1,17 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { supabaseServerClient } from "../../../db/supabase.server";
-import { ShowService } from "../../../lib/services/showService";
-import { updateShowSchema } from "../../../lib/validation/showSchemas";
-import type { ErrorResponseDto } from "../../../types";
+import { supabaseServerClient } from "../../../../../db/supabase.server";
+import { ShowService } from "../../../../../lib/services/showService";
+import {
+  createRegistrationSchema,
+  registrationQuerySchema,
+} from "../../../../../lib/validation/showSchemas";
+import type { ErrorResponseDto } from "../../../../../types";
 
-export const GET: APIRoute = async ({ params }) => {
+export const GET: APIRoute = async ({ params, request }) => {
   try {
-    const { id } = params;
-    if (!id) {
+    const { showId } = params;
+    if (!showId) {
       return new Response(
         JSON.stringify({
           error: { code: "400", message: "Show ID is required" },
@@ -19,88 +22,27 @@ export const GET: APIRoute = async ({ params }) => {
       );
     }
 
-    // Get show using service
-    const supabase = supabaseServerClient;
-    const showService = new ShowService(supabase);
-
-    const show = await showService.getShowById(id);
-
-    return new Response(JSON.stringify(show), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
-  } catch (error) {
-    console.error("Error fetching show:", error);
-
-    // Handle business logic errors
-    if (error instanceof Error) {
-      const statusCode = error.message.includes("NOT_FOUND")
-        ? 404
-        : error.message.includes("AUTHORIZATION_ERROR")
-          ? 403
-          : 500;
-
-      return new Response(
-        JSON.stringify({
-          error: {
-            code: error.message.split(":")[0] || "INTERNAL_ERROR",
-            message:
-              error.message.split(":")[1]?.trim() || "Internal server error",
-          },
-          timestamp: new Date().toISOString(),
-          request_id: crypto.randomUUID(),
-        } as ErrorResponseDto),
-        { status: statusCode },
-      );
-    }
-
-    // Generic error handler
-    return new Response(
-      JSON.stringify({
-        error: {
-          code: "INTERNAL_ERROR",
-          message: "Internal server error",
-        },
-        timestamp: new Date().toISOString(),
-        request_id: crypto.randomUUID(),
-      } as ErrorResponseDto),
-      { status: 500 },
+    // Parse query parameters
+    const url = new URL(request.url);
+    const queryParams = registrationQuerySchema.parse(
+      Object.fromEntries(url.searchParams),
     );
-  }
-};
 
-export const PUT: APIRoute = async ({ params, request }) => {
-  try {
-    const { id } = params;
-    if (!id) {
-      return new Response(
-        JSON.stringify({
-          error: { code: "400", message: "Show ID is required" },
-          timestamp: new Date().toISOString(),
-          request_id: crypto.randomUUID(),
-        } as ErrorResponseDto),
-        { status: 400 },
-      );
-    }
-
-    // Parse request body
-    const body = await request.json();
-
-    // Validate input data
-    const validatedData = updateShowSchema.parse(body);
-
-    // Update show using service
+    // Get registrations using service
     const supabase = supabaseServerClient;
     const showService = new ShowService(supabase);
 
-    const show = await showService.update(id, validatedData);
+    const registrations = await showService.getRegistrations(
+      showId,
+      queryParams,
+    );
 
-    return new Response(JSON.stringify(show), {
+    return new Response(JSON.stringify(registrations), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error updating show:", error);
+    console.error("Error fetching registrations:", error);
 
     // Handle validation errors
     if (error instanceof z.ZodError) {
@@ -108,7 +50,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
         JSON.stringify({
           error: {
             code: "VALIDATION_ERROR",
-            message: "The provided data is invalid",
+            message: "The provided query parameters are invalid",
             details: error.errors.map((err) => ({
               field: err.path.join("."),
               message: err.message,
@@ -162,10 +104,10 @@ export const PUT: APIRoute = async ({ params, request }) => {
   }
 };
 
-export const DELETE: APIRoute = async ({ params }) => {
+export const POST: APIRoute = async ({ params, request }) => {
   try {
-    const { id } = params;
-    if (!id) {
+    const { showId } = params;
+    if (!showId) {
       return new Response(
         JSON.stringify({
           error: { code: "400", message: "Show ID is required" },
@@ -176,22 +118,68 @@ export const DELETE: APIRoute = async ({ params }) => {
       );
     }
 
-    // Delete show using service
+    // Parse request body
+    const body = await request.json();
+
+    // Validate input data
+    const validatedData = createRegistrationSchema.parse(body);
+
+    // Create registration using service
     const supabase = supabaseServerClient;
     const showService = new ShowService(supabase);
 
-    await showService.delete(id);
+    // Check if dog is already registered for this show
+    const { data: existingRegistration } = await supabase
+      .from("show_registrations")
+      .select("id")
+      .eq("show_id", showId)
+      .eq("dog_id", validatedData.dog_id)
+      .single();
 
-    return new Response(
-      JSON.stringify({
-        message: "Show deleted successfully",
-        timestamp: new Date().toISOString(),
-        request_id: crypto.randomUUID(),
-      }),
-      { status: 200 },
+    if (existingRegistration) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            code: "BUSINESS_RULE_ERROR",
+            message: "Dog is already registered for this show",
+          },
+          timestamp: new Date().toISOString(),
+          request_id: crypto.randomUUID(),
+        } as ErrorResponseDto),
+        { status: 409 },
+      );
+    }
+
+    const registration = await showService.createRegistration(
+      showId,
+      validatedData,
     );
+
+    return new Response(JSON.stringify(registration), {
+      status: 201,
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (error) {
-    console.error("Error deleting show:", error);
+    console.error("Error creating registration:", error);
+
+    // Handle validation errors
+    if (error instanceof z.ZodError) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            code: "VALIDATION_ERROR",
+            message: "The provided data is invalid",
+            details: error.errors.map((err) => ({
+              field: err.path.join("."),
+              message: err.message,
+            })),
+          },
+          timestamp: new Date().toISOString(),
+          request_id: crypto.randomUUID(),
+        } as ErrorResponseDto),
+        { status: 400 },
+      );
+    }
 
     // Handle business logic errors
     if (error instanceof Error) {

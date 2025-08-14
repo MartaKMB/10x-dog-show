@@ -1,37 +1,21 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
+import { supabaseServerClient } from "../../../../db/supabase.server";
 import { ShowService } from "../../../../lib/services/showService";
 import { updateShowStatusSchema } from "../../../../lib/validation/showSchemas";
-import { supabaseServerClient } from "../../../../db/supabase.server";
 import type { ErrorResponseDto } from "../../../../types";
 
 export const PATCH: APIRoute = async ({ params, request }) => {
-  return handleStatusUpdate(params, request);
-};
-
-export const PUT: APIRoute = async ({ params, request }) => {
-  return handleStatusUpdate(params, request);
-};
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function handleStatusUpdate(params: any, request: Request) {
   try {
     const { id } = params;
-
     if (!id) {
       return new Response(
         JSON.stringify({
-          error: {
-            code: "VALIDATION_ERROR",
-            message: "Show ID is required",
-          },
+          error: { code: "400", message: "Show ID is required" },
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
         } as ErrorResponseDto),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
+        { status: 400 },
       );
     }
 
@@ -42,7 +26,9 @@ async function handleStatusUpdate(params: any, request: Request) {
     const validatedData = updateShowStatusSchema.parse(body);
 
     // Update show status using service
-    const showService = new ShowService(supabaseServerClient);
+    const supabase = supabaseServerClient;
+    const showService = new ShowService(supabase);
+
     const show = await showService.updateStatus(id, validatedData.status);
 
     return new Response(JSON.stringify(show), {
@@ -67,22 +53,21 @@ async function handleStatusUpdate(params: any, request: Request) {
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
         } as ErrorResponseDto),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
+        { status: 400 },
       );
     }
 
     // Handle business logic errors
     if (error instanceof Error) {
-      const statusCode = error.message.includes("NOT_FOUND")
-        ? 404
-        : error.message.includes("AUTHORIZATION_ERROR")
-          ? 403
-          : error.message.includes("BUSINESS_RULE_ERROR")
-            ? 422
-            : 500;
+      const statusCode = error.message.includes("AUTHORIZATION_ERROR")
+        ? 403
+        : error.message.includes("NOT_FOUND")
+          ? 404
+          : error.message.includes("CONFLICT")
+            ? 409
+            : error.message.includes("BUSINESS_RULE_ERROR")
+              ? 422
+              : 500;
 
       return new Response(
         JSON.stringify({
@@ -94,10 +79,7 @@ async function handleStatusUpdate(params: any, request: Request) {
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
         } as ErrorResponseDto),
-        {
-          status: statusCode,
-          headers: { "Content-Type": "application/json" },
-        },
+        { status: statusCode },
       );
     }
 
@@ -111,10 +93,7 @@ async function handleStatusUpdate(params: any, request: Request) {
         timestamp: new Date().toISOString(),
         request_id: crypto.randomUUID(),
       } as ErrorResponseDto),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      },
+      { status: 500 },
     );
   }
-}
+};

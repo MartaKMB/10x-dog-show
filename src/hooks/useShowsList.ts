@@ -60,7 +60,6 @@ export const useShowsList = () => {
         params.append("limit", pagination.limit.toString());
 
         const url = `/api/shows?${params.toString()}`;
-        console.warn("Loading shows with URL:", url);
 
         const response = await fetch(url);
 
@@ -69,7 +68,6 @@ export const useShowsList = () => {
         }
 
         const data = await response.json();
-        console.warn("Shows response:", data);
 
         setState({
           shows: data.data || [],

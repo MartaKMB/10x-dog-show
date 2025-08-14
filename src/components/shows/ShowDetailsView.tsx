@@ -50,7 +50,7 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({ showId }) => {
 
   // Helper functions
   const canUserEditShow = (): boolean => {
-    return userRole === "club_board";
+    return userRole === "club_board" && show?.status === "draft";
   };
 
   const canUserDeleteShow = (showData: ShowResponse): boolean => {

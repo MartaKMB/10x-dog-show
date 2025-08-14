@@ -32,7 +32,6 @@ export const GET: APIRoute = async ({ request }) => {
         name,
         status,
         show_date,
-        registration_deadline,
         location,
         judge_name,
         description,
@@ -188,6 +187,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Handle validation errors
     if (error instanceof z.ZodError) {
+      console.error("Zod validation errors:", error.errors);
       return new Response(
         JSON.stringify({
           error: {
@@ -210,6 +210,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Handle business logic errors
     if (error instanceof Error) {
+      console.error("Business logic error:", error.message);
       const statusCode = error.message.includes("AUTHORIZATION_ERROR")
         ? 403
         : error.message.includes("NOT_FOUND")

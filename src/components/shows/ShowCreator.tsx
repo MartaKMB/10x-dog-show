@@ -26,6 +26,7 @@ const ShowCreator: React.FC<ShowCreatorProps> = () => {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string>("");
 
   const { isLoading, error, createShow } = useShowCreator();
 
@@ -69,23 +70,36 @@ const ShowCreator: React.FC<ShowCreatorProps> = () => {
     }
 
     setIsSubmitting(true);
+    setErrors({});
+    setSuccessMessage("");
 
     try {
+      // Konwertuj datę do formatu ISO string
+      const showDate = new Date(formData.showDate);
+      showDate.setHours(0, 0, 0, 0); // Ustaw czas na początek dnia
+
       const showData: CreateShowDto = {
         name: formData.name,
-        show_date: formData.showDate,
+        show_date: showDate.toISOString().split("T")[0], // Format YYYY-MM-DD
         location: formData.location,
         judge_name: formData.judgeName,
         description: formData.description || undefined,
       };
 
-      await createShow(showData);
+      const result = await createShow(showData);
 
-      // Redirect to shows list
-      window.location.href = "/shows";
-    } catch (error) {
-      console.error("Error creating show:", error);
-      setErrors({ submit: "Błąd podczas tworzenia wystawy" });
+      if (result.success) {
+        setSuccessMessage("Wystawa została utworzona pomyślnie!");
+
+        // Przekieruj po 2 sekundach
+        setTimeout(() => {
+          window.location.href = "/shows";
+        }, 2000);
+      } else {
+        setErrors({
+          submit: result.error || "Błąd podczas tworzenia wystawy",
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -236,6 +250,13 @@ const ShowCreator: React.FC<ShowCreatorProps> = () => {
           {errors.submit && (
             <div className="p-4 bg-red-50 border border-red-200 rounded-md">
               <p className="text-red-600 text-sm">{errors.submit}</p>
+            </div>
+          )}
+
+          {/* Success Messages */}
+          {successMessage && (
+            <div className="p-4 bg-green-50 border border-green-200 rounded-md">
+              <p className="text-green-600 text-sm">{successMessage}</p>
             </div>
           )}
 

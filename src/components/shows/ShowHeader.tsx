@@ -145,7 +145,7 @@ const ShowHeader: React.FC<ShowHeaderProps> = ({
 
             {/* Action Buttons */}
             <div className="flex gap-2">
-              {canEdit && (
+              {canEdit && show.status === "draft" && (
                 <button
                   onClick={onEdit}
                   className="px-4 py-2 bg-amber-500 text-gray-900 rounded-md hover:bg-amber-400 transition-colors text-sm font-medium"
