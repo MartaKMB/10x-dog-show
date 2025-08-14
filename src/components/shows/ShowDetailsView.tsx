@@ -34,6 +34,7 @@ interface ShowDetailsViewModel {
   stats: ShowStatsType;
   canEdit: boolean;
   canDelete: boolean;
+  canAddDogs: boolean;
   isLoading: boolean;
   error: string | null;
   filters: FilterState;
@@ -71,6 +72,7 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
     },
     canEdit: false,
     canDelete: false,
+    canAddDogs: false,
     isLoading: true,
     error: null,
     filters: {},
@@ -111,6 +113,7 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
       const stats = calculateStats(registrations);
       const canEdit = isAuthenticated && canUserEditShow();
       const canDelete = isAuthenticated && canUserDeleteShow(show);
+      const canAddDogs = isAuthenticated && show.status === "draft";
 
       setViewModel((prev) => ({
         ...prev,
@@ -119,6 +122,7 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
         stats,
         canEdit,
         canDelete,
+        canAddDogs,
         isLoading: false,
         error: null,
       }));
@@ -312,7 +316,7 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
       <DogsList
         registrations={viewModel.registrations}
         showStatus={show.status}
-        canAddDogs={viewModel.canEdit}
+        canAddDogs={viewModel.canAddDogs}
         canEdit={viewModel.canEdit}
         canDelete={viewModel.canDelete}
         userRole={userRole}

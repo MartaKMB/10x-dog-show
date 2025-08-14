@@ -40,8 +40,7 @@ export class EvaluationService {
             microchip_number,
             kennel_name,
             father_name,
-            mother_name,
-            owners
+            mother_name
           )
         `,
         )
@@ -91,11 +90,17 @@ export class EvaluationService {
           kennel_name: evaluation.dogs.kennel_name,
           father_name: evaluation.dogs.father_name,
           mother_name: evaluation.dogs.mother_name,
-          owners: [],
+          owners: [], // Pusta tablica właścicieli - nie pobieramy ich w tym zapytaniu
         },
         dog_class: evaluation.dog_class,
-        grade: evaluation.grade,
-        baby_puppy_grade: evaluation.baby_puppy_grade,
+        grade:
+          evaluation.dog_class === "baby" || evaluation.dog_class === "puppy"
+            ? null
+            : evaluation.grade,
+        baby_puppy_grade:
+          evaluation.dog_class === "baby" || evaluation.dog_class === "puppy"
+            ? evaluation.baby_puppy_grade
+            : null,
         club_title: evaluation.club_title,
         placement: evaluation.placement,
         created_at: evaluation.created_at,

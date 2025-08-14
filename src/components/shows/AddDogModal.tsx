@@ -28,8 +28,11 @@ interface OwnerFormData {
   first_name: string;
   last_name: string;
   email: string;
-  phone: string;
-  kennel_name: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  postal_code?: string;
+  kennel_name?: string;
   gdpr_consent: boolean;
 }
 
@@ -58,11 +61,15 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
     last_name: "",
     email: "",
     phone: "",
+    address: undefined,
+    city: undefined,
+    postal_code: "",
     kennel_name: "",
     gdpr_consent: false,
   });
 
   const [errors, setErrors] = useState<ValidationErrors>({});
+  const [successMessage, setSuccessMessage] = useState<string>("");
 
   useEffect(() => {
     if (isOpen) {
@@ -160,32 +167,48 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
     }
 
     try {
-      // Create owner first
-      const ownerResponse = await fetch("/api/owners", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          first_name: ownerData.first_name,
-          last_name: ownerData.last_name,
-          email: ownerData.email,
-          phone: ownerData.phone || null,
-          address: "Brak adresu", // Required field but not used for Hovawart Club
-          city: "Brak miasta", // Required field but not used for Hovawart Club
-          kennel_name: ownerData.kennel_name || null,
-          gdpr_consent: ownerData.gdpr_consent,
-        }),
-      });
-
-      if (!ownerResponse.ok) {
-        const errorData = await ownerResponse.json();
-        throw new Error(
-          errorData.error?.message || "Błąd tworzenia właściciela",
-        );
+      // 1) Sprawdź czy właściciel już istnieje
+      let ownerId: string | undefined;
+      const existingOwnerResponse = await fetch(
+        `/api/owners?email=${ownerData.email}`,
+      );
+      if (existingOwnerResponse.ok) {
+        const existingOwners = await existingOwnerResponse.json();
+        if (existingOwners.data && existingOwners.data.length > 0) {
+          ownerId = existingOwners.data[0].id; // Użyj istniejącego właściciela
+        }
       }
 
-      const owner = await ownerResponse.json();
+      // 2) Jeśli właściciel nie istnieje, utwórz nowego
+      if (!ownerId) {
+        const ownerResponse = await fetch("/api/owners", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            first_name: ownerData.first_name,
+            last_name: ownerData.last_name,
+            email: ownerData.email,
+            phone: ownerData.phone?.trim() || null,
+            address: ownerData.address?.trim() || null,
+            city: ownerData.city?.trim() || null,
+            postal_code: ownerData.postal_code?.trim() || null,
+            kennel_name: ownerData.kennel_name?.trim() || null,
+            gdpr_consent: ownerData.gdpr_consent,
+          }),
+        });
+
+        if (!ownerResponse.ok) {
+          const errorData = await ownerResponse.json();
+          throw new Error(
+            errorData.error?.message || "Błąd tworzenia właściciela",
+          );
+        }
+
+        const owner = await ownerResponse.json();
+        ownerId = owner.id;
+      }
 
       // Create dog
       const dogResponse = await fetch("/api/dogs", {
@@ -203,7 +226,7 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
           mother_name: dogData.mother_name || null,
           owners: [
             {
-              id: owner.id,
+              id: ownerId,
               is_primary: true,
             },
           ],
@@ -256,8 +279,14 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
         throw new Error(errorData.error?.message || "Błąd zapisu oceny psa");
       }
 
-      onSuccess();
-      resetForm();
+      // Sukces - ustaw komunikat i wywołaj callback
+      setSuccessMessage(
+        `Pies "${dogData.name}" został pomyślnie dodany do wystawy!`,
+      );
+      setTimeout(() => {
+        onSuccess();
+        resetForm();
+      }, 2000);
     } catch (error) {
       console.error("Error adding dog:", error);
       setErrors({
@@ -286,10 +315,14 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
       last_name: "",
       email: "",
       phone: "",
+      address: undefined,
+      city: undefined,
+      postal_code: "",
       kennel_name: "",
       gdpr_consent: false,
     });
     setErrors({});
+    setSuccessMessage("");
   };
 
   const handleClose = () => {
@@ -583,13 +616,72 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
                   <input
                     type="tel"
                     id="owner-phone"
-                    value={ownerData.phone}
+                    value={ownerData.phone || ""}
                     onChange={(e) =>
                       handleOwnerDataChange("phone", e.target.value)
                     }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="+48 123 456 789"
                   />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="owner-address"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Adres
+                  </label>
+                  <input
+                    type="text"
+                    id="owner-address"
+                    value={ownerData.address || ""}
+                    onChange={(e) =>
+                      handleOwnerDataChange("address", e.target.value)
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="ul. Przykładowa 123"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      htmlFor="owner-city"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Miasto
+                    </label>
+                    <input
+                      type="text"
+                      id="owner-city"
+                      value={ownerData.city || ""}
+                      onChange={(e) =>
+                        handleOwnerDataChange("city", e.target.value)
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Warszawa"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="owner-postal-code"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Kod pocztowy
+                    </label>
+                    <input
+                      type="text"
+                      id="owner-postal-code"
+                      value={ownerData.postal_code || ""}
+                      onChange={(e) =>
+                        handleOwnerDataChange("postal_code", e.target.value)
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="00-001"
+                    />
+                  </div>
                 </div>
 
                 <div>
@@ -834,6 +926,13 @@ const AddDogModal: React.FC<AddDogModalProps> = ({
               </div>
             </div>
           </div>
+
+          {/* Success Message */}
+          {successMessage && (
+            <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-md">
+              <p className="text-green-600 text-sm">{successMessage}</p>
+            </div>
+          )}
 
           {/* Error Messages */}
           {errors.submit && (
