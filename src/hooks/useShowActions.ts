@@ -84,7 +84,7 @@ export const useShowActions = (show: ShowDetailResponseDto | null) => {
         const updateData: UpdateShowStatusDto = { status };
 
         const response = await fetch(`/api/shows/${show.id}/status`, {
-          method: "PUT",
+          method: "PATCH",
           headers: {
             "Content-Type": "application/json",
           },

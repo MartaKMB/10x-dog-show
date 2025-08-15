@@ -56,7 +56,11 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
   };
 
   const canUserDeleteShow = (showData: ShowResponse): boolean => {
-    return isAuthenticated && showData.registered_dogs === 0;
+    return (
+      isAuthenticated &&
+      showData.status === "draft" &&
+      showData.registered_dogs === 0
+    );
   };
 
   const canUserChangeStatus = (): boolean => {
