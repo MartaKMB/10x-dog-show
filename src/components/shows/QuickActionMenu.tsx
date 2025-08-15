@@ -1,9 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
-import type { QuickAction, UserRole } from "../../types";
+import type { QuickAction } from "../../types";
 
 interface QuickActionMenuProps {
   actions: QuickAction[];
-  userRole: UserRole;
   canEdit: boolean;
   canDelete: boolean;
   onAction: (action: string) => void;
@@ -11,7 +10,6 @@ interface QuickActionMenuProps {
 
 const QuickActionMenu: React.FC<QuickActionMenuProps> = ({
   actions,
-  userRole,
   canEdit,
   canDelete,
   onAction,
@@ -35,27 +33,11 @@ const QuickActionMenu: React.FC<QuickActionMenuProps> = ({
   const handleActionClick = (action: QuickAction) => {
     if (action.disabled) return;
 
-    // Check permissions
-    if (
-      action.requiresPermission &&
-      !action.requiresPermission.includes(userRole)
-    ) {
-      return;
-    }
-
     onAction(action.action);
     setIsOpen(false);
   };
 
   const filteredActions = actions.filter((action) => {
-    // Filter by permissions
-    if (
-      action.requiresPermission &&
-      !action.requiresPermission.includes(userRole)
-    ) {
-      return false;
-    }
-
     // Filter by specific permissions
     if (action.action === "edit" && !canEdit) return false;
     if (action.action === "delete" && !canDelete) return false;

@@ -4,13 +4,11 @@ import type { FilterState } from "../../types";
 interface RegistrationFiltersProps {
   onFiltersChange: (filters: FilterState) => void;
   currentFilters: FilterState;
-  userRole?: string;
 }
 
 const RegistrationFilters: React.FC<RegistrationFiltersProps> = ({
   onFiltersChange,
   currentFilters,
-  userRole = "department_representative",
 }) => {
   const [localFilters, setLocalFilters] = useState<FilterState>(currentFilters);
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(
@@ -115,9 +113,7 @@ const RegistrationFilters: React.FC<RegistrationFiltersProps> = ({
         )}
       </div>
 
-      <div
-        className={`grid gap-4 ${userRole === "department_representative" ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5"}`}
-      >
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {/* Search */}
         <div>
           <label
@@ -230,38 +226,6 @@ const RegistrationFilters: React.FC<RegistrationFiltersProps> = ({
             <option value="blond">Blond</option>
           </select>
         </div>
-
-        {/* Payment Status - Only for department representatives */}
-        {userRole === "department_representative" && (
-          <div>
-            <label
-              htmlFor="paymentStatus"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Status płatności
-            </label>
-            <select
-              id="paymentStatus"
-              value={
-                localFilters.isPaid === undefined
-                  ? ""
-                  : localFilters.isPaid.toString()
-              }
-              onChange={(e) => {
-                const value = e.target.value;
-                handleFilterChange(
-                  "isPaid",
-                  value === "" ? undefined : value === "true",
-                );
-              }}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="">Wszystkie</option>
-              <option value="true">Opłacone</option>
-              <option value="false">Nieopłacone</option>
-            </select>
-          </div>
-        )}
       </div>
 
       {/* Active Filters Display */}
@@ -332,19 +296,6 @@ const RegistrationFilters: React.FC<RegistrationFiltersProps> = ({
                 </button>
               </span>
             )}
-
-            {localFilters.isPaid !== undefined &&
-              userRole === "department_representative" && (
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-yellow-100 text-yellow-800">
-                  Płatność: {localFilters.isPaid ? "Opłacone" : "Nieopłacone"}
-                  <button
-                    onClick={() => handleFilterChange("isPaid", undefined)}
-                    className="ml-2 text-yellow-600 hover:text-yellow-800"
-                  >
-                    ×
-                  </button>
-                </span>
-              )}
           </div>
         </div>
       )}

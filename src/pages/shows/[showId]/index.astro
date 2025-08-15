@@ -2,10 +2,12 @@
 import Layout from "../../../layouts/Layout.astro";
 import ShowDetailsView from "../../../components/shows/ShowDetailsView.tsx";
 
-const userRole = "club_board";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Astro typing
 const { showId } = Astro.params;
+
+// Sprawdź czy użytkownik jest zalogowany
+const isAuthenticated = !!Astro.locals.auth?.user;
 ---
 
 <Layout title="Szczegóły wystawy - HovBase">
@@ -17,7 +19,11 @@ const { showId } = Astro.params;
           <h1 class="text-2xl font-bold text-gray-900 mb-2">Szczegóły wystawy</h1>
         </div>
         <div class="flex items-center gap-2 text-sm text-gray-500">
-          <span>Rola: Członek zarządu klubu</span>
+          {isAuthenticated ? (
+            <span>Zalogowany użytkownik</span>
+          ) : (
+            <span>Gość - tryb podglądu</span>
+          )}
         </div>
       </div>
     </div>
@@ -26,7 +32,7 @@ const { showId } = Astro.params;
     {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
     {/* @ts-ignore Astro typing */}
     {
-      !Astro.locals.auth?.user && (
+      !isAuthenticated && (
         <div class="bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-4">
           To jest tryb podglądu. Zaloguj się, aby edytować dane wystawy i listę psów.
         </div>
@@ -35,7 +41,7 @@ const { showId } = Astro.params;
 
     <!-- Show Details -->
     <div class="bg-white shadow rounded-lg">
-      <ShowDetailsView showId={showId} userRole={userRole} client:load />
+      {showId && <ShowDetailsView showId={showId} isAuthenticated={isAuthenticated} client:load />}
     </div>
   </div>
 </Layout>

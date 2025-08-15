@@ -22,11 +22,13 @@ import OfflineIndicator from "./OfflineIndicator";
 
 interface ShowDetailsViewProps {
   showId: string;
+  isAuthenticated: boolean;
 }
 
-const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({ showId }) => {
-  const userRole = "club_board"; // Tymczasowo hardcoded
-
+const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
+  showId,
+  isAuthenticated,
+}) => {
   // Show data and loading states
   const { show, registrations, isLoading, error, loadShowData } =
     useShowDetails(showId);
@@ -48,13 +50,29 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({ showId }) => {
 
   const resolvedShowId = showId;
 
-  // Helper functions
+  // Helper functions - now based on authentication and show status
   const canUserEditShow = (): boolean => {
-    return userRole === "club_board" && show?.status === "draft";
+    return isAuthenticated && show?.status === "draft";
   };
 
   const canUserDeleteShow = (showData: ShowResponse): boolean => {
-    return userRole === "club_board" && showData.registered_dogs === 0;
+    return isAuthenticated && showData.registered_dogs === 0;
+  };
+
+  const canUserChangeStatus = (): boolean => {
+    return isAuthenticated; // Zalogowany użytkownik zawsze może zmieniać status
+  };
+
+  const canUserAddDogs = (): boolean => {
+    return isAuthenticated && show?.status === "draft";
+  };
+
+  const canUserEditDogs = (): boolean => {
+    return isAuthenticated && show?.status === "draft";
+  };
+
+  const canUserDeleteDogs = (): boolean => {
+    return isAuthenticated && show?.status === "draft";
   };
 
   function computeShowStats(registrations: RegistrationResponse[]) {
@@ -92,7 +110,7 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({ showId }) => {
   const viewModel = {
     canEdit: canUserEditShow(),
     canDelete: show ? canUserDeleteShow(show) : false,
-    canAddDogs: userRole === "club_board",
+    canAddDogs: canUserAddDogs(),
     filters: {
       // TODO: Implement filter state
     },
@@ -192,9 +210,10 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({ showId }) => {
 
       <ShowHeader
         show={show}
-        userRole={userRole}
+        isAuthenticated={isAuthenticated}
         canEdit={viewModel.canEdit}
         canDelete={viewModel.canDelete}
+        canChangeStatus={canUserChangeStatus()}
         isDeleting={isDeleting}
         isUpdating={isUpdating}
         onDelete={deleteShow}
@@ -203,7 +222,7 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({ showId }) => {
       />
 
       {/* Show Stats */}
-      <ShowStats stats={viewModel.stats} userRole={userRole} />
+      <ShowStats stats={viewModel.stats} />
 
       {/* Registration Filters */}
       <RegistrationFilters
@@ -211,17 +230,15 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({ showId }) => {
           // TODO: Implement filter handling
         }}
         currentFilters={viewModel.filters}
-        userRole={userRole}
       />
 
       {/* Dogs List */}
       <DogsList
         registrations={viewModel.registrations}
         showStatus={show.status}
-        canAddDogs={viewModel.canAddDogs}
-        canEdit={viewModel.canEdit}
-        canDelete={viewModel.canDelete}
-        userRole={userRole}
+        canAddDogs={canUserAddDogs()}
+        canEdit={canUserEditDogs()}
+        canDelete={canUserDeleteDogs()}
         onAddDog={handleAddDog}
         onEditDog={handleEditDog}
         onDeleteDog={handleDeleteDog}

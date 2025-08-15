@@ -1,15 +1,14 @@
 import React, { useState } from "react";
-import type { DogCardViewModel, UserRole, ShowStatus } from "../../types";
+import type { DogCardViewModel, ShowStatus } from "../../types";
 import QuickActionMenu from "./QuickActionMenu";
 
 interface DogCardProps {
   dog: DogCardViewModel;
   onAction: (action: string) => void;
-  userRole: UserRole;
   showStatus: ShowStatus;
 }
 
-const DogCard: React.FC<DogCardProps> = ({ dog, onAction, userRole }) => {
+const DogCard: React.FC<DogCardProps> = ({ dog, onAction }) => {
   const [isExpanded, setIsExpanded] = useState(dog.isExpanded);
 
   const getGenderIcon = (gender: string): string => {
@@ -247,7 +246,6 @@ const DogCard: React.FC<DogCardProps> = ({ dog, onAction, userRole }) => {
                   icon: "✏️",
                   action: "edit",
                   disabled: !dog.canEdit,
-                  requiresPermission: ["club_board"],
                 },
                 {
                   id: "delete",
@@ -255,11 +253,9 @@ const DogCard: React.FC<DogCardProps> = ({ dog, onAction, userRole }) => {
                   icon: "🗑️",
                   action: "delete",
                   disabled: !dog.canDelete,
-                  requiresPermission: ["club_board"],
                 },
               ]}
               onAction={handleAction}
-              userRole={userRole}
               canEdit={dog.canEdit}
               canDelete={dog.canDelete}
             />

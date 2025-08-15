@@ -923,7 +923,6 @@ export interface QuickAction {
   icon: string;
   action: string;
   disabled?: boolean;
-  requiresPermission?: UserRole[];
 }
 
 export interface DogsListState {
