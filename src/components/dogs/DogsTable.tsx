@@ -38,7 +38,10 @@ const DogsTable: React.FC<DogsTableProps> = ({ dogs, onRowClick }) => {
             {/* <th className="px-6 py-3" /> */}
           </tr>
         </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
+        <tbody
+          data-testid="dogs-table-body"
+          className="bg-white divide-y divide-gray-200"
+        >
           {dogs.map((dog) => (
             <DogRow key={dog.id} dog={dog} onClick={onRowClick} />
           ))}

@@ -92,17 +92,34 @@ Zasady dla testów jednostkowych (wyciąg):
 
 ### 7. Harmonogram testów
 
-- Faza 1: pokrycie krytycznych komponentów auth i middleware testami integracyjnymi + smoke e2e (login, logout, publiczny wgląd).
-- Faza 2: scenariusze CRUD (shows, dogs, owners, registrations, evaluations) – testy integracyjne + rozszerzenie e2e; a11y podstawowe.
-- Faza 3: statystyki, edge-cases błędów, wydajność kluczowych widoków, domknięcie pokrycia.
-- Kontynuacja: regresja przy każdym PR (CI), smoke e2e nocne, pełny zestaw przed releasem.
+- **Faza 1** ✅: pokrycie krytycznych komponentów auth i middleware testami integracyjnymi + smoke e2e (login, logout, publiczny wgląd).
+- **Faza 2** 🚧: scenariusze CRUD (shows, dogs, owners, registrations, evaluations) – testy integracyjne + rozszerzenie e2e; a11y podstawowe.
+  - ✅ **Dogs**: `AddDogForm.test.tsx` (13 testów, wszystkie przechodzą)
+  - ✅ **Dogs**: `DogsTable.test.tsx` (testy renderowania i interakcji)
+  - 🔄 **Shows**: `ShowCreator.test.tsx`, `ShowDetailsView.test.tsx` (planowane)
+  - 🔄 **Owners**: komponenty właścicieli (planowane)
+- **Faza 3**: statystyki, edge-cases błędów, wydajność kluczowych widoków, domknięcie pokrycia.
+- **Kontynuacja**: regresja przy każdym PR (CI), smoke e2e nocne, pełny zestaw przed releasem.
 
 ### 8. Kryteria akceptacji testów
 
-- Wszystkie testy krytyczne (auth, ochrona zapisu, CRUD) przechodzą w 100%.
-- Pokrycie minimalne: linie 30%, gałęzie 20% w `src/lib` i komponentach auth; dla domenowych komponentów min. 10% na MVP.
-- E2E smoke: 0 testów niepowodzeń; średni czas odpowiedzi list <2 s na danych testowych.
-- A11y: brak krytycznych naruszeń (severity high) na stronach auth i list.
+- ✅ **Wszystkie testy krytyczne** (auth, ochrona zapisu, CRUD) przechodzą w 100%.
+- **Pokrycie minimalne**: linie 30%, gałęzie 20% w `src/lib` i komponentach auth; dla domenowych komponentów min. 10% na MVP.
+- **E2E smoke**: 0 testów niepowodzeń; średni czas odpowiedzi list <2 s na danych testowych.
+- **A11y**: brak krytycznych naruszeń (severity high) na stronach auth i list.
+
+#### Postęp implementacji testów:
+- ✅ **Komponenty autentykacji**: `LoginForm.test.tsx`, `RegisterForm.test.tsx` (29 testów)
+- ✅ **Serwisy**: `authService.test.ts`, `dogService.test.ts` (17 testów)
+- ✅ **Komponenty domenowe**: `AddDogForm.test.tsx` (13 testów, pokrycie 95.38%), `DogsTable.test.tsx`
+- 🔄 **Planowane**: komponenty shows, owners, dashboard
+
+#### Aktualne pokrycie testami (po implementacji AddDogForm):
+- **Ogólne pokrycie**: 3.29% (linie), 30.47% (gałęzie), 16.47% (funkcje)
+- **Komponenty dogs**: 64.91% (linie), 65.55% (gałęzie), 59.25% (funkcje)
+  - `AddDogForm.tsx`: **95.38%** (linie), 68.6% (gałęzie), 69.56% (funkcje)
+- **Serwisy**: 100% (wszystkie metody i przypadki brzegowe)
+- **Komponenty auth**: 60.19% (linie)
 
 ### 9. Integracja z CI/CD (zalecenia)
 
