@@ -32,25 +32,22 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({
 
   const statCards = [
     {
-      title: "Wszystkie wystawy",
+      title: "Wystawy klubowe w bazie",
       value: stats.totalShows,
       icon: "📋",
       color: "bg-amber-500",
-      description: "Łączna liczba wystaw",
     },
     {
-      title: "Uzupełnione wystawy",
+      title: "Wystawy z uzupełnionymi danymi",
       value: stats.completedShows,
       icon: "✅",
       color: "bg-amber-500",
-      description: "Uzupełnione wystawy",
     },
     {
-      title: "Dodane psy",
+      title: "Psy w bazie",
       value: stats.totalDogs,
       icon: "🐕",
       color: "bg-amber-500",
-      description: "Łączna liczba psów w serwisie",
     },
   ];
 
@@ -67,7 +64,6 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({
               <p className="text-3xl font-bold text-gray-900 mt-2">
                 {card.value}
               </p>
-              <p className="text-xs text-gray-500 mt-1">{card.description}</p>
             </div>
             <div className="bg-amber-500 text-gray-900 p-3 rounded-full text-2xl shadow-lg">
               <img src="/bar-icon.png" alt="Statystyki" className="w-6 h-6" />

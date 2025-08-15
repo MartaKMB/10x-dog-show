@@ -219,7 +219,7 @@ const DogCard: React.FC<DogCardProps> = ({
             )}
 
             {/* Evaluation Results */}
-            <div className="mt-3 p-3 bg-amber-500/60 rounded-md">
+            <div className="mt-3 p-3 bg-amber-500/40 rounded-md">
               <h4 className="font-medium text-gray-900 mb-2">Wyniki wystawy</h4>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
                 <div>
