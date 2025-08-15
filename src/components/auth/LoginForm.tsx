@@ -96,7 +96,9 @@ const LoginForm: React.FC = () => {
     <div className="max-w-md mx-auto">
       <AuthLogo />
 
-      <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Logowanie</h2>
+      <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+        Logowanie
+      </h2>
 
       {serverError && (
         <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800">

@@ -91,12 +91,13 @@ describe("DogsTable", () => {
   });
 
   describe("Renderowanie", () => {
-    it("renderuje nagłówki tabeli", () => {
+    it("renderuje nagłówki tabeli dla zalogowanego użytkownika", () => {
       render(
         <DogsTable
           dogs={mockDogs}
           isLoading={false}
           onRowClick={mockOnRowClick}
+          isAuthenticated={true}
         />,
       );
 
@@ -109,12 +110,32 @@ describe("DogsTable", () => {
       expect(screen.getByText("Chip")).toBeInTheDocument();
     });
 
+    it("renderuje nagłówki tabeli dla niezalogowanego użytkownika (bez właściciela i chipa)", () => {
+      render(
+        <DogsTable
+          dogs={mockDogs}
+          isLoading={false}
+          onRowClick={mockOnRowClick}
+          isAuthenticated={false}
+        />,
+      );
+
+      expect(screen.getByText("Imię")).toBeInTheDocument();
+      expect(screen.getByText("Hodowla")).toBeInTheDocument();
+      expect(screen.getByText("Płeć")).toBeInTheDocument();
+      expect(screen.getByText("Maść")).toBeInTheDocument();
+      expect(screen.getByText("Data urodzenia")).toBeInTheDocument();
+      expect(screen.queryByText("Właściciel")).not.toBeInTheDocument();
+      expect(screen.queryByText("Chip")).not.toBeInTheDocument();
+    });
+
     it("renderuje wszystkie psy z danych", () => {
       render(
         <DogsTable
           dogs={mockDogs}
           isLoading={false}
           onRowClick={mockOnRowClick}
+          isAuthenticated={true}
         />,
       );
 
@@ -143,7 +164,12 @@ describe("DogsTable", () => {
 
     it("renderuje puste tabele gdy brak psów", () => {
       render(
-        <DogsTable dogs={[]} isLoading={false} onRowClick={mockOnRowClick} />,
+        <DogsTable
+          dogs={[]}
+          isLoading={false}
+          onRowClick={mockOnRowClick}
+          isAuthenticated={true}
+        />,
       );
 
       // Nagłówki powinny być widoczne
@@ -161,6 +187,7 @@ describe("DogsTable", () => {
           dogs={mockDogs}
           isLoading={false}
           onRowClick={mockOnRowClick}
+          isAuthenticated={true}
         />,
       );
 
@@ -176,6 +203,7 @@ describe("DogsTable", () => {
           dogs={mockDogs}
           isLoading={false}
           onRowClick={mockOnRowClick}
+          isAuthenticated={true}
         />,
       );
 
@@ -190,6 +218,7 @@ describe("DogsTable", () => {
           dogs={mockDogs}
           isLoading={false}
           onRowClick={mockOnRowClick}
+          isAuthenticated={true}
         />,
       );
 
@@ -207,6 +236,7 @@ describe("DogsTable", () => {
           dogs={mockDogs}
           isLoading={false}
           onRowClick={mockOnRowClick}
+          isAuthenticated={true}
         />,
       );
 
@@ -224,6 +254,7 @@ describe("DogsTable", () => {
           dogs={mockDogs}
           isLoading={false}
           onRowClick={mockOnRowClick}
+          isAuthenticated={true}
         />,
       );
 
@@ -238,6 +269,7 @@ describe("DogsTable", () => {
           dogs={mockDogs}
           isLoading={false}
           onRowClick={mockOnRowClick}
+          isAuthenticated={true}
         />,
       );
 
@@ -252,6 +284,7 @@ describe("DogsTable", () => {
           dogs={mockDogs}
           isLoading={false}
           onRowClick={mockOnRowClick}
+          isAuthenticated={true}
         />,
       );
 
@@ -269,6 +302,7 @@ describe("DogsTable", () => {
           dogs={mockDogs}
           isLoading={false}
           onRowClick={mockOnRowClick}
+          isAuthenticated={true}
         />,
       );
 
@@ -282,7 +316,9 @@ describe("DogsTable", () => {
     });
 
     it("nie wywołuje onRowClick gdy funkcja nie jest przekazana", async () => {
-      render(<DogsTable dogs={mockDogs} isLoading={false} />);
+      render(
+        <DogsTable dogs={mockDogs} isLoading={false} isAuthenticated={true} />,
+      );
 
       const firstRow = screen.getByText("Rex").closest("tr");
       expect(firstRow).toBeInTheDocument();
@@ -300,6 +336,7 @@ describe("DogsTable", () => {
           dogs={mockDogs}
           isLoading={false}
           onRowClick={mockOnRowClick}
+          isAuthenticated={true}
         />,
       );
 
@@ -333,6 +370,7 @@ describe("DogsTable", () => {
           dogs={mockDogs}
           isLoading={false}
           onRowClick={mockOnRowClick}
+          isAuthenticated={true}
         />,
       );
 
@@ -353,6 +391,7 @@ describe("DogsTable", () => {
           dogs={mockDogs}
           isLoading={false}
           onRowClick={mockOnRowClick}
+          isAuthenticated={true}
         />,
       );
 
@@ -379,6 +418,7 @@ describe("DogsTable", () => {
           dogs={mockDogs}
           isLoading={false}
           onRowClick={mockOnRowClick}
+          isAuthenticated={true}
         />,
       );
 
@@ -425,6 +465,7 @@ describe("DogsTable", () => {
           dogs={dogsWithLongNames}
           isLoading={false}
           onRowClick={mockOnRowClick}
+          isAuthenticated={true}
         />,
       );
 
@@ -467,6 +508,7 @@ describe("DogsTable", () => {
           dogs={dogsWithLongKennels}
           isLoading={false}
           onRowClick={mockOnRowClick}
+          isAuthenticated={true}
         />,
       );
 
@@ -485,6 +527,7 @@ describe("DogsTable", () => {
           dogs={mockDogs}
           isLoading={false}
           onRowClick={mockOnRowClick}
+          isAuthenticated={true}
         />,
       );
 
@@ -498,6 +541,7 @@ describe("DogsTable", () => {
           dogs={mockDogs}
           isLoading={false}
           onRowClick={mockOnRowClick}
+          isAuthenticated={true}
         />,
       );
 

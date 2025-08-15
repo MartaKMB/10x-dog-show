@@ -7,7 +7,11 @@ import ErrorDisplay from "../shows/ErrorDisplay";
 import EmptyState from "../shows/EmptyState";
 import { useDogsCatalog } from "../../hooks/useDogsCatalog";
 
-const DogsListView: React.FC = () => {
+type DogsListViewProps = {
+  isAuthenticated: boolean;
+};
+
+const DogsListView: React.FC<DogsListViewProps> = ({ isAuthenticated }) => {
   const {
     state,
     updateFilters,
@@ -70,6 +74,7 @@ const DogsListView: React.FC = () => {
               dogs={state.dogs}
               isLoading={state.isLoading}
               onRowClick={handleRowClick}
+              isAuthenticated={isAuthenticated}
             />
             {state.pagination.pages > 1 && (
               <div className="border-t border-gray-200 p-4">

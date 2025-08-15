@@ -4,6 +4,7 @@ import type { DogResponse } from "../../types";
 type DogRowProps = {
   dog: DogResponse;
   onClick?: (dogId: string) => void;
+  isAuthenticated: boolean;
 };
 
 const formatOwners = (owners: DogResponse["owners"]) => {
@@ -13,7 +14,7 @@ const formatOwners = (owners: DogResponse["owners"]) => {
   return others > 0 ? `${primary.name} (+${others})` : primary.name;
 };
 
-const DogRow: React.FC<DogRowProps> = ({ dog, onClick }) => {
+const DogRow: React.FC<DogRowProps> = ({ dog, onClick, isAuthenticated }) => {
   const handleClick = () => {
     if (onClick) onClick(dog.id);
   };
@@ -41,12 +42,16 @@ const DogRow: React.FC<DogRowProps> = ({ dog, onClick }) => {
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
         {new Date(dog.birth_date).toLocaleDateString()}
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-        {formatOwners(dog.owners)}
-      </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-        {dog.microchip_number || "-"}
-      </td>
+      {isAuthenticated && (
+        <>
+          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+            {formatOwners(dog.owners)}
+          </td>
+          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+            {dog.microchip_number || "-"}
+          </td>
+        </>
+      )}
       {/* <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
         <button
           type="button"
