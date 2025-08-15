@@ -30,7 +30,7 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
   isAuthenticated,
 }) => {
   // Show data and loading states
-  const { show, registrations, isLoading, error, loadShowData } =
+  const { show, registrations, isLoading, error, loadShowData, stats } =
     useShowDetails(showId);
   const { deleteShow, updateShow, updateShowStatus, isDeleting, isUpdating } =
     useShowActions(show);
@@ -79,27 +79,6 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
     return isAuthenticated && show?.status === "draft";
   };
 
-  function computeShowStats(registrations: RegistrationResponse[]) {
-    const byClass: Record<string, number> = {};
-    const byGender: Record<string, number> = {};
-    const byCoat: Record<string, number> = {};
-
-    registrations.forEach((registration) => {
-      byClass[registration.dog_class] =
-        (byClass[registration.dog_class] || 0) + 1;
-      byGender[registration.dog.gender] =
-        (byGender[registration.dog.gender] || 0) + 1;
-      byCoat[registration.dog.coat] = (byCoat[registration.dog.coat] || 0) + 1;
-    });
-
-    return {
-      totalDogs: registrations.length,
-      byClass,
-      byGender,
-      byCoat,
-    };
-  }
-
   const deleteDog = async (registrationId: string) => {
     // TODO: Implement deleteDog function
     // eslint-disable-next-line no-console
@@ -119,7 +98,7 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
       // TODO: Implement filter state
     },
     registrations: registrations || [],
-    stats: computeShowStats(registrations || []),
+    stats: stats,
   };
 
   const handleAddDog = () => {

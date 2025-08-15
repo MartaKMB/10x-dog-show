@@ -354,6 +354,7 @@ export interface RegistrationResponse {
   dog_class: DogClass;
   catalog_number: number | null;
   registered_at: string;
+  evaluation?: EvaluationResponse | null;
 }
 
 export interface CatalogGenerationResponse {

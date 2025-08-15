@@ -122,15 +122,15 @@ const DogCard: React.FC<DogCardProps> = ({ dog, onAction }) => {
     setIsExpanded(!isExpanded);
   };
 
-  const evaluation = dog.evaluation
+  const evaluation = dog.registration.evaluation
     ? {
         grade:
-          dog.evaluation.dog_class === "baby" ||
-          dog.evaluation.dog_class === "puppy"
-            ? (dog.evaluation.baby_puppy_grade ?? null)
-            : (dog.evaluation.grade ?? null),
-        title: dog.evaluation.club_title ?? null,
-        placement: dog.evaluation.placement ?? null,
+          dog.registration.evaluation.dog_class === "baby" ||
+          dog.registration.evaluation.dog_class === "puppy"
+            ? (dog.registration.evaluation.baby_puppy_grade ?? null)
+            : (dog.registration.evaluation.grade ?? null),
+        title: dog.registration.evaluation.club_title ?? null,
+        placement: dog.registration.evaluation.placement ?? null,
       }
     : {
         grade: null as string | null,

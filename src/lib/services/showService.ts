@@ -281,19 +281,7 @@ export class ShowService {
       throw new Error(`INTERNAL_ERROR: Failed to fetch show: ${error.message}`);
     }
 
-    // Return basic show data without registration count for now
-    // This avoids RLS issues with show_registrations table
-    return {
-      id: show.id,
-      name: show.name,
-      status: show.status,
-      show_date: show.show_date,
-      location: show.location,
-      judge_name: show.judge_name,
-      description: show.description,
-      registered_dogs: 0, // Will be fetched separately if needed
-      created_at: show.created_at,
-    };
+    return await this.formatResponse(show);
   }
 
   /**
@@ -391,10 +379,10 @@ export class ShowService {
   }
 
   /**
-   * Gets registrations for a show
+   * Gets registrations for a specific show
    * @param showId Show ID
    * @param params Query parameters
-   * @returns Paginated registrations response
+   * @returns Paginated registrations with full dog and owner data
    */
   async getRegistrations(showId: string, params?: any): Promise<any> {
     // Verify show exists (basic check without formatting)
@@ -424,7 +412,10 @@ export class ShowService {
           gender,
           birth_date,
           microchip_number,
-          kennel_name
+          kennel_name,
+          coat,
+          father_name,
+          mother_name
         )
       `,
         { count: "exact" },
@@ -452,12 +443,59 @@ export class ShowService {
       );
     }
 
-    const formattedRegistrations = registrations.map((reg: any) => ({
-      id: reg.id,
-      dog: reg.dogs,
-      dog_class: reg.dog_class,
-      registered_at: reg.registered_at,
-    }));
+    // Pobierz właścicieli dla wszystkich psów
+    const dogIds = registrations.map((reg: any) => reg.dogs.id);
+    const { data: dogOwners } = await this.supabase
+      .from("dog_owners")
+      .select("dog_id, owner_id, is_primary")
+      .in("dog_id", dogIds);
+
+    const ownerIds = [...new Set(dogOwners?.map((rel) => rel.owner_id) || [])];
+    const { data: owners } = await this.supabase
+      .from("owners")
+      .select("id, first_name, last_name, email, phone, kennel_name")
+      .in("id", ownerIds);
+
+    // Pobierz oceny dla wszystkich rejestracji
+    const { data: evaluations } = await this.supabase
+      .from("evaluations")
+      .select(
+        "id, dog_id, dog_class, grade, baby_puppy_grade, club_title, placement",
+      )
+      .eq("show_id", showId);
+
+    const formattedRegistrations = registrations.map((reg: any) => {
+      const dogOwnersForDog =
+        dogOwners?.filter((rel) => rel.dog_id === reg.dogs.id) || [];
+      const dogOwnersWithDetails = dogOwnersForDog.map((rel) => {
+        const owner = owners?.find((o) => o.id === rel.owner_id);
+        return {
+          id: owner?.id || rel.owner_id,
+          name: owner
+            ? `${owner.first_name} ${owner.last_name}`
+            : "Unknown Owner",
+          email: owner?.email || "",
+          phone: owner?.phone || null,
+          kennel_name: owner?.kennel_name || null,
+          is_primary: rel.is_primary,
+        };
+      });
+
+      const evaluation = evaluations?.find(
+        (evaluation) => evaluation.dog_id === reg.dogs.id,
+      );
+
+      return {
+        id: reg.id,
+        dog: {
+          ...reg.dogs,
+          owners: dogOwnersWithDetails,
+        },
+        dog_class: reg.dog_class,
+        registered_at: reg.registered_at,
+        evaluation: evaluation || null,
+      };
+    });
 
     return {
       data: formattedRegistrations,
