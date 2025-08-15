@@ -1,9 +1,5 @@
 # HovBase 🐾
 
-<div align="center">
-  <img src="logo.png" alt="HovBase Logo" width="200" height="auto">
-</div>
-
 ---
 
 ## 🇵🇱 O projekcie
@@ -33,6 +29,12 @@ Planned features:
 - Breeder, owner, puppy and training profiles
 - Extended breed statistics and reports
 - Pedigree history browsing
+
+---
+
+<div align="center">
+  <img src="logo.png" alt="HovBase Logo" width="200" height="auto">
+</div>
 
 ---
 
@@ -141,7 +143,6 @@ For contributions or questions, please contact m.muchabalcerek@gmail.com.
 | ------------------ | ------------------------------------ |
 | `npm run dev`      | Start the development server         |
 | `npm run build`    | Build the application for production |
-| `npm run preview`  | Preview the production build locally |
 | `npm run lint`     | Run ESLint to check code quality     |
 | `npm run lint:fix` | Fix ESLint errors automatically      |
 | `npm run format`   | Format code with Prettier            |
@@ -159,10 +160,8 @@ The project supports both local and cloud testing environments:
 | Script                   | Description                             |
 | ------------------------ | --------------------------------------- |
 | `npm run test`       | Run unit and integration tests          |
-| `npm run test:watch`     | Run tests in watch mode                 |
 | `npm run test:coverage`  | Run tests with coverage report          |
 | `npm run test:e2e:cloud` | Run e2e tests against cloud environment |
-| `npm run test:all`       | Run all tests (unit + e2e)              |
 
 ### Project Scope Details
 
@@ -203,17 +202,6 @@ The project supports both local and cloud testing environments:
 - Club title statistics
 - Individual dog performance history
 
-### Success Metrics
-
-- **Data Accuracy**: 0% errors in show data
-- **Data Entry Time**: <30 minutes per show
-- **User Satisfaction**: >90% satisfaction rate
-- **System Performance**: <2 seconds response time
-- **Uptime**: 99.9% availability
-- **Access Control**: 100% permission enforcement for show editing
-- **Code Quality**: 30% line coverage, 20% branch coverage minimum
-- **Test Reliability**: 100% pass rate for critical tests (auth, CRUD)
-- **Cloud Testing**: 100% pass rate for e2e tests against production environment
 
 ## 📞 Support
 
