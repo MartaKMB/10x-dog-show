@@ -42,8 +42,13 @@ const DogsListView: React.FC<DogsListViewProps> = ({ isAuthenticated }) => {
       <div className="bg-white shadow rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Lista psów</h1>
-            <p className="text-gray-600">Wyszukuj i filtruj psy w systemie</p>
+            <h1 className="text-2xl font-bold text-gray-900">
+              Psy w bazie HovBase
+            </h1>
+            <p className="text-gray-600">
+              Poznaj Hovawarty zgromadzonye w oficjalnej bazie Klubu.
+              Przeglądaj, wyszukuj i filtruj psy według wybranych kryteriów.
+            </p>
           </div>
         </div>
 
