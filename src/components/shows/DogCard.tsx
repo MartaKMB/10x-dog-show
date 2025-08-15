@@ -6,9 +6,14 @@ interface DogCardProps {
   dog: DogCardViewModel;
   onAction: (action: string) => void;
   showStatus: ShowStatus;
+  isAuthenticated: boolean;
 }
 
-const DogCard: React.FC<DogCardProps> = ({ dog, onAction }) => {
+const DogCard: React.FC<DogCardProps> = ({
+  dog,
+  onAction,
+  isAuthenticated,
+}) => {
   const [isExpanded, setIsExpanded] = useState(dog.isExpanded);
 
   const getGenderIcon = (gender: string): string => {
@@ -181,35 +186,37 @@ const DogCard: React.FC<DogCardProps> = ({ dog, onAction }) => {
               </div>
             </div>
 
-            {/* Owner Information - Always Visible */}
-            <div className="mt-3 p-3 bg-gray-50 rounded-md">
-              <h4 className="font-medium text-gray-900 mb-2">Właściciel</h4>
-              {dog.registration.dog.owners &&
-              dog.registration.dog.owners.length > 0 ? (
-                dog.registration.dog.owners.map((owner, index) => (
-                  <div key={owner.id} className="text-sm">
-                    <p className="text-gray-700">
-                      <strong>
-                        {owner.is_primary
-                          ? "Główny właściciel:"
-                          : "Współwłaściciel:"}
-                      </strong>{" "}
-                      {owner.name || "Brak danych"}
-                    </p>
-                    {owner.email && (
-                      <p className="text-gray-600">{owner.email}</p>
-                    )}
-                    {index < dog.registration.dog.owners.length - 1 && (
-                      <hr className="my-2 border-gray-200" />
-                    )}
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-600 text-sm">
-                  Brak danych o właścicielu
-                </p>
-              )}
-            </div>
+            {/* Owner Information - Only for authenticated users */}
+            {isAuthenticated && (
+              <div className="mt-3 p-3 bg-gray-50 rounded-md">
+                <h4 className="font-medium text-gray-900 mb-2">Właściciel</h4>
+                {dog.registration.dog.owners &&
+                dog.registration.dog.owners.length > 0 ? (
+                  dog.registration.dog.owners.map((owner, index) => (
+                    <div key={owner.id} className="text-sm">
+                      <p className="text-gray-700">
+                        <strong>
+                          {owner.is_primary
+                            ? "Główny właściciel:"
+                            : "Współwłaściciel:"}
+                        </strong>{" "}
+                        {owner.name || "Brak danych"}
+                      </p>
+                      {owner.email && (
+                        <p className="text-gray-600">{owner.email}</p>
+                      )}
+                      {index < dog.registration.dog.owners.length - 1 && (
+                        <hr className="my-2 border-gray-200" />
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-600 text-sm">
+                    Brak danych o właścicielu
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* Evaluation Results */}
             <div className="mt-3 p-3 bg-amber-500/60 rounded-md">

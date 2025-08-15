@@ -10,6 +10,7 @@ interface HierarchicalListProps {
   canDelete: boolean;
   userRole: UserRole;
   showStatus: ShowStatus;
+  isAuthenticated: boolean;
 }
 
 const HierarchicalList: React.FC<HierarchicalListProps> = ({
@@ -20,6 +21,7 @@ const HierarchicalList: React.FC<HierarchicalListProps> = ({
   canDelete,
   userRole,
   showStatus,
+  isAuthenticated,
 }) => {
   const handleKeyDown = (event: React.KeyboardEvent, nodeId: string) => {
     switch (event.key) {
@@ -72,6 +74,7 @@ const HierarchicalList: React.FC<HierarchicalListProps> = ({
           userRole={userRole}
           showStatus={showStatus}
           onKeyDown={handleKeyDown}
+          isAuthenticated={isAuthenticated}
         />
       ))}
     </div>

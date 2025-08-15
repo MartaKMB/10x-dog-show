@@ -19,11 +19,7 @@ const isAuthenticated = !!Astro.locals.auth?.user;
           <h1 class="text-2xl font-bold text-gray-900 mb-2">Szczegóły wystawy</h1>
         </div>
         <div class="flex items-center gap-2 text-sm text-gray-500">
-          {isAuthenticated ? (
-            <span>Zalogowany użytkownik</span>
-          ) : (
-            <span>Gość - tryb podglądu</span>
-          )}
+          {isAuthenticated ? <span>Zalogowany użytkownik</span> : <span>Gość - tryb podglądu</span>}
         </div>
       </div>
     </div>

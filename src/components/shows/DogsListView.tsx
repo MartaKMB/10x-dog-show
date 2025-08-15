@@ -18,12 +18,14 @@ interface DogsListViewProps {
   showId: string;
   userRole?: UserRole;
   showStatus?: ShowStatus;
+  isAuthenticated: boolean;
 }
 
 const DogsListView: React.FC<DogsListViewProps> = ({
   showId,
   userRole = "club_board",
   showStatus = "draft",
+  isAuthenticated,
 }) => {
   const { state, fetchDogs, updateFilters, searchDogs, clearFilters } =
     useDogsList(showId, userRole, showStatus);
@@ -169,6 +171,7 @@ const DogsListView: React.FC<DogsListViewProps> = ({
               canDelete={state.canDelete}
               userRole={userRole}
               showStatus={showStatus}
+              isAuthenticated={isAuthenticated}
             />
 
             {state.pagination.pages > 1 && (

@@ -12,6 +12,7 @@ interface ClassGroupNodeProps {
   showStatus: ShowStatus;
   onKeyDown: (event: React.KeyboardEvent, nodeId: string) => void;
   level: number;
+  isAuthenticated: boolean;
 }
 
 const ClassGroupNode: React.FC<ClassGroupNodeProps> = ({
@@ -23,6 +24,7 @@ const ClassGroupNode: React.FC<ClassGroupNodeProps> = ({
   showStatus,
   onKeyDown,
   level,
+  isAuthenticated,
 }) => {
   const handleToggle = () => {
     onNodeToggle(node.id);
@@ -115,6 +117,7 @@ const ClassGroupNode: React.FC<ClassGroupNodeProps> = ({
                     }}
                     onAction={(action) => onDogAction(action, childNode.id)}
                     showStatus={showStatus}
+                    isAuthenticated={isAuthenticated}
                   />
                 </div>
               );

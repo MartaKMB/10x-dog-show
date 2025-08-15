@@ -324,6 +324,7 @@ Główna struktura składa się z:
 ### 3.3 Tryb podglądu (Guest Mode)
 
 1. **Dostęp bez logowania**
+
    - Przeglądanie wszystkich danych systemu
    - Ukryte przyciski edycji
    - Komunikat o trybie podglądu

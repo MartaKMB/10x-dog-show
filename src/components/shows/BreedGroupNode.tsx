@@ -12,6 +12,7 @@ interface BreedGroupNodeProps {
   showStatus: ShowStatus;
   onKeyDown: (event: React.KeyboardEvent, nodeId: string) => void;
   level: number;
+  isAuthenticated: boolean;
 }
 
 const BreedGroupNode: React.FC<BreedGroupNodeProps> = ({
@@ -24,6 +25,7 @@ const BreedGroupNode: React.FC<BreedGroupNodeProps> = ({
   showStatus,
   onKeyDown,
   level,
+  isAuthenticated,
 }) => {
   const handleToggle = () => {
     onNodeToggle(node.id);
@@ -87,6 +89,7 @@ const BreedGroupNode: React.FC<BreedGroupNodeProps> = ({
               showStatus={showStatus}
               onKeyDown={onKeyDown}
               level={level + 1}
+              isAuthenticated={isAuthenticated}
             />
           ))}
         </div>

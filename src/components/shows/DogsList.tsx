@@ -11,6 +11,7 @@ interface DogsListProps {
   onAddDog: () => void;
   onEditDog: (registration: RegistrationResponse) => void;
   onDeleteDog: (registration: RegistrationResponse) => void;
+  isAuthenticated: boolean;
 }
 
 const DogsList: React.FC<DogsListProps> = ({
@@ -22,6 +23,7 @@ const DogsList: React.FC<DogsListProps> = ({
   onAddDog,
   onEditDog,
   onDeleteDog,
+  isAuthenticated,
 }) => {
   const [sortBy] = useState<"name" | "class">("name");
   const [sortOrder] = useState<"asc" | "desc">("asc");
@@ -275,6 +277,7 @@ const DogsList: React.FC<DogsListProps> = ({
                                     }
                                   }}
                                   showStatus={showStatus}
+                                  isAuthenticated={isAuthenticated}
                                 />
                               ))}
                             </div>

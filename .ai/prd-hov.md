@@ -89,7 +89,8 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 
 ### System uprawnień:
 
-- **Użytkownik niezalogowany**: 
+- **Użytkownik niezalogowany**:
+
   - Przeglądanie wszystkich danych (wystawy, psy, właściciele)
   - Brak dostępu do funkcji edycji
   - Komunikat informacyjny o trybie podglądu

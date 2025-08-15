@@ -309,13 +309,16 @@ export const PERMISSIONS = {
 
 // System uprawnień oparty na autoryzacji i statusie
 export const SHOW_PERMISSIONS = {
-  EDIT: (isAuthenticated: boolean, showStatus: ShowStatus) => 
+  EDIT: (isAuthenticated: boolean, showStatus: ShowStatus) =>
     isAuthenticated && showStatus === "draft",
-  DELETE: (isAuthenticated: boolean, showStatus: ShowStatus, hasDogs: boolean) => 
-    isAuthenticated && showStatus === "draft" && !hasDogs,
+  DELETE: (
+    isAuthenticated: boolean,
+    showStatus: ShowStatus,
+    hasDogs: boolean,
+  ) => isAuthenticated && showStatus === "draft" && !hasDogs,
   CHANGE_STATUS: (isAuthenticated: boolean) => isAuthenticated,
-  MANAGE_DOGS: (isAuthenticated: boolean, showStatus: ShowStatus) => 
-    isAuthenticated && showStatus === "draft"
+  MANAGE_DOGS: (isAuthenticated: boolean, showStatus: ShowStatus) =>
+    isAuthenticated && showStatus === "draft",
 } as const;
 ```
 
@@ -355,14 +358,14 @@ export interface ShowPermissions {
 }
 
 export const getShowPermissions = (
-  isAuthenticated: boolean, 
-  showStatus: ShowStatus, 
-  hasRegisteredDogs: boolean
+  isAuthenticated: boolean,
+  showStatus: ShowStatus,
+  hasRegisteredDogs: boolean,
 ): ShowPermissions => ({
   canEdit: isAuthenticated && showStatus === "draft",
   canDelete: isAuthenticated && showStatus === "draft" && !hasRegisteredDogs,
   canChangeStatus: isAuthenticated,
-  canManageDogs: isAuthenticated && showStatus === "draft"
+  canManageDogs: isAuthenticated && showStatus === "draft",
 });
 ```
 
@@ -408,8 +411,8 @@ export interface CreateEvaluationDto {
 
 // Walidacja uprawnień do ocen
 export const canManageEvaluation = (
-  isAuthenticated: boolean, 
-  showStatus: ShowStatus
+  isAuthenticated: boolean,
+  showStatus: ShowStatus,
 ): boolean => {
   return isAuthenticated && showStatus === "draft";
 };
@@ -417,27 +420,28 @@ export const canManageEvaluation = (
 
 // Oceny w języku polskim
 export type EvaluationGrade =
-  | "doskonała"
-  | "bardzo_dobra"
-  | "dobra"
-  | "zadowalająca"
-  | "zdyskwalifikowana"
-  | "nieobecna";
+| "doskonała"
+| "bardzo_dobra"
+| "dobra"
+| "zadowalająca"
+| "zdyskwalifikowana"
+| "nieobecna";
 
 // Tytuły klubowe hovawartów
 export type ClubTitle =
-  | "młodzieżowy_zwycięzca_klubu"
-  | "zwycięzca_klubu"
-  | "zwycięzca_klubu_weteranów"
-  | "najlepszy_reproduktor"
-  | "najlepsza_suka_hodowlana"
-  | "najlepsza_para"
-  | "najlepsza_hodowla"
-  | "zwycięzca_rasy"
-  | "zwycięzca_płci_przeciwnej"
-  | "najlepszy_junior"
-  | "najlepszy_weteran";
-```
+| "młodzieżowy_zwycięzca_klubu"
+| "zwycięzca_klubu"
+| "zwycięzca_klubu_weteranów"
+| "najlepszy_reproduktor"
+| "najlepsza_suka_hodowlana"
+| "najlepsza_para"
+| "najlepsza_hodowla"
+| "zwycięzca_rasy"
+| "zwycięzca_płci_przeciwnej"
+| "najlepszy_junior"
+| "najlepszy_weteran";
+
+````
 
 ## 6. Usunięte endpointy
 
@@ -574,7 +578,7 @@ export const createEvaluationSchema = z
         "Baby/Puppy classes must use baby_puppy_grade, other classes must use grade",
     },
   );
-```
+````
 
 ### 7.2 Logika biznesowa
 

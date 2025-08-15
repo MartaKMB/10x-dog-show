@@ -120,7 +120,7 @@ The project supports both local and cloud testing environments:
    SUPABASE_URL=http://127.0.0.1:54321
    SUPABASE_ANON_KEY=your_local_anon_key_here
    SUPABASE_SERVICE_ROLE_KEY=your_local_service_role_key_here
-   
+
    # Public Supabase URLs (for client-side)
    PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
    PUBLIC_SUPABASE_ANON_KEY=your_local_anon_key_here

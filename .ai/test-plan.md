@@ -110,6 +110,7 @@ Zasady dla testów jednostkowych (wyciąg):
 - **A11y**: brak krytycznych naruszeń (severity high) na stronach auth i list.
 
 #### Postęp implementacji testów:
+
 - ✅ **Komponenty autentykacji**: `LoginForm.test.tsx`, `RegisterForm.test.tsx` (29 testów)
 - ✅ **Serwisy**: `authService.test.ts`, `dogService.test.ts` (17 testów)
 - ✅ **Komponenty domenowe**: `AddDogForm.test.tsx` (13 testów, pokrycie 95.38%), `DogsTable.test.tsx` (20 testów)
@@ -118,6 +119,7 @@ Zasady dla testów jednostkowych (wyciąg):
 - 🔄 **Planowane**: komponenty owners
 
 #### Aktualne pokrycie testami (po implementacji AddDogForm i Shows):
+
 - **Ogólne pokrycie**: 3.29% (linie), 30.47% (gałęzie), 16.47% (funkcje)
 - **Komponenty dogs**: 64.91% (linie), 65.55% (gałęzie), 59.25% (funkcje)
   - `AddDogForm.tsx`: **95.38%** (linie), 68.6% (gałęzie), 69.56% (funkcje)
@@ -139,6 +141,7 @@ Zasady dla testów jednostkowych (wyciąg):
 ### 11. Implementacja testów dla Shows
 
 #### ShowCreator.test.tsx - 10 testów, wszystkie przechodzą
+
 - **Renderowanie**: podstawowe elementy formularza, etykiety pól
 - **Walidacja**: wymagane pola, data w przyszłości
 - **Interakcje**: wypełnianie pól, czyszczenie błędów
@@ -147,19 +150,23 @@ Zasady dla testów jednostkowych (wyciąg):
 - **Nawigacja**: przekierowanie po anulowaniu
 
 #### ShowDetailsView.test.tsx - 5 testów, wszystkie przechodzą
+
 - **Renderowanie**: podstawowe elementy widoku, stan ładowania, błąd, pusty stan
 - **Inicjalizacja**: ładowanie danych wystawy przy montowaniu
 
 #### Dodane data-testid dla Shows:
+
 - **ShowCreator**: `show-creator-form`, `show-name-input`, `show-date-input`, `show-location-input`, `show-judge-input`, `show-description-input`, `submit-button`, `cancel-button`, komunikaty błędów i sukcesu
 - **ShowDetailsView**: `show-details-view`
 
 #### Następne kroki dla Shows:
+
 - Rozszerzenie testów o więcej scenariuszy (edge cases, błędy API)
 - Testy integracyjne z API endpoints
 - Testy a11y dla formularzy i widoków
 
 #### Dashboard.test.tsx - 14 testów, wszystkie przechodzą
+
 - **Renderowanie dla użytkownika niezalogowanego**: podstawowe elementy, brak sekcji statystyk i quick actions, rola "Gość (tylko podgląd)"
 - **Renderowanie dla użytkownika zalogowanego (club_board)**: sekcja statystyk, sekcja quick actions, rola "Członek zarządu klubu"
 - **Renderowanie dla użytkownika zalogowanego bez quick actions**: sekcja statystyk bez quick actions
@@ -167,9 +174,11 @@ Zasady dla testów jednostkowych (wyciąg):
 - **Obsługa błędów**: placeholder dla przyszłych testów (wymaga zaawansowanego mockowania)
 
 #### Dodane data-testid dla Dashboard:
+
 - **Dashboard**: `dashboard-container`, `dashboard-stats-section`, `dashboard-recent-shows-section`, `dashboard-quick-actions-section`, `dashboard-system-info`, `dashboard-version-info`, `dashboard-status-info`, `dashboard-role-info`, `dashboard-error`, `dashboard-retry-button`
 
 #### Następne kroki dla Dashboard:
+
 - Implementacja testów błędów z zaawansowanym mockowaniem
 - Testy integracyjne z API endpoints
 - Testy a11y dla widoków dashboardu

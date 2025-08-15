@@ -225,6 +225,7 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
         onAddDog={handleAddDog}
         onEditDog={handleEditDog}
         onDeleteDog={handleDeleteDog}
+        isAuthenticated={isAuthenticated}
       />
 
       {/* Modals */}

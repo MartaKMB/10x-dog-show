@@ -11,6 +11,7 @@ interface FciGroupNodeProps {
   userRole: UserRole;
   showStatus: ShowStatus;
   onKeyDown: (event: React.KeyboardEvent, nodeId: string) => void;
+  isAuthenticated: boolean;
 }
 
 const FciGroupNode: React.FC<FciGroupNodeProps> = ({
@@ -22,6 +23,7 @@ const FciGroupNode: React.FC<FciGroupNodeProps> = ({
   userRole,
   showStatus,
   onKeyDown,
+  isAuthenticated,
 }) => {
   const handleToggle = () => {
     onNodeToggle(node.id);
@@ -106,6 +108,7 @@ const FciGroupNode: React.FC<FciGroupNodeProps> = ({
               showStatus={showStatus}
               onKeyDown={onKeyDown}
               level={1}
+              isAuthenticated={isAuthenticated}
             />
           ))}
         </div>
