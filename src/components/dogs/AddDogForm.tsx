@@ -333,7 +333,12 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
       <p className="text-gray-600 mb-6">
         Utwórz psa bez przypisania do wystawy.
       </p>
-      <form onSubmit={handleSubmit} className="space-y-8" ref={formRef}>
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-8"
+        ref={formRef}
+        data-testid="add-dog-form"
+      >
         <div>
           <h2 className="text-lg font-semibold text-gray-900 mb-3">Dane psa</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -351,9 +356,15 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
                 onChange={(e) => handleDogChange("name", e.target.value)}
                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Nazwa psa"
+                data-testid="dog-name-input"
               />
               {errors.name && (
-                <p className="text-red-600 text-sm mt-1">{errors.name[0]}</p>
+                <p
+                  className="text-red-600 text-sm mt-1"
+                  data-testid="dog-name-error"
+                >
+                  {errors.name[0]}
+                </p>
               )}
             </div>
             <div>
@@ -370,9 +381,13 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
                 onChange={(e) => handleDogChange("kennel_name", e.target.value)}
                 placeholder="Nazwa hodowli"
                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                data-testid="kennel-name-input"
               />
               {errors.kennel_name && (
-                <p className="text-red-600 text-sm mt-1">
+                <p
+                  className="text-red-600 text-sm mt-1"
+                  data-testid="kennel-name-error"
+                >
                   {errors.kennel_name[0]}
                 </p>
               )}
@@ -390,9 +405,13 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
                 value={dogData.birth_date}
                 onChange={(e) => handleDogChange("birth_date", e.target.value)}
                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                data-testid="birth-date-input"
               />
               {errors.birth_date && (
-                <p className="text-red-600 text-sm mt-1">
+                <p
+                  className="text-red-600 text-sm mt-1"
+                  data-testid="birth-date-error"
+                >
                   {errors.birth_date[0]}
                 </p>
               )}
@@ -436,6 +455,7 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
                   handleDogChange("gender", e.target.value as DogGender)
                 }
                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                data-testid="dog-gender-select"
               >
                 <option value="male">Samiec</option>
                 <option value="female">Suka</option>
@@ -458,6 +478,7 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
                   )
                 }
                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                data-testid="dog-coat-select"
               >
                 <option value="czarny">Czarny</option>
                 <option value="czarny_podpalany">Czarny podpalany</option>
@@ -522,7 +543,10 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
                 placeholder="Imię"
               />
               {errors.owner_first_name && (
-                <p className="text-red-600 text-sm mt-1">
+                <p
+                  className="text-red-600 text-sm mt-1"
+                  data-testid="owner-first-name-error"
+                >
                   {errors.owner_first_name[0]}
                 </p>
               )}
@@ -543,7 +567,10 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
                 placeholder="Nazwisko"
               />
               {errors.owner_last_name && (
-                <p className="text-red-600 text-sm mt-1">
+                <p
+                  className="text-red-600 text-sm mt-1"
+                  data-testid="owner-last-name-error"
+                >
                   {errors.owner_last_name[0]}
                 </p>
               )}
@@ -564,7 +591,10 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
                 placeholder="email@example.com"
               />
               {errors.owner_email && (
-                <p className="text-red-600 text-sm mt-1">
+                <p
+                  className="text-red-600 text-sm mt-1"
+                  data-testid="owner-email-error"
+                >
                   {errors.owner_email[0]}
                 </p>
               )}
@@ -664,13 +694,17 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
                   }))
                 }
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                data-testid="gdpr-consent-checkbox"
               />
               <span className="text-sm text-gray-700">
                 Właściciel udzielił zgody RODO *
               </span>
             </div>
             {errors.owner_gdpr_consent && (
-              <p className="text-red-600 text-sm mt-1 md:col-span-2">
+              <p
+                className="text-red-600 text-sm mt-1 md:col-span-2"
+                data-testid="gdpr-consent-error"
+              >
                 {errors.owner_gdpr_consent[0]}
               </p>
             )}
@@ -678,13 +712,19 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
         </div>
 
         {errors.submit && (
-          <div className="p-4 bg-red-50 border border-red-200 rounded-md">
+          <div
+            className="p-4 bg-red-50 border border-red-200 rounded-md"
+            data-testid="submit-error"
+          >
             <p className="text-red-600 text-sm">{errors.submit[0]}</p>
           </div>
         )}
 
         {successMessage && (
-          <div className="p-4 bg-green-50 border border-green-200 rounded-md">
+          <div
+            className="p-4 bg-green-50 border border-green-200 rounded-md"
+            data-testid="success-message"
+          >
             <p className="text-green-600 text-sm">{successMessage}</p>
           </div>
         )}
@@ -700,6 +740,7 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
             type="submit"
             disabled={isSubmitting}
             className="px-4 py-2 bg-amber-500 text-gray-900 rounded-md hover:bg-amber-400 disabled:opacity-50 transition-colors"
+            data-testid="submit-button"
           >
             {isSubmitting ? "Zapisywanie..." : "Dodaj psa"}
           </button>

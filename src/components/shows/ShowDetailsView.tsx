@@ -188,7 +188,7 @@ const ShowDetailsView: React.FC<ShowDetailsViewProps> = ({
   }
 
   return (
-    <div className="space-y-6">
+    <div data-testid="show-details-view" className="space-y-6">
       <OfflineIndicator />
 
       <ShowHeader
