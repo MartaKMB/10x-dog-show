@@ -22,6 +22,7 @@ HovBase is a web application designed to centralize and manage dog show results 
 - **Dog Registration**: Complete CRUD operations for dogs and their owners
 - **Evaluation System**: Standard FCI evaluations with Polish language support
 - **User Management**: Secure authentication system for club management
+- **Access Control**: Role-based permissions with guest preview mode
 - **Statistics & Reports**: Basic show statistics and performance analytics
 - **Responsive Design**: Full functionality on desktop and mobile devices
 
@@ -30,6 +31,7 @@ HovBase is a web application designed to centralize and manage dog show results 
 - **Club Management**: Full access to all show data and administrative functions
 - **Show Organizers**: Tools for entering and managing show results
 - **Dog Owners & Breeders**: Access to historical results and performance data
+- **Guest Users**: Preview mode with read-only access to all data
 
 ## 🛠 Tech Stack
 
@@ -170,7 +172,8 @@ The project supports both local and cloud testing environments:
 
 - Create, edit, and delete club shows
 - Configure show dates, locations, and judges
-- Manage show status (planned, in progress, completed)
+- Manage show status (draft, open_for_registration, in_progress, completed)
+- **Access control based on show status and user authentication**
 
 #### Dog & Owner Management
 
@@ -195,6 +198,8 @@ The project supports both local and cloud testing environments:
 - Single role: Club management with full permissions
 - Secure authentication and session management
 - User account administration
+- **Guest preview mode for unauthenticated users**
+- **Status-based permissions for show editing**
 
 #### Statistics & Reporting
 
@@ -223,7 +228,9 @@ The project supports both local and cloud testing environments:
 - ✅ Basic authentication system
 - ✅ Core CRUD operations
 - ✅ Testing infrastructure migration to cloud
-- 🔄 Show management interface
+- ✅ **Show management interface with access control**
+- ✅ **User permission system based on authentication and show status**
+- ✅ **Guest preview mode for unauthenticated users**
 - 🔄 Evaluation system implementation
 - 🔄 Statistics and reporting
 - ⏳ User testing and refinement
@@ -235,6 +242,7 @@ The project supports both local and cloud testing environments:
 - **User Satisfaction**: >90% satisfaction rate
 - **System Performance**: <2 seconds response time
 - **Uptime**: 99.9% availability
+- **Access Control**: 100% permission enforcement for show editing
 - **Code Quality**: 30% line coverage, 20% branch coverage minimum
 - **Test Reliability**: 100% pass rate for critical tests (auth, CRUD)
 - **Cloud Testing**: 100% pass rate for e2e tests against production environment

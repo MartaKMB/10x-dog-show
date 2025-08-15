@@ -11,21 +11,27 @@ System Klub Hovawarta Show to aplikacja webowa do zarządzania wystawami klubowy
 - `/auth/login` - Logowanie użytkownika
 - `/` - Dashboard główny
 - `/shows` - Lista wystaw
-- `/shows/[showId]` - Szczegóły wystawy
-- `/shows/new` - Tworzenie nowej wystawy
-- `/shows/[showId]/edit` - Edycja wystawy
-- `/shows/[showId]/registrations` - Rejestracje na wystawę
-- `/shows/[showId]/evaluations` - Oceny wystawy
+- `/shows/[showId]` - Szczegóły wystawy (z kontrolą uprawnień)
+- `/shows/new` - Tworzenie nowej wystawy (tylko zalogowani)
+- `/shows/[showId]/edit` - Edycja wystawy (tylko zalogowani, status "SZKIC")
+- `/shows/[showId]/registrations` - Rejestracje na wystawę (z kontrolą uprawnień)
+- `/shows/[showId]/evaluations` - Oceny wystawy (z kontrolą uprawnień)
 - `/shows/[showId]/stats` - Statystyki wystawy
 - `/dogs` - Lista psów
 - `/dogs/[dogId]` - Szczegóły psa
-- `/dogs/new` - Dodawanie psa
-- `/dogs/[dogId]/edit` - Edycja psa
+- `/dogs/new` - Dodawanie psa (tylko zalogowani)
+- `/dogs/[dogId]/edit` - Edycja psa (tylko zalogowani)
 - `/owners` - Lista właścicieli
 - `/owners/[ownerId]` - Szczegóły właściciela
-- `/owners/new` - Dodawanie właściciela
-- `/owners/[ownerId]/edit` - Edycja właściciela
+- `/owners/new` - Dodawanie właściciela (tylko zalogowani)
+- `/owners/[ownerId]/edit` - Edycja właściciela (tylko zalogowani)
 - `/users` - Zarządzanie użytkownikami (tylko admin)
+
+### Kontrola dostępu:
+
+- **Wszystkie ścieżki**: Dostęp do wglądu dla użytkowników niezalogowanych
+- **Ścieżki edycji**: Wymagają autoryzacji i odpowiednich uprawnień
+- **Ścieżki zarządzania**: Wymagają roli admin
 
 ## 3. Struktura komponentów
 
@@ -104,11 +110,12 @@ App
 ### ShowDetails
 
 - **Opis**: Szczegółowy widok wystawy z rejestracjami i ocenami
-- **Główne elementy**: ShowHeader, ShowStats, RegistrationsList, EvaluationsList
+- **Główne elementy**: ShowHeader, ShowStats, RegistrationsList, EvaluationsList, AccessControl
 - **Obsługiwane zdarzenia**: Status changes, navigation to registrations/evaluations
-- **Walidacja**: Show status transitions
-- **Typy**: ShowResponse, RegistrationResponse[], EvaluationResponse[]
-- **Propsy**: show, registrations, evaluations, onStatusChange
+- **Walidacja**: Show status transitions, user permissions
+- **Typy**: ShowResponse, RegistrationResponse[], EvaluationResponse[], ShowPermissions
+- **Propsy**: show, registrations, evaluations, onStatusChange, isAuthenticated
+- **Kontrola dostępu**: Dynamiczne wyświetlanie przycisków edycji oparte na statusie i autoryzacji
 
 ### ShowForm
 
@@ -585,12 +592,21 @@ const createDog = async (data: DogCreateRequest): Promise<DogResponse> => {
 - **Token expiration**: Sprawdzanie w AuthGuard
 - **Role permissions**: Sprawdzanie w komponentach
 
+### Access Control Validation
+
+- **User authentication**: Sprawdzanie czy użytkownik jest zalogowany
+- **Show status permissions**: Walidacja uprawnień do edycji na podstawie statusu wystawy
+- **Guest access**: Umożliwienie wglądu bez autoryzacji
+- **Permission enforcement**: Blokowanie operacji edycji dla użytkowników bez uprawnień
+
 ### Shows Validation
 
 - **Unique show name**: Walidacja w ShowForm
 - **Date validation**: Registration deadline < show date
 - **Status transitions**: Walidacja w ShowActions
 - **Required fields**: Walidacja w ShowForm
+- **Access permissions**: Walidacja uprawnień do edycji na podstawie statusu
+- **Status-based editing**: Edycja tylko w statusie "SZKIC"
 
 ### Dogs Validation
 
@@ -640,6 +656,8 @@ const createDog = async (data: DogCreateRequest): Promise<DogResponse> => {
 2. **Authentication**: Implementacja LoginForm, AuthGuard, useAuth hook
 3. **Layout**: Implementacja Sidebar, TopNavigation, Breadcrumbs
 4. **Common components**: LoadingSpinner, ErrorBoundary, EmptyState
+5. **Access Control**: Implementacja systemu uprawnień opartego na autoryzacji i statusie
+6. **Guest Preview Mode**: Implementacja trybu podglądu dla użytkowników niezalogowanych
 
 ### Faza 2: Zarządzanie danymi
 

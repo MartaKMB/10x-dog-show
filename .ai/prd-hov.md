@@ -81,9 +81,26 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 
 ### System użytkowników:
 
+- **Użytkownicy niezalogowani**: dostęp tylko do wglądu (tryb podglądu)
+- **Użytkownicy zalogowani**: pełne uprawnienia z ograniczeniami statusu wystawy
 - Jedna rola: zarząd klubu z pełnymi uprawnieniami
 - Bezpieczne logowanie i wylogowanie
 - Zarządzanie kontami użytkowników
+
+### System uprawnień:
+
+- **Użytkownik niezalogowany**: 
+  - Przeglądanie wszystkich danych (wystawy, psy, właściciele)
+  - Brak dostępu do funkcji edycji
+  - Komunikat informacyjny o trybie podglądu
+
+- **Użytkownik zalogowany**:
+  - **Zawsze może zmieniać status wystawy** (niezależnie od obecnego statusu)
+  - **Edycja wystawy**: tylko w statusie "SZKIC"
+  - **Usuwanie wystawy**: tylko w statusie "SZKIC" i gdy brak zarejestrowanych psów
+  - **Dodawanie psów**: tylko w statusie "SZKIC"
+  - **Edycja psów**: tylko w statusie "SZKIC"
+  - **Usuwanie psów**: tylko w statusie "SZKIC"
 
 ### System statystyk:
 
@@ -116,6 +133,8 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 - Zarządzanie rodowodami
 - System zawodów
 - Zarządzanie szczeniętami
+- **System płatności** (usunięty z MVP)
+- **System ról użytkowników** (uproszczony do jednej roli)
 
 ## 5. Historyjki użytkownika
 
@@ -130,22 +149,25 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 - Po udanym logowaniu użytkownik jest przekierowany do dashboardu
 - Sesja użytkownika jest utrzymywana przez określony czas
 
-### US-002: Wgląd
+### US-002: Wgląd (Tryb podglądu)
 
-**Tytuł:** Wgląd
+**Tytuł:** Wgląd bez logowania
 
-**Opis:** Jako użytkownik chcę móc oglądać, wyświetlać dane z aplikacji.
+**Opis:** Jako użytkownik niezalogowany chcę móc oglądać i wyświetlać dane z aplikacji w trybie podglądu.
 
 **Kryteria akceptacji:**
 
-- Użytkownik może przeglądać wszystkie dane serwisu (zblurowne dane właściela)
-- Funkcjonalnośćedycji nie jest dostępna bez logowania się do systemu (US-003).
+- Użytkownik może przeglądać wszystkie dane serwisu (wystawy, psy, właściciele)
+- Funkcjonalność edycji nie jest dostępna bez logowania się do systemu
+- Wyświetlany jest komunikat informacyjny o trybie podglądu
+- Wszystkie przyciski edycji są ukryte dla użytkowników niezalogowanych
+- Dostęp do danych jest ograniczony tylko do wglądu
 
 ### US-003: Bezpieczny dostęp i uwierzytelnianie
 
-**Tytuł:** Bezpieczny dostęp
+**Tytuł:** Bezpieczny dostęp z systemem uprawnień
 
-**Opis:** Jako użytkownik chcę mieć możliwość rejestracji i logowania się do systemu w sposób zapewniający bezpieczeństwo moich danych.
+**Opis:** Jako użytkownik chcę mieć możliwość rejestracji i logowania się do systemu w sposób zapewniający bezpieczeństwo moich danych, z odpowiednim systemem uprawnień.
 
 **Kryteria akceptacji:**
 
@@ -153,7 +175,12 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 - Logowanie wymaga podania adresu email i hasła.
 - Rejestracja wymaga podania adresu email, hasła i potwierdzenia hasła.
 - Użytkownik MOŻE korzystać z serwisu BEZ trybu edycji bez logowania się do systemu (US-002).
-- Użytkownik NIE MOŻE korzystać z funkcji edycji bez logowania się do systemu (US-003).
+- Użytkownik NIE MOŻE korzystać z funkcji edycji bez logowania się do systemu.
+- **System uprawnień dla zalogowanych użytkowników:**
+  - Zawsze może zmieniać status wystawy (niezależnie od obecnego statusu)
+  - Edycja wystawy tylko w statusie "SZKIC"
+  - Usuwanie wystawy tylko w statusie "SZKIC" i gdy brak zarejestrowanych psów
+  - Dodawanie/edycja/usuwanie psów tylko w statusie "SZKIC"
 - Użytkownik może logować się do systemu poprzez przycisk w prawym górnym rogu.
 - Użytkownik może się wylogować z systemu poprzez przycisk w prawym górnym rogu w głównym @Layout.astro.
 - Nie korzystamy z zewnętrznych serwisów logowania (np. Google, GitHub).
@@ -273,6 +300,7 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 - **Dokładność danych** - cel: 0% błędów w danych wystaw
 - **Czas wprowadzania wyników** - cel: <30 minut na wystawę
 - **Satysfakcja użytkowników** - cel: >90% satysfakcji
+- **Bezpieczeństwo dostępu** - cel: 100% kontroli uprawnień edycji
 
 ### Metryki techniczne:
 
@@ -368,6 +396,8 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 - Możliwość tworzenia i zarządzania wystawami klubowymi
 - Pełny CRUD dla psów, właścicieli i ocen
 - System użytkowników z jedną rolą
+- **System uprawnień oparty na autoryzacji i statusie wystawy**
+- **Tryb podglądu dla użytkowników niezalogowanych**
 - Podstawowe statystyki i raporty
 - Responsywny interfejs
 
@@ -377,6 +407,7 @@ Klub Hovawarta nie ma centralnego systemu do archiwizacji wyników wystaw klubow
 - Dostępność 99.9%
 - Wsparcie dla urządzeń mobilnych
 - Bezpieczne przechowywanie danych
+- **Bezpieczeństwo**: Kontrola uprawnień edycji na podstawie autoryzacji i statusu
 - **Jakość kodu**: Testy jednostkowe i integracyjne z Vitest
 - **Stabilność**: Testy e2e z Playwright dla krytycznych ścieżek
 - **Pokrycie testów**: 30% linii, 20% gałęzi minimum dla MVP
