@@ -31,4 +31,4 @@ pnpm-debug.log*
 # Playwright test artifacts
 playwright-report/
 test-results/
-covarage/
+coverage/
