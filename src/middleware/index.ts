@@ -20,21 +20,36 @@ export const onRequest = defineMiddleware(
     });
 
     try {
-      // Sprawdź sesję użytkownika
-      const {
-        data: { user },
-        error,
-      } = await supabase.auth.getUser();
+      let user = null;
+      let session = null;
 
-      if (error) {
-        console.error("Auth error in middleware:", error);
+      // Sprawdź sesję użytkownika
+      try {
+        const {
+          data: { user: authUser },
+          error,
+        } = await supabase.auth.getUser();
+
+        if (error) {
+          console.error("Auth error in middleware:", error);
+        } else {
+          user = authUser;
+        }
+
+        // Pobierz sesję
+        const {
+          data: { session: authSession },
+        } = await supabase.auth.getSession();
+        session = authSession;
+      } catch (authError) {
+        console.error("Auth session check failed:", authError);
       }
 
       // Wzbogac locals
       locals.supabase = supabase;
       locals.auth = {
-        user: user || null,
-        session: null, // Uproszczenie - nie potrzebujemy pełnej sesji w middleware
+        user: user,
+        session: session,
       };
 
       // Sprawdź czy ścieżka wymaga autoryzacji
