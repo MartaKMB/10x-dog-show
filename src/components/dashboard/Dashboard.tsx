@@ -6,7 +6,7 @@ import { useDashboard } from "../../hooks/useDashboard";
 import type { UserRole } from "../../types";
 
 interface DashboardProps {
-  userRole: UserRole;
+  userRole?: UserRole;
   showQuickActions?: boolean;
   isAuthenticated?: boolean;
 }

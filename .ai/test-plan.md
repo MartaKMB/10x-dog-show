@@ -97,6 +97,7 @@ Zasady dla testów jednostkowych (wyciąg):
   - ✅ **Dogs**: `AddDogForm.test.tsx` (13 testów, wszystkie przechodzą)
   - ✅ **Dogs**: `DogsTable.test.tsx` (20 testów, wszystkie przechodzą)
   - ✅ **Shows**: `ShowCreator.test.tsx` (10 testów, wszystkie przechodzą), `ShowDetailsView.test.tsx` (5 testów, wszystkie przechodzą)
+  - ✅ **Dashboard**: `Dashboard.test.tsx` (14 testów, wszystkie przechodzą)
   - 🔄 **Owners**: komponenty właścicieli (planowane)
 - **Faza 3**: statystyki, edge-cases błędów, wydajność kluczowych widoków, domknięcie pokrycia.
 - **Kontynuacja**: regresja przy każdym PR (CI), smoke e2e nocne, pełny zestaw przed releasem.
@@ -113,7 +114,8 @@ Zasady dla testów jednostkowych (wyciąg):
 - ✅ **Serwisy**: `authService.test.ts`, `dogService.test.ts` (17 testów)
 - ✅ **Komponenty domenowe**: `AddDogForm.test.tsx` (13 testów, pokrycie 95.38%), `DogsTable.test.tsx` (20 testów)
 - ✅ **Komponenty shows**: `ShowCreator.test.tsx` (10 testów), `ShowDetailsView.test.tsx` (5 testów)
-- 🔄 **Planowane**: komponenty owners, dashboard
+- ✅ **Komponenty dashboard**: `Dashboard.test.tsx` (14 testów)
+- 🔄 **Planowane**: komponenty owners
 
 #### Aktualne pokrycie testami (po implementacji AddDogForm i Shows):
 - **Ogólne pokrycie**: 3.29% (linie), 30.47% (gałęzie), 16.47% (funkcje)
@@ -156,3 +158,18 @@ Zasady dla testów jednostkowych (wyciąg):
 - Rozszerzenie testów o więcej scenariuszy (edge cases, błędy API)
 - Testy integracyjne z API endpoints
 - Testy a11y dla formularzy i widoków
+
+#### Dashboard.test.tsx - 14 testów, wszystkie przechodzą
+- **Renderowanie dla użytkownika niezalogowanego**: podstawowe elementy, brak sekcji statystyk i quick actions, rola "Gość (tylko podgląd)"
+- **Renderowanie dla użytkownika zalogowanego (club_board)**: sekcja statystyk, sekcja quick actions, rola "Członek zarządu klubu"
+- **Renderowanie dla użytkownika zalogowanego bez quick actions**: sekcja statystyk bez quick actions
+- **Informacje systemowe**: wersja, status, rola użytkownika
+- **Obsługa błędów**: placeholder dla przyszłych testów (wymaga zaawansowanego mockowania)
+
+#### Dodane data-testid dla Dashboard:
+- **Dashboard**: `dashboard-container`, `dashboard-stats-section`, `dashboard-recent-shows-section`, `dashboard-quick-actions-section`, `dashboard-system-info`, `dashboard-version-info`, `dashboard-status-info`, `dashboard-role-info`, `dashboard-error`, `dashboard-retry-button`
+
+#### Następne kroki dla Dashboard:
+- Implementacja testów błędów z zaawansowanym mockowaniem
+- Testy integracyjne z API endpoints
+- Testy a11y dla widoków dashboardu
