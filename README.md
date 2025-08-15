@@ -1,5 +1,9 @@
 # HovBase 🐾
 
+<div align="center">
+  <img src="logo.png" alt="HovBase Logo" width="200" height="auto">
+</div>
+
 ---
 
 ## 🇵🇱 O projekcie
