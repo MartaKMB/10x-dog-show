@@ -26,6 +26,7 @@ const ShowCreator: React.FC<ShowCreatorProps> = () => {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string>("");
 
   const { isLoading, error, createShow } = useShowCreator();
 
@@ -69,23 +70,36 @@ const ShowCreator: React.FC<ShowCreatorProps> = () => {
     }
 
     setIsSubmitting(true);
+    setErrors({});
+    setSuccessMessage("");
 
     try {
+      // Konwertuj datę do formatu ISO string
+      const showDate = new Date(formData.showDate);
+      showDate.setHours(0, 0, 0, 0); // Ustaw czas na początek dnia
+
       const showData: CreateShowDto = {
         name: formData.name,
-        show_date: formData.showDate,
+        show_date: showDate.toISOString().split("T")[0], // Format YYYY-MM-DD
         location: formData.location,
         judge_name: formData.judgeName,
         description: formData.description || undefined,
       };
 
-      await createShow(showData);
+      const result = await createShow(showData);
 
-      // Redirect to shows list
-      window.location.href = "/shows";
-    } catch (error) {
-      console.error("Error creating show:", error);
-      setErrors({ submit: "Błąd podczas tworzenia wystawy" });
+      if (result.success) {
+        setSuccessMessage("Wystawa została utworzona pomyślnie!");
+
+        // Przekieruj po 2 sekundach
+        setTimeout(() => {
+          window.location.href = "/shows";
+        }, 2000);
+      } else {
+        setErrors({
+          submit: result.error || "Błąd podczas tworzenia wystawy",
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -122,7 +136,11 @@ const ShowCreator: React.FC<ShowCreatorProps> = () => {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form
+          data-testid="show-creator-form"
+          onSubmit={handleSubmit}
+          className="space-y-6"
+        >
           {/* Show Name */}
           <div>
             <label
@@ -132,6 +150,7 @@ const ShowCreator: React.FC<ShowCreatorProps> = () => {
               Nazwa wystawy *
             </label>
             <input
+              data-testid="show-name-input"
               type="text"
               id="name"
               value={formData.name}
@@ -142,7 +161,9 @@ const ShowCreator: React.FC<ShowCreatorProps> = () => {
               placeholder="np. Wystawa Klubowa Hovawartów 2024"
             />
             {errors.name && (
-              <p className="text-red-600 text-sm mt-1">{errors.name}</p>
+              <p data-testid="name-error" className="text-red-600 text-sm mt-1">
+                {errors.name}
+              </p>
             )}
           </div>
 
@@ -155,6 +176,7 @@ const ShowCreator: React.FC<ShowCreatorProps> = () => {
               Data wystawy *
             </label>
             <input
+              data-testid="show-date-input"
               type="date"
               id="showDate"
               value={formData.showDate}
@@ -164,7 +186,12 @@ const ShowCreator: React.FC<ShowCreatorProps> = () => {
               }`}
             />
             {errors.showDate && (
-              <p className="text-red-600 text-sm mt-1">{errors.showDate}</p>
+              <p
+                data-testid="show-date-error"
+                className="text-red-600 text-sm mt-1"
+              >
+                {errors.showDate}
+              </p>
             )}
           </div>
 
@@ -177,6 +204,7 @@ const ShowCreator: React.FC<ShowCreatorProps> = () => {
               Lokalizacja *
             </label>
             <input
+              data-testid="show-location-input"
               type="text"
               id="location"
               value={formData.location}
@@ -187,7 +215,12 @@ const ShowCreator: React.FC<ShowCreatorProps> = () => {
               placeholder="np. Warszawa, ul. Wystawowa 1"
             />
             {errors.location && (
-              <p className="text-red-600 text-sm mt-1">{errors.location}</p>
+              <p
+                data-testid="location-error"
+                className="text-red-600 text-sm mt-1"
+              >
+                {errors.location}
+              </p>
             )}
           </div>
 
@@ -200,6 +233,7 @@ const ShowCreator: React.FC<ShowCreatorProps> = () => {
               Imię i nazwisko sędziego *
             </label>
             <input
+              data-testid="show-judge-input"
               type="text"
               id="judgeName"
               value={formData.judgeName}
@@ -210,7 +244,12 @@ const ShowCreator: React.FC<ShowCreatorProps> = () => {
               placeholder="np. dr Jan Sędzia"
             />
             {errors.judgeName && (
-              <p className="text-red-600 text-sm mt-1">{errors.judgeName}</p>
+              <p
+                data-testid="judge-error"
+                className="text-red-600 text-sm mt-1"
+              >
+                {errors.judgeName}
+              </p>
             )}
           </div>
 
@@ -223,6 +262,7 @@ const ShowCreator: React.FC<ShowCreatorProps> = () => {
               Opis wystawy
             </label>
             <textarea
+              data-testid="show-description-input"
               id="description"
               value={formData.description}
               onChange={(e) => handleInputChange("description", e.target.value)}
@@ -234,14 +274,28 @@ const ShowCreator: React.FC<ShowCreatorProps> = () => {
 
           {/* Error Messages */}
           {errors.submit && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-md">
+            <div
+              data-testid="submit-error"
+              className="p-4 bg-red-50 border border-red-200 rounded-md"
+            >
               <p className="text-red-600 text-sm">{errors.submit}</p>
+            </div>
+          )}
+
+          {/* Success Messages */}
+          {successMessage && (
+            <div
+              data-testid="success-message"
+              className="p-4 bg-green-50 border border-green-200 rounded-md"
+            >
+              <p className="text-green-600 text-sm">{successMessage}</p>
             </div>
           )}
 
           {/* Action Buttons */}
           <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
             <button
+              data-testid="cancel-button"
               type="button"
               onClick={() => (window.location.href = "/shows")}
               disabled={isSubmitting}
@@ -250,6 +304,7 @@ const ShowCreator: React.FC<ShowCreatorProps> = () => {
               Anuluj
             </button>
             <button
+              data-testid="submit-button"
               type="submit"
               disabled={isSubmitting || isLoading}
               className="px-4 py-2 bg-amber-500 text-gray-900 rounded-md hover:bg-amber-400 disabled:opacity-50 transition-colors"

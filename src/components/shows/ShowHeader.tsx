@@ -1,11 +1,12 @@
 import React from "react";
-import type { ShowResponse, UserRole, ShowStatus } from "../../types";
+import type { ShowResponse, ShowStatus } from "../../types";
 
 interface ShowHeaderProps {
   show: ShowResponse;
-  userRole: UserRole;
+  isAuthenticated: boolean;
   canEdit: boolean;
   canDelete: boolean;
+  canChangeStatus: boolean;
   isDeleting: boolean;
   isUpdating: boolean;
   onDelete: () => void;
@@ -15,8 +16,10 @@ interface ShowHeaderProps {
 
 const ShowHeader: React.FC<ShowHeaderProps> = ({
   show,
+  isAuthenticated,
   canEdit,
   canDelete,
+  canChangeStatus,
   isDeleting,
   isUpdating,
   onDelete,
@@ -118,10 +121,10 @@ const ShowHeader: React.FC<ShowHeaderProps> = ({
           )}
         </div>
 
-        {/* Actions - hidden for users without edit/delete permissions */}
-        {(canEdit || canDelete) && (
+        {/* Actions - Status change always visible for authenticated users, other actions based on permissions */}
+        {isAuthenticated && (
           <div className="flex flex-col sm:flex-row gap-2">
-            {/* Status Change */}
+            {/* Status Change - Always visible for authenticated users */}
             <div className="flex items-center gap-2">
               <label
                 htmlFor="status-select"
@@ -135,7 +138,7 @@ const ShowHeader: React.FC<ShowHeaderProps> = ({
                 onChange={(e) =>
                   handleStatusChange(e.target.value as ShowStatus)
                 }
-                disabled={isUpdating || !canEdit}
+                disabled={isUpdating || !canChangeStatus}
                 className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white text-gray-900"
               >
                 <option value="draft">Szkic</option>
@@ -143,27 +146,29 @@ const ShowHeader: React.FC<ShowHeaderProps> = ({
               </select>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex gap-2">
-              {canEdit && (
-                <button
-                  onClick={onEdit}
-                  className="px-4 py-2 bg-amber-500 text-gray-900 rounded-md hover:bg-amber-400 transition-colors text-sm font-medium"
-                >
-                  Edytuj
-                </button>
-              )}
+            {/* Action Buttons - Only visible when user can edit/delete */}
+            {(canEdit || canDelete) && (
+              <div className="flex gap-2">
+                {canEdit && (
+                  <button
+                    onClick={onEdit}
+                    className="px-4 py-2 bg-amber-500 text-gray-900 rounded-md hover:bg-amber-400 transition-colors text-sm font-medium"
+                  >
+                    Edytuj
+                  </button>
+                )}
 
-              {canDelete && (
-                <button
-                  onClick={handleDelete}
-                  disabled={isDeleting}
-                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 transition-colors text-sm font-medium"
-                >
-                  {isDeleting ? "Usuwanie..." : "Usuń"}
-                </button>
-              )}
-            </div>
+                {canDelete && (
+                  <button
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 transition-colors text-sm font-medium"
+                  >
+                    {isDeleting ? "Usuwanie..." : "Usuń"}
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>

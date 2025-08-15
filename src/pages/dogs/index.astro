@@ -4,11 +4,12 @@ import Layout from "../../layouts/Layout.astro";
 // @ts-ignore Astro typing issue in lints
 import DogsListView from "../../components/dogs/DogsListView.tsx";
 
-// TODO: Get user role from authentication if needed in the future
+const { auth } = Astro.locals;
+const isAuthenticated = !!auth?.user;
 ---
 
 <Layout title="Psy - Lista i wyszukiwanie">
   <div class="container mx-auto px-4 py-8">
-    <DogsListView client:load />
+    <DogsListView client:load isAuthenticated={isAuthenticated} />
   </div>
 </Layout>

@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
-import { z } from "zod";
-import { supabaseServerClient } from "../../db/supabase.server";
+import { createSupabaseServerClient } from "../../db/supabase.server";
 import type { ErrorResponseDto } from "../../types";
+import { z } from "zod";
 
 // Schema dla tworzenia użytkownika
 const createUserSchema = z.object({
@@ -12,46 +12,22 @@ const createUserSchema = z.object({
   role: z.literal("club_board").default("club_board"),
 });
 
-export const GET: APIRoute = async ({ request }) => {
+export const GET: APIRoute = async () => {
   try {
-    const url = new URL(request.url);
-    const page = parseInt(url.searchParams.get("page") || "1");
-    const limit = Math.min(
-      parseInt(url.searchParams.get("limit") || "20"),
-      100,
-    );
-    const offset = (page - 1) * limit;
+    const supabase = createSupabaseServerClient();
 
-    const {
-      data: users,
-      error,
-      count,
-    } = await supabaseServerClient
+    const { data: users, error } = await supabase
       .from("users")
-      .select("*", { count: "exact" })
+      .select("*")
       .is("deleted_at", null)
-      .range(offset, offset + limit - 1)
       .order("created_at", { ascending: false });
 
-    if (error) {
-      throw new Error(`Database error: ${error.message}`);
-    }
+    if (error) throw error;
 
-    return new Response(
-      JSON.stringify({
-        data: users || [],
-        pagination: {
-          page,
-          limit,
-          total: count || 0,
-          pages: Math.ceil((count || 0) / limit),
-        },
-      }),
-      {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      },
-    );
+    return new Response(JSON.stringify({ data: users }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (error) {
     console.error("Error fetching users:", error);
 
@@ -59,7 +35,7 @@ export const GET: APIRoute = async ({ request }) => {
       JSON.stringify({
         error: {
           code: "INTERNAL_ERROR",
-          message: "Internal server error",
+          message: "Failed to fetch users",
         },
         timestamp: new Date().toISOString(),
         request_id: crypto.randomUUID(),
@@ -75,15 +51,18 @@ export const GET: APIRoute = async ({ request }) => {
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
-    const validatedData = createUserSchema.parse(body);
+    const { email, password, first_name, last_name, role } =
+      createUserSchema.parse(body);
 
-    // Sprawdź czy użytkownik już istnieje
-    const { data: existingUser } = await supabaseServerClient
+    const supabase = createSupabaseServerClient();
+
+    // Check if user already exists
+    const { data: existingUser } = await supabase
       .from("users")
       .select("id")
-      .eq("email", validatedData.email)
+      .eq("email", email)
       .is("deleted_at", null)
-      .single();
+      .maybeSingle();
 
     if (existingUser) {
       return new Response(
@@ -102,39 +81,41 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    // Hash hasła (w produkcji użyj bcrypt)
-    const passwordHash = await crypto.subtle
-      .digest("SHA-256", new TextEncoder().encode(validatedData.password))
-      .then((hash) =>
-        Array.from(new Uint8Array(hash))
-          .map((b) => b.toString(16).padStart(2, "0"))
-          .join(""),
-      );
+    // Hash password
+    const passwordHashBuffer = await crypto.subtle.digest(
+      "SHA-256",
+      new TextEncoder().encode(password),
+    );
+    const password_hash = Array.from(new Uint8Array(passwordHashBuffer))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
 
-    const { data: user, error } = await supabaseServerClient
+    // Create user
+    const { data: user, error } = await supabase
       .from("users")
       .insert({
-        email: validatedData.email,
-        password_hash: passwordHash,
-        first_name: validatedData.first_name,
-        last_name: validatedData.last_name,
-        role: validatedData.role,
+        email,
+        password_hash,
+        first_name,
+        last_name,
+        role: role || "club_board",
+        is_active: true,
       })
       .select()
       .single();
 
-    if (error) {
-      throw new Error(`Database error: ${error.message}`);
-    }
+    if (error) throw error;
 
-    // Usuń hash hasła z odpowiedzi
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password_hash, ...userWithoutPassword } = user;
-
-    return new Response(JSON.stringify(userWithoutPassword), {
-      status: 201,
-      headers: { "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({
+        data: user,
+        message: "User created successfully",
+      }),
+      {
+        status: 201,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
   } catch (error) {
     console.error("Error creating user:", error);
 
@@ -143,7 +124,7 @@ export const POST: APIRoute = async ({ request }) => {
         JSON.stringify({
           error: {
             code: "VALIDATION_ERROR",
-            message: "Invalid input data",
+            message: "Invalid request data",
             details: error.errors.map((err) => ({
               field: err.path.join("."),
               message: err.message,
@@ -153,7 +134,7 @@ export const POST: APIRoute = async ({ request }) => {
           request_id: crypto.randomUUID(),
         } as ErrorResponseDto),
         {
-          status: 400,
+          status: 422,
           headers: { "Content-Type": "application/json" },
         },
       );
@@ -163,7 +144,7 @@ export const POST: APIRoute = async ({ request }) => {
       JSON.stringify({
         error: {
           code: "INTERNAL_ERROR",
-          message: "Internal server error",
+          message: "Failed to create user",
         },
         timestamp: new Date().toISOString(),
         request_id: crypto.randomUUID(),

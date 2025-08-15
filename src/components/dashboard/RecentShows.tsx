@@ -98,7 +98,7 @@ const RecentShows: React.FC<RecentShowsProps> = ({
     >
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-gray-900">
-          Ostatnie wystawy
+          Rejestr wystaw klubowych
         </h2>
         <a
           href="/shows"

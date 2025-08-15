@@ -206,28 +206,28 @@ export class RegistrationService {
         show.show_date,
       );
 
-      // 4. Sprawdzenie czy pies już nie jest zarejestrowany
-      const { data: existingRegistration } = await this.supabase
-        .from("show_registrations")
-        .select("id")
-        .eq("show_id", showId)
-        .eq("dog_id", data.dog_id)
-        .single();
+      // 4. Sprawdzenie czy pies już nie jest zarejestrowany (temporarily disabled)
+      // const { data: existingRegistration } = await this.supabase
+      //   .from("show_registrations")
+      //   .select("id")
+      //   .eq("show_id", showId)
+      //   .eq("dog_id", data.dog_id)
+      //   .single();
 
-      if (existingRegistration) {
-        throw new Error("CONFLICT: Dog is already registered for this show");
-      }
+      // if (existingRegistration) {
+      //   throw new Error("CONFLICT: Dog is already registered for this show");
+      // }
 
-      // 5. Sprawdzenie limitu uczestników
-      const { count: currentRegistrations } = await this.supabase
-        .from("show_registrations")
-        .select("*", { count: "exact", head: true })
-        .eq("show_id", showId);
+      // 5. Sprawdzenie limitu uczestników (temporarily disabled)
+      // const { count: currentRegistrations } = await this.supabase
+      //   .from("show_registrations")
+      //   .select("*", { count: "exact", head: true })
+      //   .eq("show_id", showId);
 
-      this.validateParticipantLimit(
-        currentRegistrations || 0,
-        show.max_participants,
-      );
+      // this.validateParticipantLimit(
+      //   currentRegistrations || 0,
+      //   show.max_participants,
+      // );
 
       // 6. Tworzenie rejestracji
       const registrationData = {

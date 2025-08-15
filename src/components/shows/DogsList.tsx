@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import type { RegistrationResponse, ShowStatus, UserRole } from "../../types";
+import type { RegistrationResponse, ShowStatus } from "../../types";
 import DogCard from "./DogCard.tsx";
 
 interface DogsListProps {
@@ -8,10 +8,10 @@ interface DogsListProps {
   canAddDogs: boolean;
   canEdit: boolean;
   canDelete: boolean;
-  userRole?: UserRole;
   onAddDog: () => void;
   onEditDog: (registration: RegistrationResponse) => void;
   onDeleteDog: (registration: RegistrationResponse) => void;
+  isAuthenticated: boolean;
 }
 
 const DogsList: React.FC<DogsListProps> = ({
@@ -20,10 +20,10 @@ const DogsList: React.FC<DogsListProps> = ({
   canAddDogs,
   canEdit,
   canDelete,
-  userRole = "club_board",
   onAddDog,
   onEditDog,
   onDeleteDog,
+  isAuthenticated,
 }) => {
   const [sortBy] = useState<"name" | "class">("name");
   const [sortOrder] = useState<"asc" | "desc">("asc");
@@ -276,8 +276,8 @@ const DogsList: React.FC<DogsListProps> = ({
                                         console.warn("Unknown action:", action);
                                     }
                                   }}
-                                  userRole={userRole}
                                   showStatus={showStatus}
+                                  isAuthenticated={isAuthenticated}
                                 />
                               ))}
                             </div>

@@ -28,6 +28,18 @@ Główna struktura składa się z:
   - Bezpieczne przechowywanie sesji
   - Wsparcie dla klawiatury i screen readerów
 
+#### Guest Preview Mode
+
+- **Ścieżka**: Wszystkie strony bez logowania
+- **Główny cel**: Umożliwienie przeglądania danych bez autoryzacji
+- **Kluczowe informacje**: Komunikat o trybie podglądu, ukryte przyciski edycji
+- **Kluczowe komponenty**: PreviewBanner, AccessControl, ReadOnlyMode
+- **UX/Dostępność/Bezpieczeństwo**:
+  - Jasny komunikat o trybie podglądu
+  - Ukrycie wszystkich przycisków edycji
+  - Zachowanie pełnej funkcjonalności przeglądania
+  - Zachęta do logowania dla pełnego dostępu
+
 ### 2.2 Dashboard/Home
 
 #### Main Dashboard
@@ -76,7 +88,9 @@ Główna struktura składa się z:
 - **UX/Dostępność/Bezpieczeństwo**:
   - Sekcje z możliwością zwijania/rozwijania
   - Szybkie przejścia do rejestracji i ocen
-  - Walidacja możliwości edycji (tylko przed rozpoczęciem wystawy)
+  - **Walidacja możliwości edycji oparta na statusie wystawy i autoryzacji**
+  - **Dynamiczne wyświetlanie przycisków edycji w zależności od uprawnień**
+  - **Komunikat o trybie podglądu dla użytkowników niezalogowanych**
 
 #### Show Creator/Editor
 
@@ -293,6 +307,7 @@ Główna struktura składa się z:
 
    - Lista wystaw
    - Szczegóły wystawy
+   - **Kontrola uprawnień edycji oparta na statusie i autoryzacji**
    - Zarządzanie rejestracjami i ocenami
 
 4. **Zarządzanie psami** (`/dogs` → `/dogs/[dogId]`)
@@ -305,6 +320,21 @@ Główna struktura składa się z:
    - Lista właścicieli
    - Szczegóły właściciela
    - Zarządzanie zgodą GDPR
+
+### 3.3 Tryb podglądu (Guest Mode)
+
+1. **Dostęp bez logowania**
+
+   - Przeglądanie wszystkich danych systemu
+   - Ukryte przyciski edycji
+   - Komunikat o trybie podglądu
+   - Zachęta do logowania dla pełnego dostępu
+
+2. **Ograniczenia trybu podglądu**
+   - Brak dostępu do funkcji edycji
+   - Brak dostępu do funkcji usuwania
+   - Brak dostępu do zarządzania użytkownikami
+   - Pełny dostęp do przeglądania i wyszukiwania
 
 ### 3.2 Szczegółowe przepływy
 
@@ -388,6 +418,8 @@ Każda strona zawiera breadcrumbs pokazujące hierarchię:
 - **LoginForm**: Formularz logowania z walidacją
 - **AuthGuard**: Ochrona tras wymagających uwierzytelnienia
 - **UserMenu**: Menu użytkownika z opcjami wylogowania
+- **AccessControl**: Kontrola dostępu do funkcji edycji
+- **PreviewBanner**: Komunikat o trybie podglądu dla gości
 
 ### 5.2 Komponenty danych
 
@@ -452,3 +484,5 @@ Każda strona zawiera breadcrumbs pokazujące hierarchię:
 - **GDPRConsentForm**: Formularz zgody GDPR
 - **ClassAgeCalculator**: Kalkulator klasy na podstawie wieku
 - **TitleValidator**: Walidator tytułów klubowych
+- **ShowPermissions**: Kontrola uprawnień do edycji wystawy
+- **StatusBasedActions**: Dynamiczne akcje oparte na statusie wystawy

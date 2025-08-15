@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
+import { createSupabaseServerClient } from "../../../../../db/supabase.server";
 import { ShowService } from "../../../../../lib/services/showService";
-import { supabaseServerClient } from "../../../../../db/supabase.server";
 import type { ErrorResponseDto } from "../../../../../types";
 
 export const GET: APIRoute = async ({ params }) => {
@@ -11,7 +11,7 @@ export const GET: APIRoute = async ({ params }) => {
       return new Response(
         JSON.stringify({
           error: {
-            code: "VALIDATION_ERROR",
+            code: "BAD_REQUEST",
             message: "Show ID is required",
           },
           timestamp: new Date().toISOString(),
@@ -24,8 +24,9 @@ export const GET: APIRoute = async ({ params }) => {
       );
     }
 
+    const supabase = createSupabaseServerClient();
     // Get registration stats using service
-    const showService = new ShowService(supabaseServerClient);
+    const showService = new ShowService(supabase);
     const registrations = await showService.getRegistrations(showId);
 
     // Calculate stats from registrations

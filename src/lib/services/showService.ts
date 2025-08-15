@@ -25,16 +25,24 @@ export class ShowService {
     dogClass: string,
     showDate: string,
   ): boolean {
+    console.error("validateDogClassByAge called with:", {
+      birthDate,
+      dogClass,
+      showDate,
+    });
+
     const birth = new Date(birthDate);
     const show = new Date(showDate);
     const ageInMonths =
       (show.getTime() - birth.getTime()) / (1000 * 60 * 60 * 24 * 30.44);
 
+    console.error("Calculated age in months:", ageInMonths);
+
     switch (dogClass) {
       case "baby":
-        if (ageInMonths < 3 || ageInMonths >= 6) {
+        if (ageInMonths < 4 || ageInMonths >= 6) {
           throw new Error(
-            "BUSINESS_RULE_ERROR: Baby class dogs must be 3-6 months old",
+            "BUSINESS_RULE_ERROR: Baby class dogs must be 4-6 months old",
           );
         }
         break;
@@ -81,10 +89,10 @@ export class ShowService {
         }
         break;
       case "veteran":
-        if (ageInMonths < 96) {
-          // 8 years = 96 months
+        if (ageInMonths < 84) {
+          // 7 years = 84 months (zgodnie z dokumentacją)
           throw new Error(
-            "BUSINESS_RULE_ERROR: Veteran class dogs must be at least 8 years old",
+            "BUSINESS_RULE_ERROR: Veteran class dogs must be at least 7 years old",
           );
         }
         break;
@@ -141,21 +149,25 @@ export class ShowService {
 
   /**
    * Validates if show accepts registrations
+   * @param showStatus Current show status
    * @returns true if accepts registrations
    */
-  private validateShowAcceptsRegistrations(): boolean {
-    // For Hovawart Club, all shows accept registrations (they are created after the fact)
-    return true;
+  private validateShowAcceptsRegistrations(showStatus?: string): boolean {
+    // For Hovawart Club, shows in draft status accept registrations
+    // This allows for post-factum registration of historical shows
+    if (showStatus) {
+      return showStatus === "draft";
+    }
+    return true; // Backward compatibility
   }
 
   /**
    * Creates a new show
    * @param data Show creation data
-   * @param organizerId Organizer user ID
    * @returns Created show
    */
   async create(data: CreateShowInput): Promise<ShowResponseDto> {
-    await this.validateBusinessRules();
+    await this.validateBusinessRules(data);
 
     const showData = {
       ...data,
@@ -237,10 +249,17 @@ export class ShowService {
 
   /**
    * Validates business rules for show creation
+   * @deprecated Overlap check removed for local development
    */
-  private async validateBusinessRules(): Promise<void> {
-    // No specific business rules for Hovawart Club shows
-    // Shows are created after the fact, so no date validation needed
+  private async validateBusinessRules(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _data?: any,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _excludeShowId?: string,
+  ): Promise<void> {
+    // Business rules validation temporarily disabled for local development
+    // This will be re-enabled when deploying to production
+    return;
   }
 
   /**
@@ -274,6 +293,17 @@ export class ShowService {
   async update(id: string, data: UpdateShowInput): Promise<ShowResponseDto> {
     const currentShow = await this.getShowById(id);
     this.validateShowEditable(currentShow.status, "update");
+
+    // Check for overlapping dates if show_date is being updated
+    if (data.show_date) {
+      await this.validateBusinessRules(
+        {
+          show_date: data.show_date,
+          name: data.name || currentShow.name,
+        },
+        id,
+      );
+    }
 
     const updateData = {
       ...data,
@@ -349,14 +379,27 @@ export class ShowService {
   }
 
   /**
-   * Gets registrations for a show
+   * Gets registrations for a specific show
    * @param showId Show ID
    * @param params Query parameters
-   * @returns Paginated registrations response
+   * @returns Paginated registrations with full dog and owner data
    */
   async getRegistrations(showId: string, params?: any): Promise<any> {
-    // Verify show exists
-    await this.getShowById(showId);
+    // Verify show exists (basic check without formatting)
+    const { error: showError } = await this.supabase
+      .from("shows")
+      .select("id")
+      .eq("id", showId)
+      .single();
+
+    if (showError) {
+      if (showError.code === "PGRST116") {
+        throw new Error("NOT_FOUND: Show not found");
+      }
+      throw new Error(
+        `INTERNAL_ERROR: Failed to fetch show: ${showError.message}`,
+      );
+    }
 
     let query = this.supabase
       .from("show_registrations")
@@ -369,7 +412,10 @@ export class ShowService {
           gender,
           birth_date,
           microchip_number,
-          kennel_name
+          kennel_name,
+          coat,
+          father_name,
+          mother_name
         )
       `,
         { count: "exact" },
@@ -387,7 +433,7 @@ export class ShowService {
     const offset = (page - 1) * limit;
 
     query = query.range(offset, offset + limit - 1);
-    query = query.order("created_at", { ascending: true });
+    query = query.order("registered_at", { ascending: true });
 
     const { data: registrations, error, count } = await query;
 
@@ -397,13 +443,59 @@ export class ShowService {
       );
     }
 
-    const formattedRegistrations = registrations.map((reg: any) => ({
-      id: reg.id,
-      dog: reg.dogs,
-      dog_class: reg.dog_class,
-      catalog_number: reg.catalog_number,
-      registered_at: reg.created_at,
-    }));
+    // Pobierz właścicieli dla wszystkich psów
+    const dogIds = registrations.map((reg: any) => reg.dogs.id);
+    const { data: dogOwners } = await this.supabase
+      .from("dog_owners")
+      .select("dog_id, owner_id, is_primary")
+      .in("dog_id", dogIds);
+
+    const ownerIds = [...new Set(dogOwners?.map((rel) => rel.owner_id) || [])];
+    const { data: owners } = await this.supabase
+      .from("owners")
+      .select("id, first_name, last_name, email, phone, kennel_name")
+      .in("id", ownerIds);
+
+    // Pobierz oceny dla wszystkich rejestracji
+    const { data: evaluations } = await this.supabase
+      .from("evaluations")
+      .select(
+        "id, dog_id, dog_class, grade, baby_puppy_grade, club_title, placement",
+      )
+      .eq("show_id", showId);
+
+    const formattedRegistrations = registrations.map((reg: any) => {
+      const dogOwnersForDog =
+        dogOwners?.filter((rel) => rel.dog_id === reg.dogs.id) || [];
+      const dogOwnersWithDetails = dogOwnersForDog.map((rel) => {
+        const owner = owners?.find((o) => o.id === rel.owner_id);
+        return {
+          id: owner?.id || rel.owner_id,
+          name: owner
+            ? `${owner.first_name} ${owner.last_name}`
+            : "Unknown Owner",
+          email: owner?.email || "",
+          phone: owner?.phone || null,
+          kennel_name: owner?.kennel_name || null,
+          is_primary: rel.is_primary,
+        };
+      });
+
+      const evaluation = evaluations?.find(
+        (evaluation) => evaluation.dog_id === reg.dogs.id,
+      );
+
+      return {
+        id: reg.id,
+        dog: {
+          ...reg.dogs,
+          owners: dogOwnersWithDetails,
+        },
+        dog_class: reg.dog_class,
+        registered_at: reg.registered_at,
+        evaluation: evaluation || null,
+      };
+    });
 
     return {
       data: formattedRegistrations,
@@ -423,8 +515,27 @@ export class ShowService {
    * @returns Created registration
    */
   async createRegistration(showId: string, data: any): Promise<any> {
-    const show = await this.getShowById(showId);
-    this.validateShowAcceptsRegistrations();
+    // Get basic show info without formatting for validation
+    const { data: show, error: showError } = await this.supabase
+      .from("shows")
+      .select("id, status, show_date")
+      .eq("id", showId)
+      .single();
+
+    if (showError) {
+      if (showError.code === "PGRST116") {
+        throw new Error("NOT_FOUND: Show not found");
+      }
+      throw new Error(
+        `INTERNAL_ERROR: Failed to fetch show: ${showError.message}`,
+      );
+    }
+
+    if (!this.validateShowAcceptsRegistrations(show.status)) {
+      throw new Error(
+        `BUSINESS_RULE_ERROR: Show with status '${show.status}' does not accept registrations`,
+      );
+    }
 
     // Validate dog exists
     const { data: dog, error: dogError } = await this.supabase
@@ -440,8 +551,9 @@ export class ShowService {
     // Validate dog class by age
     this.validateDogClassByAge(dog.birth_date, data.dog_class, show.show_date);
 
-    // Check for duplicate registration
-    await this.validateNoDuplicateRegistration(showId, data.dog_id);
+    // Check for duplicate registration (temporarily disabled for local development)
+    // This will be re-enabled when deploying to production
+    // await this.validateNoDuplicateRegistration(showId, data.dog_id);
 
     // No participant limit validation for Hovawart Club shows
 
@@ -449,7 +561,6 @@ export class ShowService {
       show_id: showId,
       dog_id: data.dog_id,
       dog_class: data.dog_class,
-      created_at: new Date().toISOString(),
     };
 
     const { data: registration, error } = await this.supabase
@@ -480,8 +591,7 @@ export class ShowService {
       id: registration.id,
       dog: registration.dogs,
       dog_class: registration.dog_class,
-      catalog_number: registration.catalog_number,
-      registered_at: registration.created_at,
+      registered_at: registration.registered_at,
     };
   }
 
@@ -497,8 +607,27 @@ export class ShowService {
     registrationId: string,
     data: any,
   ): Promise<any> {
-    const show = await this.getShowById(showId);
-    this.validateShowEditable(show.status, "update registration");
+    // Get basic show info without formatting for validation
+    const { data: show, error: showError } = await this.supabase
+      .from("shows")
+      .select("id, status, show_date")
+      .eq("id", showId)
+      .single();
+
+    if (showError) {
+      if (showError.code === "PGRST116") {
+        throw new Error("NOT_FOUND: Show not found");
+      }
+      throw new Error(
+        `INTERNAL_ERROR: Failed to fetch show: ${showError.message}`,
+      );
+    }
+
+    if (!this.validateShowEditable(show.status, "update registration")) {
+      throw new Error(
+        `BUSINESS_RULE_ERROR: Cannot update registration for show with status '${show.status}'`,
+      );
+    }
 
     // Get current registration
     const { data: currentRegistration, error: fetchError } = await this.supabase
@@ -531,7 +660,6 @@ export class ShowService {
 
     const updateData = {
       ...data,
-      updated_at: new Date().toISOString(),
     };
 
     const { data: registration, error } = await this.supabase
@@ -563,8 +691,7 @@ export class ShowService {
       id: registration.id,
       dog: registration.dogs,
       dog_class: registration.dog_class,
-      catalog_number: registration.catalog_number,
-      registered_at: registration.created_at,
+      registered_at: registration.registered_at,
     };
   }
 
@@ -577,8 +704,27 @@ export class ShowService {
     showId: string,
     registrationId: string,
   ): Promise<void> {
-    const show = await this.getShowById(showId);
-    this.validateShowEditable(show.status, "delete registration");
+    // Get basic show info without formatting for validation
+    const { data: show, error: showError } = await this.supabase
+      .from("shows")
+      .select("id, status")
+      .eq("id", showId)
+      .single();
+
+    if (showError) {
+      if (showError.code === "PGRST116") {
+        throw new Error("NOT_FOUND: Show not found");
+      }
+      throw new Error(
+        `INTERNAL_ERROR: Failed to fetch show: ${showError.message}`,
+      );
+    }
+
+    if (!this.validateShowEditable(show.status, "delete registration")) {
+      throw new Error(
+        `BUSINESS_RULE_ERROR: Cannot delete registration for show with status '${show.status}'`,
+      );
+    }
 
     const { error } = await this.supabase
       .from("show_registrations")

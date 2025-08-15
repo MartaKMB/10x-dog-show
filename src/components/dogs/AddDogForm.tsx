@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import type { DogGender } from "../../types";
 
 interface AddDogFormProps {
@@ -21,6 +21,9 @@ interface OwnerFormData {
   last_name: string;
   email: string;
   phone?: string;
+  address?: string; // Dodaję brakujące pole, opcjonalne
+  city?: string; // Dodaję brakujące pole, opcjonalne
+  postal_code?: string; // Dodaję brakujące pole
   kennel_name?: string;
   gdpr_consent: boolean;
 }
@@ -28,6 +31,9 @@ interface OwnerFormData {
 type ValidationErrors = Record<string, string[]>;
 
 const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
+  // Refs for form fields to sync with browser autofill
+  const formRef = useRef<HTMLFormElement>(null);
+
   const [dogData, setDogData] = useState<DogFormData>({
     name: "",
     gender: "male",
@@ -44,12 +50,129 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
     last_name: "",
     email: "",
     phone: "",
+    address: undefined, // Dodaję brakujące pole
+    city: undefined, // Dodaję brakujące pole
+    postal_code: "", // Dodaję brakujące pole
     kennel_name: "",
     gdpr_consent: false,
   });
 
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string>("");
+
+  // Sync React state with HTML form values on component mount
+  useEffect(() => {
+    if (formRef.current) {
+      const form = formRef.current;
+
+      // Sync dog data
+      const dogNameInput = form.querySelector("#dog-name") as HTMLInputElement;
+      const dogKennelInput = form.querySelector(
+        "#kennel-name",
+      ) as HTMLInputElement;
+      const dogBirthInput = form.querySelector(
+        "#birth-date",
+      ) as HTMLInputElement;
+      const dogGenderSelect = form.querySelector(
+        "#dog-gender",
+      ) as HTMLSelectElement;
+      const dogCoatSelect = form.querySelector(
+        "#dog-coat",
+      ) as HTMLSelectElement;
+      const dogMicrochipInput = form.querySelector(
+        "#microchip-number",
+      ) as HTMLInputElement;
+      const dogFatherInput = form.querySelector(
+        "#father-name",
+      ) as HTMLInputElement;
+      const dogMotherInput = form.querySelector(
+        "#mother-name",
+      ) as HTMLInputElement;
+
+      // Sync owner data
+      const ownerFirstNameInput = form.querySelector(
+        "#owner-first-name",
+      ) as HTMLInputElement;
+      const ownerLastNameInput = form.querySelector(
+        "#owner-last-name",
+      ) as HTMLInputElement;
+      const ownerEmailInput = form.querySelector(
+        "#owner-email",
+      ) as HTMLInputElement;
+      const ownerPhoneInput = form.querySelector(
+        "#owner-phone",
+      ) as HTMLInputElement;
+      const ownerAddressInput = form.querySelector(
+        "#owner-address",
+      ) as HTMLInputElement;
+      const ownerCityInput = form.querySelector(
+        "#owner-city",
+      ) as HTMLInputElement;
+      const ownerPostalCodeInput = form.querySelector(
+        "#owner-postal-code",
+      ) as HTMLInputElement;
+      const ownerKennelInput = form.querySelector(
+        "#owner-kennel-name",
+      ) as HTMLInputElement;
+
+      // Update React state if HTML has values (from autofill)
+      if (dogNameInput?.value)
+        setDogData((prev) => ({ ...prev, name: dogNameInput.value }));
+      if (dogKennelInput?.value)
+        setDogData((prev) => ({ ...prev, kennel_name: dogKennelInput.value }));
+      if (dogBirthInput?.value)
+        setDogData((prev) => ({ ...prev, birth_date: dogBirthInput.value }));
+      if (dogGenderSelect?.value)
+        setDogData((prev) => ({
+          ...prev,
+          gender: dogGenderSelect.value as DogGender,
+        }));
+      if (dogCoatSelect?.value)
+        setDogData((prev) => ({
+          ...prev,
+          coat: dogCoatSelect.value as "czarny" | "czarny_podpalany" | "blond",
+        }));
+      if (dogMicrochipInput?.value)
+        setDogData((prev) => ({
+          ...prev,
+          microchip_number: dogMicrochipInput.value,
+        }));
+      if (dogFatherInput?.value)
+        setDogData((prev) => ({ ...prev, father_name: dogFatherInput.value }));
+      if (dogMotherInput?.value)
+        setDogData((prev) => ({ ...prev, mother_name: dogMotherInput.value }));
+
+      if (ownerFirstNameInput?.value)
+        setOwnerData((prev) => ({
+          ...prev,
+          first_name: ownerFirstNameInput.value,
+        }));
+      if (ownerLastNameInput?.value)
+        setOwnerData((prev) => ({
+          ...prev,
+          last_name: ownerLastNameInput.value,
+        }));
+      if (ownerEmailInput?.value)
+        setOwnerData((prev) => ({ ...prev, email: ownerEmailInput.value }));
+      if (ownerPhoneInput?.value)
+        setOwnerData((prev) => ({ ...prev, phone: ownerPhoneInput.value }));
+      if (ownerAddressInput?.value)
+        setOwnerData((prev) => ({ ...prev, address: ownerAddressInput.value }));
+      if (ownerCityInput?.value)
+        setOwnerData((prev) => ({ ...prev, city: ownerCityInput.value }));
+      if (ownerPostalCodeInput?.value)
+        setOwnerData((prev) => ({
+          ...prev,
+          postal_code: ownerPostalCodeInput.value,
+        }));
+      if (ownerKennelInput?.value)
+        setOwnerData((prev) => ({
+          ...prev,
+          kennel_name: ownerKennelInput.value,
+        }));
+    }
+  }, []);
 
   const validateForm = (): boolean => {
     const newErrors: ValidationErrors = {};
@@ -88,13 +211,40 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: [] }));
   };
 
-  const handleOwnerChange = (
-    field: keyof OwnerFormData,
-    value: string | boolean,
-  ) => {
-    setOwnerData((prev) => ({ ...prev, [field]: value }));
-    const key = `owner_${field}`;
-    if (errors[key]) setErrors((prev) => ({ ...prev, [key]: [] }));
+  const handleOwnerChange = (field: keyof OwnerFormData, value: string) => {
+    // Konwertuj puste stringi na undefined dla pól opcjonalnych
+    const processedValue =
+      field === "address" || field === "city"
+        ? value.trim() || undefined
+        : value;
+
+    setOwnerData((prev) => ({ ...prev, [field]: processedValue }));
+    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: [] }));
+  };
+
+  const resetForm = () => {
+    setDogData({
+      name: "",
+      gender: "male",
+      birth_date: "",
+      coat: "czarny",
+      microchip_number: "",
+      kennel_name: "",
+      father_name: "",
+      mother_name: "",
+    });
+    setOwnerData({
+      first_name: "",
+      last_name: "",
+      email: "",
+      phone: "",
+      address: undefined,
+      city: undefined,
+      postal_code: "",
+      kennel_name: "",
+      gdpr_consent: false,
+    });
+    setErrors({});
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -102,28 +252,44 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
     if (!validateForm()) return;
     setIsSubmitting(true);
     try {
-      // 1) Create owner
-      const ownerRes = await fetch("/api/owners", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          first_name: ownerData.first_name,
-          last_name: ownerData.last_name,
-          email: ownerData.email,
-          phone: ownerData.phone || null,
-          address: "Brak adresu",
-          city: "Brak miasta",
-          kennel_name: ownerData.kennel_name || null,
-          gdpr_consent: ownerData.gdpr_consent,
-        }),
-      });
-      if (!ownerRes.ok) {
-        const err = await ownerRes.json();
-        throw new Error(err?.error?.message || "Błąd tworzenia właściciela");
+      // 1) Sprawdź czy właściciel już istnieje
+      let ownerId: string | undefined;
+      const existingOwnerResponse = await fetch(
+        `/api/owners?email=${ownerData.email}`,
+      );
+      if (existingOwnerResponse.ok) {
+        const existingOwners = await existingOwnerResponse.json();
+        if (existingOwners.data && existingOwners.data.length > 0) {
+          ownerId = existingOwners.data[0].id; // Użyj istniejącego właściciela
+        }
       }
-      const owner = await ownerRes.json();
 
-      // 2) Create dog
+      // 2) Jeśli właściciel nie istnieje, utwórz nowego
+      if (!ownerId) {
+        const ownerRes = await fetch("/api/owners", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            first_name: ownerData.first_name,
+            last_name: ownerData.last_name,
+            email: ownerData.email,
+            phone: ownerData.phone?.trim() || null,
+            address: ownerData.address?.trim() || null,
+            city: ownerData.city?.trim() || null,
+            postal_code: ownerData.postal_code?.trim() || null,
+            kennel_name: ownerData.kennel_name?.trim() || null,
+            gdpr_consent: ownerData.gdpr_consent,
+          }),
+        });
+        if (!ownerRes.ok) {
+          const err = await ownerRes.json();
+          throw new Error(err?.error?.message || "Błąd tworzenia właściciela");
+        }
+        const owner = await ownerRes.json();
+        ownerId = owner.id;
+      }
+
+      // 3) Create dog
       const dogRes = await fetch("/api/dogs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -131,11 +297,12 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
           name: dogData.name,
           gender: dogData.gender,
           birth_date: dogData.birth_date,
-          microchip_number: dogData.microchip_number || undefined,
-          kennel_name: dogData.kennel_name || undefined,
-          father_name: dogData.father_name || undefined,
-          mother_name: dogData.mother_name || undefined,
-          owners: [{ id: owner.id, is_primary: true }],
+          coat: dogData.coat,
+          microchip_number: dogData.microchip_number || null,
+          kennel_name: dogData.kennel_name || null,
+          father_name: dogData.father_name || null,
+          mother_name: dogData.mother_name || null,
+          owners: [{ id: ownerId, is_primary: true }],
         }),
       });
       if (!dogRes.ok) {
@@ -143,27 +310,14 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
         throw new Error(err?.error?.message || "Błąd tworzenia psa");
       }
 
+      setSuccessMessage(`Pies "${dogData.name}" został pomyślnie dodany!`);
       onSuccess?.();
+
+      // Clear success message after 5 seconds
+      setTimeout(() => setSuccessMessage(""), 5000);
+
       // Reset form
-      setDogData({
-        name: "",
-        gender: "male",
-        birth_date: "",
-        coat: "czarny",
-        microchip_number: "",
-        kennel_name: "",
-        father_name: "",
-        mother_name: "",
-      });
-      setOwnerData({
-        first_name: "",
-        last_name: "",
-        email: "",
-        phone: "",
-        kennel_name: "",
-        gdpr_consent: false,
-      });
-      setErrors({});
+      resetForm();
     } catch (error) {
       setErrors({
         submit: [error instanceof Error ? error.message : "Błąd dodawania psa"],
@@ -179,7 +333,12 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
       <p className="text-gray-600 mb-6">
         Utwórz psa bez przypisania do wystawy.
       </p>
-      <form onSubmit={handleSubmit} className="space-y-8">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-8"
+        ref={formRef}
+        data-testid="add-dog-form"
+      >
         <div>
           <h2 className="text-lg font-semibold text-gray-900 mb-3">Dane psa</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -197,9 +356,15 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
                 onChange={(e) => handleDogChange("name", e.target.value)}
                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Nazwa psa"
+                data-testid="dog-name-input"
               />
               {errors.name && (
-                <p className="text-red-600 text-sm mt-1">{errors.name[0]}</p>
+                <p
+                  className="text-red-600 text-sm mt-1"
+                  data-testid="dog-name-error"
+                >
+                  {errors.name[0]}
+                </p>
               )}
             </div>
             <div>
@@ -216,9 +381,13 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
                 onChange={(e) => handleDogChange("kennel_name", e.target.value)}
                 placeholder="Nazwa hodowli"
                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                data-testid="kennel-name-input"
               />
               {errors.kennel_name && (
-                <p className="text-red-600 text-sm mt-1">
+                <p
+                  className="text-red-600 text-sm mt-1"
+                  data-testid="kennel-name-error"
+                >
                   {errors.kennel_name[0]}
                 </p>
               )}
@@ -236,9 +405,13 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
                 value={dogData.birth_date}
                 onChange={(e) => handleDogChange("birth_date", e.target.value)}
                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                data-testid="birth-date-input"
               />
               {errors.birth_date && (
-                <p className="text-red-600 text-sm mt-1">
+                <p
+                  className="text-red-600 text-sm mt-1"
+                  data-testid="birth-date-error"
+                >
                   {errors.birth_date[0]}
                 </p>
               )}
@@ -282,6 +455,7 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
                   handleDogChange("gender", e.target.value as DogGender)
                 }
                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                data-testid="dog-gender-select"
               >
                 <option value="male">Samiec</option>
                 <option value="female">Suka</option>
@@ -304,6 +478,7 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
                   )
                 }
                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                data-testid="dog-coat-select"
               >
                 <option value="czarny">Czarny</option>
                 <option value="czarny_podpalany">Czarny podpalany</option>
@@ -368,7 +543,10 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
                 placeholder="Imię"
               />
               {errors.owner_first_name && (
-                <p className="text-red-600 text-sm mt-1">
+                <p
+                  className="text-red-600 text-sm mt-1"
+                  data-testid="owner-first-name-error"
+                >
                   {errors.owner_first_name[0]}
                 </p>
               )}
@@ -389,7 +567,10 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
                 placeholder="Nazwisko"
               />
               {errors.owner_last_name && (
-                <p className="text-red-600 text-sm mt-1">
+                <p
+                  className="text-red-600 text-sm mt-1"
+                  data-testid="owner-last-name-error"
+                >
                   {errors.owner_last_name[0]}
                 </p>
               )}
@@ -410,7 +591,10 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
                 placeholder="email@example.com"
               />
               {errors.owner_email && (
-                <p className="text-red-600 text-sm mt-1">
+                <p
+                  className="text-red-600 text-sm mt-1"
+                  data-testid="owner-email-error"
+                >
                   {errors.owner_email[0]}
                 </p>
               )}
@@ -449,21 +633,78 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
                 placeholder="Nazwa hodowli"
               />
             </div>
+            <div>
+              <label
+                htmlFor="owner-address"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Adres
+              </label>
+              <input
+                id="owner-address"
+                type="text"
+                value={ownerData.address || ""}
+                onChange={(e) => handleOwnerChange("address", e.target.value)}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Ulica i numer domu"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="owner-city"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Miasto
+              </label>
+              <input
+                id="owner-city"
+                type="text"
+                value={ownerData.city || ""}
+                onChange={(e) => handleOwnerChange("city", e.target.value)}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Miasto"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="owner-postal-code"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Kod pocztowy
+              </label>
+              <input
+                id="owner-postal-code"
+                type="text"
+                value={ownerData.postal_code || ""}
+                onChange={(e) =>
+                  handleOwnerChange("postal_code", e.target.value)
+                }
+                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="12-345"
+              />
+            </div>
             <div className="flex items-center gap-2 md:col-span-2">
               <input
                 type="checkbox"
                 checked={ownerData.gdpr_consent}
                 onChange={(e) =>
-                  handleOwnerChange("gdpr_consent", e.target.checked)
+                  setOwnerData((prev) => ({
+                    ...prev,
+                    gdpr_consent: e.target.checked,
+                  }))
                 }
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                data-testid="gdpr-consent-checkbox"
               />
               <span className="text-sm text-gray-700">
                 Właściciel udzielił zgody RODO *
               </span>
             </div>
             {errors.owner_gdpr_consent && (
-              <p className="text-red-600 text-sm mt-1 md:col-span-2">
+              <p
+                className="text-red-600 text-sm mt-1 md:col-span-2"
+                data-testid="gdpr-consent-error"
+              >
                 {errors.owner_gdpr_consent[0]}
               </p>
             )}
@@ -471,8 +712,20 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
         </div>
 
         {errors.submit && (
-          <div className="p-4 bg-red-50 border border-red-200 rounded-md">
+          <div
+            className="p-4 bg-red-50 border border-red-200 rounded-md"
+            data-testid="submit-error"
+          >
             <p className="text-red-600 text-sm">{errors.submit[0]}</p>
+          </div>
+        )}
+
+        {successMessage && (
+          <div
+            className="p-4 bg-green-50 border border-green-200 rounded-md"
+            data-testid="success-message"
+          >
+            <p className="text-green-600 text-sm">{successMessage}</p>
           </div>
         )}
 
@@ -487,6 +740,7 @@ const AddDogForm: React.FC<AddDogFormProps> = ({ onSuccess }) => {
             type="submit"
             disabled={isSubmitting}
             className="px-4 py-2 bg-amber-500 text-gray-900 rounded-md hover:bg-amber-400 disabled:opacity-50 transition-colors"
+            data-testid="submit-button"
           >
             {isSubmitting ? "Zapisywanie..." : "Dodaj psa"}
           </button>

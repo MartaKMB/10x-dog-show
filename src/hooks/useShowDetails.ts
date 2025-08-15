@@ -14,6 +14,12 @@ interface UseShowDetailsReturn {
   refreshData: () => Promise<void>;
   updateFilters: (filters: FilterState) => Promise<void>;
   filteredRegistrations: RegistrationResponseDto[];
+  stats: {
+    totalDogs: number;
+    byClass: Record<string, number>;
+    byGender: Record<string, number>;
+    byCoat: Record<string, number>;
+  };
 }
 
 export const useShowDetails = (showId: string): UseShowDetailsReturn => {
@@ -116,6 +122,45 @@ export const useShowDetails = (showId: string): UseShowDetailsReturn => {
     });
   }, [registrations, filters]);
 
+  // Obliczanie statystyk wystawy
+  const stats = useMemo(() => {
+    if (!registrations || registrations.length === 0) {
+      return {
+        totalDogs: 0,
+        byClass: {},
+        byGender: {},
+        byCoat: {},
+      };
+    }
+
+    const statsData = {
+      totalDogs: registrations.length,
+      byClass: {} as Record<string, number>,
+      byGender: {} as Record<string, number>,
+      byCoat: {} as Record<string, number>,
+    };
+
+    registrations.forEach((registration) => {
+      // Klasa psa
+      const dogClass = registration.dog_class;
+      statsData.byClass[dogClass] = (statsData.byClass[dogClass] || 0) + 1;
+
+      // Płeć psa
+      const gender = registration.dog.gender;
+      if (gender) {
+        statsData.byGender[gender] = (statsData.byGender[gender] || 0) + 1;
+      }
+
+      // Maść psa
+      const coat = registration.dog.coat;
+      if (coat) {
+        statsData.byCoat[coat] = (statsData.byCoat[coat] || 0) + 1;
+      }
+    });
+
+    return statsData;
+  }, [registrations]);
+
   useEffect(() => {
     loadShowData();
   }, [loadShowData]);
@@ -129,5 +174,6 @@ export const useShowDetails = (showId: string): UseShowDetailsReturn => {
     refreshData,
     updateFilters,
     filteredRegistrations,
+    stats,
   };
 };

@@ -11,7 +11,6 @@ create table public.shows (
     name varchar(200) not null,
     status public.show_status default 'draft',
     show_date date not null,
-    registration_deadline date not null,
     location varchar(200) not null,
     judge_name varchar(200) not null,
     description text,
@@ -20,7 +19,6 @@ create table public.shows (
     updated_at timestamp with time zone default now(),
     deleted_at timestamp with time zone null,
     
-    constraint valid_dates check (registration_deadline <= show_date),
     constraint valid_show_date check (show_date >= current_date - interval '10 years')
 );
 

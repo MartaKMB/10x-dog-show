@@ -1,15 +1,19 @@
 import React, { useState } from "react";
-import type { DogCardViewModel, UserRole, ShowStatus } from "../../types";
+import type { DogCardViewModel, ShowStatus } from "../../types";
 import QuickActionMenu from "./QuickActionMenu";
 
 interface DogCardProps {
   dog: DogCardViewModel;
   onAction: (action: string) => void;
-  userRole: UserRole;
   showStatus: ShowStatus;
+  isAuthenticated: boolean;
 }
 
-const DogCard: React.FC<DogCardProps> = ({ dog, onAction, userRole }) => {
+const DogCard: React.FC<DogCardProps> = ({
+  dog,
+  onAction,
+  isAuthenticated,
+}) => {
   const [isExpanded, setIsExpanded] = useState(dog.isExpanded);
 
   const getGenderIcon = (gender: string): string => {
@@ -123,15 +127,15 @@ const DogCard: React.FC<DogCardProps> = ({ dog, onAction, userRole }) => {
     setIsExpanded(!isExpanded);
   };
 
-  const evaluation = dog.evaluation
+  const evaluation = dog.registration.evaluation
     ? {
         grade:
-          dog.evaluation.dog_class === "baby" ||
-          dog.evaluation.dog_class === "puppy"
-            ? (dog.evaluation.baby_puppy_grade ?? null)
-            : (dog.evaluation.grade ?? null),
-        title: dog.evaluation.club_title ?? null,
-        placement: dog.evaluation.placement ?? null,
+          dog.registration.evaluation.dog_class === "baby" ||
+          dog.registration.evaluation.dog_class === "puppy"
+            ? (dog.registration.evaluation.baby_puppy_grade ?? null)
+            : (dog.registration.evaluation.grade ?? null),
+        title: dog.registration.evaluation.club_title ?? null,
+        placement: dog.registration.evaluation.placement ?? null,
       }
     : {
         grade: null as string | null,
@@ -182,38 +186,40 @@ const DogCard: React.FC<DogCardProps> = ({ dog, onAction, userRole }) => {
               </div>
             </div>
 
-            {/* Owner Information - Always Visible */}
-            <div className="mt-3 p-3 bg-gray-50 rounded-md">
-              <h4 className="font-medium text-gray-900 mb-2">Właściciel</h4>
-              {dog.registration.dog.owners &&
-              dog.registration.dog.owners.length > 0 ? (
-                dog.registration.dog.owners.map((owner, index) => (
-                  <div key={owner.id} className="text-sm">
-                    <p className="text-gray-700">
-                      <strong>
-                        {owner.is_primary
-                          ? "Główny właściciel:"
-                          : "Współwłaściciel:"}
-                      </strong>{" "}
-                      {owner.name || "Brak danych"}
-                    </p>
-                    {owner.email && (
-                      <p className="text-gray-600">{owner.email}</p>
-                    )}
-                    {index < dog.registration.dog.owners.length - 1 && (
-                      <hr className="my-2 border-gray-200" />
-                    )}
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-600 text-sm">
-                  Brak danych o właścicielu
-                </p>
-              )}
-            </div>
+            {/* Owner Information - Only for authenticated users */}
+            {isAuthenticated && (
+              <div className="mt-3 p-3 bg-gray-50 rounded-md">
+                <h4 className="font-medium text-gray-900 mb-2">Właściciel</h4>
+                {dog.registration.dog.owners &&
+                dog.registration.dog.owners.length > 0 ? (
+                  dog.registration.dog.owners.map((owner, index) => (
+                    <div key={owner.id} className="text-sm">
+                      <p className="text-gray-700">
+                        <strong>
+                          {owner.is_primary
+                            ? "Główny właściciel:"
+                            : "Współwłaściciel:"}
+                        </strong>{" "}
+                        {owner.name || "Brak danych"}
+                      </p>
+                      {owner.email && (
+                        <p className="text-gray-600">{owner.email}</p>
+                      )}
+                      {index < dog.registration.dog.owners.length - 1 && (
+                        <hr className="my-2 border-gray-200" />
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-600 text-sm">
+                    Brak danych o właścicielu
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* Evaluation Results */}
-            <div className="mt-3 p-3 bg-amber-500/60 rounded-md">
+            <div className="mt-3 p-3 bg-amber-500/40 rounded-md">
               <h4 className="font-medium text-gray-900 mb-2">Wyniki wystawy</h4>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
                 <div>
@@ -247,7 +253,6 @@ const DogCard: React.FC<DogCardProps> = ({ dog, onAction, userRole }) => {
                   icon: "✏️",
                   action: "edit",
                   disabled: !dog.canEdit,
-                  requiresPermission: ["club_board"],
                 },
                 {
                   id: "delete",
@@ -255,11 +260,9 @@ const DogCard: React.FC<DogCardProps> = ({ dog, onAction, userRole }) => {
                   icon: "🗑️",
                   action: "delete",
                   disabled: !dog.canDelete,
-                  requiresPermission: ["club_board"],
                 },
               ]}
               onAction={handleAction}
-              userRole={userRole}
               canEdit={dog.canEdit}
               canDelete={dog.canDelete}
             />

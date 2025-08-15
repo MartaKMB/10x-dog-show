@@ -3,8 +3,10 @@ import { z } from "zod";
 // UUID validation schema
 const uuidSchema = z.string().uuid("Invalid UUID format");
 
-// Date validation schema
-const dateSchema = z.string().datetime("Invalid date format");
+// Date validation schema - dla dat wystaw używamy prostego formatu daty
+const dateSchema = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format. Use YYYY-MM-DD");
 
 // Main schema for creating shows (uproszczony dla klubu hovawartów)
 export const createShowSchema = z.object({
@@ -22,6 +24,7 @@ export const createShowSchema = z.object({
     .min(1, "Judge name is required")
     .max(200, "Judge name cannot exceed 200 characters"),
   description: z.string().optional(),
+  max_participants: z.number().min(1).optional(),
 });
 
 // Schema for updating shows
@@ -31,6 +34,7 @@ export const updateShowSchema = z.object({
   location: z.string().min(1).max(500).optional(),
   judge_name: z.string().min(1).max(200).optional(),
   description: z.string().optional(),
+  max_participants: z.number().min(1).optional(),
 });
 
 // Schema for show query parameters (uproszczony)

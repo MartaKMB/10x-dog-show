@@ -4,7 +4,9 @@ import { z } from "zod";
 const uuidSchema = z.string().uuid("Invalid UUID format");
 
 // Date validation schema
-const dateSchema = z.string().datetime("Invalid date format");
+const dateSchema = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format. Use YYYY-MM-DD");
 
 // Main schema for creating dogs (uproszczony dla hovawartów)
 export const createDogSchema = z
@@ -29,13 +31,14 @@ export const createDogSchema = z
     microchip_number: z
       .string()
       .regex(/^[0-9]{15}$/, "Microchip number must be exactly 15 digits")
+      .nullable()
       .optional(),
     kennel_name: z
       .string()
       .min(1, "Kennel name is required")
       .max(200, "Kennel name cannot exceed 200 characters"),
-    father_name: z.string().max(100).optional(),
-    mother_name: z.string().max(100).optional(),
+    father_name: z.string().max(100).nullable().optional(),
+    mother_name: z.string().max(100).nullable().optional(),
     owners: z
       .array(
         z.object({
@@ -76,8 +79,8 @@ export const updateDogSchema = z.object({
     .min(1, "Kennel name is required")
     .max(200, "Kennel name cannot exceed 200 characters")
     .optional(),
-  father_name: z.string().max(100).optional(),
-  mother_name: z.string().max(100).optional(),
+  father_name: z.string().max(100).nullable().optional(),
+  mother_name: z.string().max(100).nullable().optional(),
 });
 
 // Schema for dog query parameters

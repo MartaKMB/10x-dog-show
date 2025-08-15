@@ -1,21 +1,31 @@
 import type { APIRoute } from "astro";
-import { z } from "zod";
 import { createSupabaseServerInstance } from "../../../db/supabase.server.ts";
 
-const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-});
+export const POST: APIRoute = async ({ cookies, request }) => {
+  const supabase = createSupabaseServerInstance({
+    headers: request.headers,
+    cookies,
+  });
 
-export const POST: APIRoute = async ({ request, cookies }) => {
   try {
-    const body = await request.json();
-    const { email, password } = loginSchema.parse(body);
+    const { email, password } = await request.json();
 
-    const supabase = createSupabaseServerInstance({
-      headers: request.headers,
-      cookies,
-    });
+    if (!email || !password) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            code: "VALIDATION_ERROR",
+            message: "Email i hasło są wymagane",
+          },
+        }),
+        {
+          status: 400,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+    }
 
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -23,64 +33,52 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     });
 
     if (error) {
-      const message = error.message ?? "invalid_credentials";
-      return new Response(
-        JSON.stringify({
-          error: { code: "401", message },
-          timestamp: new Date().toISOString(),
-          request_id: crypto.randomUUID(),
-        }),
-        { status: 401 },
-      );
-    }
-
-    // Optional: enforce is_active from public.users if profile exists
-    const { data: profile } = await supabase
-      .from("users")
-      .select("first_name,last_name,role,is_active")
-      .eq("email", email)
-      .maybeSingle();
-
-    if (profile && profile.is_active === false) {
-      await supabase.auth.signOut();
       return new Response(
         JSON.stringify({
           error: {
-            code: "403",
-            message: "Konto nieaktywne. Skontaktuj się z administratorem.",
+            code: "AUTHENTICATION_ERROR",
+            message: error.message,
           },
-          timestamp: new Date().toISOString(),
-          request_id: crypto.randomUUID(),
         }),
-        { status: 403 },
+        {
+          status: 401,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
       );
     }
 
     return new Response(
       JSON.stringify({
+        message: "Zalogowano pomyślnie",
         user: {
-          id: data.user?.id ?? "",
-          email: data.user?.email ?? "",
-          first_name: profile?.first_name ?? "",
-          last_name: profile?.last_name ?? "",
-          role: (profile?.role as "club_board") ?? "club_board",
+          id: data.user?.id,
+          email: data.user?.email,
         },
-        access_token: data.session?.access_token ?? "",
-        expires_at: new Date(
-          (data.session?.expires_at ?? 0) * 1000,
-        ).toISOString(),
       }),
-      { status: 200 },
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
     );
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (err) {
+  } catch (error) {
+    console.error("Login error:", error);
     return new Response(
       JSON.stringify({
-        error: { code: "422", message: "invalid_payload" },
-        timestamp: new Date().toISOString(),
-        request_id: crypto.randomUUID(),
+        error: {
+          code: "INTERNAL_ERROR",
+          message: "Błąd serwera",
+        },
       }),
-      { status: 422 },
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
     );
   }
 };

@@ -64,36 +64,36 @@ ON CONFLICT (dog_id, owner_id) DO NOTHING;
 -- 5. INSERT SHOWS
 -- =============================================================================
 
-INSERT INTO public.shows (name, status, show_date, registration_deadline, location, judge_name, description, max_participants) VALUES
-('Wystawa Klubowa Hovawartów 2024', 'draft', '2024-06-15', '2024-06-01', 'Warszawa, ul. Wystawowa 1', 'dr Jan Sędzia', 'Doroczna wystawa klubowa hovawartów', 100),
-('Wystawa Klubowa Hovawartów 2024 - Jesień', 'draft', '2024-09-20', '2024-09-10', 'Kraków, ul. Wystawowa 5', 'dr Anna Sędzia', 'Jesienna wystawa klubowa hovawartów', 80),
-('Wystawa Klubowa Hovawartów 2023', 'completed', '2023-06-10', '2023-06-01', 'Poznań, ul. Wystawowa 10', 'dr Piotr Sędzia', 'Doroczna wystawa klubowa hovawartów 2023', 120);
+INSERT INTO public.shows (name, status, show_date, location, judge_name, description, max_participants) VALUES
+('Wystawa Klubowa Hovawartów 2024', 'draft', '2024-06-15', 'Warszawa, ul. Wystawowa 1', 'dr Jan Sędzia', 'Doroczna wystawa klubowa hovawartów', 100),
+('Wystawa Klubowa Hovawartów 2024 - Jesień', 'draft', '2024-09-20', 'Kraków, ul. Wystawowa 5', 'dr Anna Sędzia', 'Jesienna wystawa klubowa hovawartów', 80),
+('Wystawa Klubowa Hovawartów 2023', 'completed', '2023-06-10', 'Poznań, ul. Wystawowa 10', 'dr Piotr Sędzia', 'Doroczna wystawa klubowa hovawartów 2023', 120);
 
 -- =============================================================================
 -- 6. INSERT SHOW REGISTRATIONS
 -- =============================================================================
 
-INSERT INTO public.show_registrations (show_id, dog_id, dog_class, catalog_number) VALUES
+INSERT INTO public.show_registrations (show_id, dog_id, dog_class) VALUES
 -- Registrations for the first show (Warszawa 2024) - draft status
-((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2024' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawart z Przykładu' LIMIT 1), 'open', 1),
-((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2024' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawartka z Przykładu' LIMIT 1), 'open', 2),
-((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2024' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawart Max' LIMIT 1), 'champion', 3),
-((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2024' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawartka Luna' LIMIT 1), 'junior', 4),
-((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2024' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawart Rocky' LIMIT 1), 'open', 5),
-((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2024' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawartka Bella' LIMIT 1), 'puppy', 6),
-((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2024' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawart Shadow' LIMIT 1), 'working', 7),
-((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2024' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawartka Storm' LIMIT 1), 'veteran', 8),
-((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2024' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawart Blizzard' LIMIT 1), 'open', 9),
-((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2024' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawartka Aurora' LIMIT 1), 'intermediate', 10),
+((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2024' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawart z Przykładu' LIMIT 1), 'open'),
+((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2024' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawartka z Przykładu' LIMIT 1), 'open'),
+((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2024' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawart Max' LIMIT 1), 'champion'),
+((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2024' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawartka Luna' LIMIT 1), 'junior'),
+((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2024' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawart Rocky' LIMIT 1), 'open'),
+((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2024' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawartka Bella' LIMIT 1), 'puppy'),
+((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2024' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawart Shadow' LIMIT 1), 'working'),
+((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2024' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawartka Storm' LIMIT 1), 'veteran'),
+((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2024' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawart Blizzard' LIMIT 1), 'open'),
+((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2024' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawartka Aurora' LIMIT 1), 'intermediate'),
 
 -- Registrations for the second show (Kraków 2024) - draft status
-((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2024 - Jesień' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawart z Przykładu' LIMIT 1), 'open', 1),
-((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2024 - Jesień' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawartka z Przykładu' LIMIT 1), 'champion', 2),
+((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2024 - Jesień' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawart z Przykładu' LIMIT 1), 'open'),
+((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2024 - Jesień' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawartka z Przykładu' LIMIT 1), 'champion'),
 
 -- Registrations for the third show (Poznań 2023) - completed status
-((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2023' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawart Max' LIMIT 1), 'open', 1),
-((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2023' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawartka Luna' LIMIT 1), 'junior', 2),
-((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2023' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawart Rocky' LIMIT 1), 'champion', 3)
+((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2023' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawart Max' LIMIT 1), 'open'),
+((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2023' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawartka Luna' LIMIT 1), 'junior'),
+((SELECT id FROM public.shows WHERE name = 'Wystawa Klubowa Hovawartów 2023' LIMIT 1), (SELECT id FROM public.dogs WHERE name = 'Hovawart Rocky' LIMIT 1), 'champion')
 ON CONFLICT (show_id, dog_id) DO NOTHING;
 
 -- =============================================================================

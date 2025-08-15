@@ -1,8 +1,8 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
+import { createSupabaseServerClient } from "../../../../../db/supabase.server";
 import { EvaluationService } from "../../../../../lib/services/evaluationService";
 import { updateEvaluationSchema } from "../../../../../lib/validation/evaluationSchemas";
-import { supabaseServerClient } from "../../../../../db/supabase.server";
 import type { ErrorResponseDto } from "../../../../../types";
 
 export const GET: APIRoute = async ({ params }) => {
@@ -12,21 +12,18 @@ export const GET: APIRoute = async ({ params }) => {
       return new Response(
         JSON.stringify({
           error: {
-            code: "VALIDATION_ERROR",
+            code: "BAD_REQUEST",
             message: "Show ID and Evaluation ID are required",
           },
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
         } as ErrorResponseDto),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
+        { status: 400, headers: { "Content-Type": "application/json" } },
       );
     }
 
-    // Get evaluation using service
-    const evaluationService = new EvaluationService(supabaseServerClient);
+    const supabase = createSupabaseServerClient();
+    const evaluationService = new EvaluationService(supabase);
     const evaluations = await evaluationService.getEvaluations(showId, {
       page: 1,
       limit: 1000, // Get all to find the specific one
@@ -111,27 +108,21 @@ export const PUT: APIRoute = async ({ params, request }) => {
       return new Response(
         JSON.stringify({
           error: {
-            code: "VALIDATION_ERROR",
+            code: "BAD_REQUEST",
             message: "Show ID and Evaluation ID are required",
           },
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
         } as ErrorResponseDto),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
+        { status: 400, headers: { "Content-Type": "application/json" } },
       );
     }
 
-    // Parse request body
     const body = await request.json();
-
-    // Validate input data
     const validatedData = updateEvaluationSchema.parse(body);
 
-    // Update evaluation using service
-    const evaluationService = new EvaluationService(supabaseServerClient);
+    const supabase = createSupabaseServerClient();
+    const evaluationService = new EvaluationService(supabase);
     const evaluation = await evaluationService.update(
       showId,
       evaluationId,
@@ -221,21 +212,18 @@ export const DELETE: APIRoute = async ({ params }) => {
       return new Response(
         JSON.stringify({
           error: {
-            code: "VALIDATION_ERROR",
+            code: "BAD_REQUEST",
             message: "Show ID and Evaluation ID are required",
           },
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
         } as ErrorResponseDto),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
+        { status: 400, headers: { "Content-Type": "application/json" } },
       );
     }
 
-    // Delete evaluation using service
-    const evaluationService = new EvaluationService(supabaseServerClient);
+    const supabase = createSupabaseServerClient();
+    const evaluationService = new EvaluationService(supabase);
     await evaluationService.delete(showId, evaluationId);
 
     return new Response(

@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { supabaseServerClient } from "../../../db/supabase.server";
+import { createSupabaseServerClient } from "../../../db/supabase.server";
 import { ShowService } from "../../../lib/services/showService";
 import { createShowSchema } from "../../../lib/validation/showSchemas";
 import type { ErrorResponseDto } from "../../../types";
@@ -21,7 +21,7 @@ export const GET: APIRoute = async ({ request }) => {
       Object.fromEntries(url.searchParams),
     );
 
-    const supabase = supabaseServerClient;
+    const supabase = createSupabaseServerClient();
 
     // Build the base query with registration count
     let query = supabase
@@ -32,7 +32,6 @@ export const GET: APIRoute = async ({ request }) => {
         name,
         status,
         show_date,
-        registration_deadline,
         location,
         judge_name,
         description,
@@ -174,7 +173,7 @@ export const POST: APIRoute = async ({ request }) => {
     const validatedData = createShowSchema.parse(body);
 
     // Create show using service with server instance
-    const supabase = supabaseServerClient;
+    const supabase = createSupabaseServerClient();
 
     const showService = new ShowService(supabase);
     const show = await showService.create(validatedData);
@@ -188,6 +187,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Handle validation errors
     if (error instanceof z.ZodError) {
+      console.error("Zod validation errors:", error.errors);
       return new Response(
         JSON.stringify({
           error: {
@@ -210,6 +210,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Handle business logic errors
     if (error instanceof Error) {
+      console.error("Business logic error:", error.message);
       const statusCode = error.message.includes("AUTHORIZATION_ERROR")
         ? 403
         : error.message.includes("NOT_FOUND")

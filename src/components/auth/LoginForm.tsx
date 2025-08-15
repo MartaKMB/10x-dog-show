@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "../ui/button";
+import AuthLogo from "./AuthLogo";
 
 type ValidationErrors = Record<string, string[]>;
 
@@ -76,8 +77,12 @@ const LoginForm: React.FC = () => {
         throw new Error(message);
       }
 
-      // SSR-first cookies are set by the server. Redirect to dashboard.
-      window.location.href = "/";
+      // Sprawdź czy jest parametr redirect w URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const redirectTo = urlParams.get("redirect") || "/";
+
+      // Przekieruj na odpowiednią stronę
+      window.location.href = redirectTo;
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Wystąpił błąd podczas logowania";
@@ -89,7 +94,11 @@ const LoginForm: React.FC = () => {
 
   return (
     <div className="max-w-md mx-auto">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Logowanie</h1>
+      <AuthLogo />
+
+      <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+        Logowanie
+      </h2>
 
       {serverError && (
         <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800">

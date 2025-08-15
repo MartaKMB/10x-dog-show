@@ -1,6 +1,6 @@
 import React from "react";
 import type { HierarchyNode, UserRole, ShowStatus } from "../../types";
-import DogCard from "./DogCard.tsx";
+import DogCard from "./DogCard";
 
 interface ClassGroupNodeProps {
   node: HierarchyNode;
@@ -12,6 +12,7 @@ interface ClassGroupNodeProps {
   showStatus: ShowStatus;
   onKeyDown: (event: React.KeyboardEvent, nodeId: string) => void;
   level: number;
+  isAuthenticated: boolean;
 }
 
 const ClassGroupNode: React.FC<ClassGroupNodeProps> = ({
@@ -20,10 +21,10 @@ const ClassGroupNode: React.FC<ClassGroupNodeProps> = ({
   onDogAction,
   canEdit,
   canDelete,
-  userRole,
   showStatus,
   onKeyDown,
   level,
+  isAuthenticated,
 }) => {
   const handleToggle = () => {
     onNodeToggle(node.id);
@@ -115,8 +116,8 @@ const ClassGroupNode: React.FC<ClassGroupNodeProps> = ({
                       isProcessing: false,
                     }}
                     onAction={(action) => onDogAction(action, childNode.id)}
-                    userRole={userRole}
                     showStatus={showStatus}
+                    isAuthenticated={isAuthenticated}
                   />
                 </div>
               );

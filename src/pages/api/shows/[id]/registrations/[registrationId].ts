@@ -1,117 +1,24 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { RegistrationService } from "../../../../../lib/services/registrationService";
-import {
-  updateRegistrationSchema,
-  updatePaymentStatusSchema,
-} from "../../../../../lib/validation/registrationSchemas";
-import { supabaseServerClient } from "../../../../../db/supabase.server";
+import { createSupabaseServerClient } from "../../../../../db/supabase.server";
+import { ShowService } from "../../../../../lib/services/showService";
+import { updateRegistrationSchema } from "../../../../../lib/validation/showSchemas";
 import type { ErrorResponseDto } from "../../../../../types";
-
-export const GET: APIRoute = async ({ params }) => {
-  try {
-    const { id: showId, registrationId } = params;
-
-    if (!showId || !registrationId) {
-      return new Response(
-        JSON.stringify({
-          error: {
-            code: "VALIDATION_ERROR",
-            message: "Show ID and Registration ID are required",
-          },
-          timestamp: new Date().toISOString(),
-          request_id: crypto.randomUUID(),
-        } as ErrorResponseDto),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
-    }
-
-    // Get registration details using service
-    const registrationService = new RegistrationService(supabaseServerClient);
-    const registration = await registrationService.getRegistrations(showId, {
-      page: 1,
-      limit: 1,
-    });
-
-    // Find specific registration
-    const foundRegistration = registration.data.find(
-      (r) => r.id === registrationId,
-    );
-    if (!foundRegistration) {
-      throw new Error("NOT_FOUND: Registration not found");
-    }
-
-    return new Response(JSON.stringify(registration), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
-  } catch (error) {
-    console.error("Error fetching registration:", error);
-
-    // Handle business logic errors
-    if (error instanceof Error) {
-      const statusCode = error.message.includes("NOT_FOUND")
-        ? 404
-        : error.message.includes("AUTHORIZATION_ERROR")
-          ? 403
-          : 500;
-
-      return new Response(
-        JSON.stringify({
-          error: {
-            code: error.message.split(":")[0] || "INTERNAL_ERROR",
-            message:
-              error.message.split(":")[1]?.trim() || "Internal server error",
-          },
-          timestamp: new Date().toISOString(),
-          request_id: crypto.randomUUID(),
-        } as ErrorResponseDto),
-        {
-          status: statusCode,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
-    }
-
-    // Generic error handler
-    return new Response(
-      JSON.stringify({
-        error: {
-          code: "INTERNAL_ERROR",
-          message: "Internal server error",
-        },
-        timestamp: new Date().toISOString(),
-        request_id: crypto.randomUUID(),
-      } as ErrorResponseDto),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      },
-    );
-  }
-};
 
 export const PUT: APIRoute = async ({ params, request }) => {
   try {
     const { id: showId, registrationId } = params;
-
     if (!showId || !registrationId) {
       return new Response(
         JSON.stringify({
           error: {
-            code: "VALIDATION_ERROR",
+            code: "400",
             message: "Show ID and Registration ID are required",
           },
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
         } as ErrorResponseDto),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
+        { status: 400 },
       );
     }
 
@@ -122,8 +29,10 @@ export const PUT: APIRoute = async ({ params, request }) => {
     const validatedData = updateRegistrationSchema.parse(body);
 
     // Update registration using service
-    const registrationService = new RegistrationService(supabaseServerClient);
-    const registration = await registrationService.updateRegistration(
+    const supabase = createSupabaseServerClient();
+    const showService = new ShowService(supabase);
+
+    const registration = await showService.updateRegistration(
       showId,
       registrationId,
       validatedData,
@@ -151,22 +60,21 @@ export const PUT: APIRoute = async ({ params, request }) => {
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
         } as ErrorResponseDto),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
+        { status: 400 },
       );
     }
 
     // Handle business logic errors
     if (error instanceof Error) {
-      const statusCode = error.message.includes("NOT_FOUND")
-        ? 404
-        : error.message.includes("AUTHORIZATION_ERROR")
-          ? 403
-          : error.message.includes("BUSINESS_RULE_ERROR")
-            ? 422
-            : 500;
+      const statusCode = error.message.includes("AUTHORIZATION_ERROR")
+        ? 403
+        : error.message.includes("NOT_FOUND")
+          ? 404
+          : error.message.includes("CONFLICT")
+            ? 409
+            : error.message.includes("BUSINESS_RULE_ERROR")
+              ? 422
+              : 500;
 
       return new Response(
         JSON.stringify({
@@ -178,10 +86,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
         } as ErrorResponseDto),
-        {
-          status: statusCode,
-          headers: { "Content-Type": "application/json" },
-        },
+        { status: statusCode },
       );
     }
 
@@ -195,163 +100,56 @@ export const PUT: APIRoute = async ({ params, request }) => {
         timestamp: new Date().toISOString(),
         request_id: crypto.randomUUID(),
       } as ErrorResponseDto),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      },
-    );
-  }
-};
-
-export const PATCH: APIRoute = async ({ params, request }) => {
-  try {
-    const { id: showId, registrationId } = params;
-
-    if (!showId || !registrationId) {
-      return new Response(
-        JSON.stringify({
-          error: {
-            code: "VALIDATION_ERROR",
-            message: "Show ID and Registration ID are required",
-          },
-          timestamp: new Date().toISOString(),
-          request_id: crypto.randomUUID(),
-        } as ErrorResponseDto),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
-    }
-
-    // Parse request body
-    const body = await request.json();
-
-    // Validate input data
-    const validatedData = updatePaymentStatusSchema.parse(body);
-
-    // Update payment status using service
-    const registrationService = new RegistrationService(supabaseServerClient);
-    const registration = await registrationService.updatePaymentStatus(
-      showId,
-      registrationId,
-      validatedData,
-    );
-
-    return new Response(JSON.stringify(registration), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
-  } catch (error) {
-    console.error("Error updating payment status:", error);
-
-    // Handle validation errors
-    if (error instanceof z.ZodError) {
-      return new Response(
-        JSON.stringify({
-          error: {
-            code: "VALIDATION_ERROR",
-            message: "The provided data is invalid",
-            details: error.errors.map((err) => ({
-              field: err.path.join("."),
-              message: err.message,
-            })),
-          },
-          timestamp: new Date().toISOString(),
-          request_id: crypto.randomUUID(),
-        } as ErrorResponseDto),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
-    }
-
-    // Handle business logic errors
-    if (error instanceof Error) {
-      const statusCode = error.message.includes("NOT_FOUND")
-        ? 404
-        : error.message.includes("AUTHORIZATION_ERROR")
-          ? 403
-          : error.message.includes("BUSINESS_RULE_ERROR")
-            ? 422
-            : 500;
-
-      return new Response(
-        JSON.stringify({
-          error: {
-            code: error.message.split(":")[0] || "INTERNAL_ERROR",
-            message:
-              error.message.split(":")[1]?.trim() || "Internal server error",
-          },
-          timestamp: new Date().toISOString(),
-          request_id: crypto.randomUUID(),
-        } as ErrorResponseDto),
-        {
-          status: statusCode,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
-    }
-
-    // Generic error handler
-    return new Response(
-      JSON.stringify({
-        error: {
-          code: "INTERNAL_ERROR",
-          message: "Internal server error",
-        },
-        timestamp: new Date().toISOString(),
-        request_id: crypto.randomUUID(),
-      } as ErrorResponseDto),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      },
+      { status: 500 },
     );
   }
 };
 
 export const DELETE: APIRoute = async ({ params }) => {
   try {
-    const { id: showId, registrationId } = params;
-
+    const { showId, registrationId } = params;
     if (!showId || !registrationId) {
       return new Response(
         JSON.stringify({
           error: {
-            code: "VALIDATION_ERROR",
+            code: "400",
             message: "Show ID and Registration ID are required",
           },
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
         } as ErrorResponseDto),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
+        { status: 400 },
       );
     }
 
     // Delete registration using service
-    const registrationService = new RegistrationService(supabaseServerClient);
-    await registrationService.deleteRegistration(showId, registrationId);
+    const supabase = createSupabaseServerClient();
+    const showService = new ShowService(supabase);
 
-    return new Response(null, {
-      status: 204,
-    });
+    await showService.deleteRegistration(showId, registrationId);
+
+    return new Response(
+      JSON.stringify({
+        message: "Registration deleted successfully",
+        timestamp: new Date().toISOString(),
+        request_id: crypto.randomUUID(),
+      }),
+      { status: 200 },
+    );
   } catch (error) {
     console.error("Error deleting registration:", error);
 
     // Handle business logic errors
     if (error instanceof Error) {
-      const statusCode = error.message.includes("NOT_FOUND")
-        ? 404
-        : error.message.includes("AUTHORIZATION_ERROR")
-          ? 403
-          : error.message.includes("BUSINESS_RULE_ERROR")
-            ? 422
-            : 500;
+      const statusCode = error.message.includes("AUTHORIZATION_ERROR")
+        ? 403
+        : error.message.includes("NOT_FOUND")
+          ? 404
+          : error.message.includes("CONFLICT")
+            ? 409
+            : error.message.includes("BUSINESS_RULE_ERROR")
+              ? 422
+              : 500;
 
       return new Response(
         JSON.stringify({
@@ -363,10 +161,7 @@ export const DELETE: APIRoute = async ({ params }) => {
           timestamp: new Date().toISOString(),
           request_id: crypto.randomUUID(),
         } as ErrorResponseDto),
-        {
-          status: statusCode,
-          headers: { "Content-Type": "application/json" },
-        },
+        { status: statusCode },
       );
     }
 
@@ -380,10 +175,7 @@ export const DELETE: APIRoute = async ({ params }) => {
         timestamp: new Date().toISOString(),
         request_id: crypto.randomUUID(),
       } as ErrorResponseDto),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      },
+      { status: 500 },
     );
   }
 };

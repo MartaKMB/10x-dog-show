@@ -19,8 +19,8 @@ const QuickActions: React.FC<QuickActionsProps> = ({ userRole }) => {
   const allActions: QuickAction[] = [
     {
       id: "new-show",
-      title: "Nowa wystawa",
-      description: "Utwórz nową wystawę klubową",
+      title: "Dodaj wystawę",
+      description: "Udokumentuj klubową wystawę Hovawartów",
       icon: "/add-icon.png",
       href: "/shows/new",
       color: "bg-amber-500 hover:bg-amber-400 border border-amber-600",
@@ -29,7 +29,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({ userRole }) => {
     {
       id: "new-dog",
       title: "Dodaj psa",
-      description: "Dodaj nowego psa do serwisu",
+      description: "Wprowadź nowego psa do bazy HovBase",
       icon: "/dog-icon.svg",
       href: "/dogs/new",
       color: "bg-amber-500 hover:bg-amber-400 border border-amber-600",
@@ -38,7 +38,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({ userRole }) => {
     {
       id: "statistics",
       title: "Statystyki",
-      description: "Przeglądaj statystyki systemu",
+      description: "Przeglądaj statystyki rasy i systemu",
       icon: "/bar-icon.png",
       href: "/statistics",
       color: "bg-amber-500 hover:bg-amber-400 border border-amber-600",
@@ -58,7 +58,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({ userRole }) => {
       data-testid="quick-actions-container"
     >
       <h2 className="text-lg font-semibold text-gray-900 mb-4">
-        Szybkie akcje
+        Moje działania
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {availableActions.map((action) => (

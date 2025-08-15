@@ -998,25 +998,39 @@ The API uses **JWT (JSON Web Token)** based authentication provided by Supabase 
 - **Token Format**: `Authorization: Bearer <jwt_token>`
 - **Token Expiry**: 1 hour (configurable)
 - **Refresh Mechanism**: Automatic refresh token rotation
+- **Guest Access**: Unauthenticated users can access read-only endpoints
 
 ### 3.2 Authorization Roles
 
-#### Club Board
+#### Club Board (Authenticated Users)
 
 - **Full access** to all endpoints
 - Can manage users, shows, dogs, owners, registrations, and evaluations
 - Can view all data across all shows
 - Can generate statistics and manage GDPR requests
+- **Show editing permissions based on status**:
+  - Can always change show status
+  - Can edit shows only in "draft" status
+  - Can delete shows only in "draft" status with no registered dogs
+  - Can manage dogs only in "draft" status
+
+#### Guest Users (Unauthenticated)
+
+- **Read-only access** to all data
+- Can view shows, dogs, owners, and evaluations
+- Cannot perform any modification operations
+- Access limited to preview mode
 
 ### 3.3 Row Level Security (RLS)
 
 The API implements **Row Level Security** policies at the database level:
 
 - **Users**: Can only view/edit their own profile
-- **Shows**: Club board can access all shows
-- **Dogs/Owners**: Club board can access all dogs and owners
-- **Registrations/Evaluations**: Club board can access all data
+- **Shows**: Club board can access all shows, guests can view all shows
+- **Dogs/Owners**: Club board can access all dogs and owners, guests can view all data
+- **Registrations/Evaluations**: Club board can access all data, guests can view all data
 - **Soft Delete**: All tables filter out deleted records automatically
+- **Status-based Access**: Show editing operations restricted by show status
 
 ### 3.4 Rate Limiting
 
@@ -1067,9 +1081,10 @@ The API implements **Row Level Security** policies at the database level:
 
 #### Show Management
 
-- **Edit restrictions**: Shows can only be edited before they start
+- **Edit restrictions**: Shows can only be edited in "draft" status
 - **Status transitions**: Shows must follow valid status progression
 - **Capacity limits**: Registration cannot exceed max_participants
+- **Access control**: Show editing operations restricted by authentication and status
 
 #### Evaluation Rules
 
@@ -1083,6 +1098,13 @@ The API implements **Row Level Security** policies at the database level:
 - **Consent tracking**: All consent changes are logged with timestamps
 - **Data retention**: Data is automatically scheduled for deletion after 3 years
 - **Deletion timeline**: Data deletion requests are processed within 30 days
+
+#### Access Control
+
+- **Authentication required**: All modification operations require valid authentication
+- **Status-based permissions**: Show editing restricted by show status
+- **Guest access**: Unauthenticated users have read-only access to all data
+- **Permission validation**: All operations validated against user permissions and show status
 
 ### 4.3 Error Handling
 

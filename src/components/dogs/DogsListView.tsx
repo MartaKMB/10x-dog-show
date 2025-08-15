@@ -7,7 +7,11 @@ import ErrorDisplay from "../shows/ErrorDisplay";
 import EmptyState from "../shows/EmptyState";
 import { useDogsCatalog } from "../../hooks/useDogsCatalog";
 
-const DogsListView: React.FC = () => {
+type DogsListViewProps = {
+  isAuthenticated: boolean;
+};
+
+const DogsListView: React.FC<DogsListViewProps> = ({ isAuthenticated }) => {
   const {
     state,
     updateFilters,
@@ -38,8 +42,13 @@ const DogsListView: React.FC = () => {
       <div className="bg-white shadow rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Lista psów</h1>
-            <p className="text-gray-600">Wyszukuj i filtruj psy w systemie</p>
+            <h1 className="text-2xl font-bold text-gray-900">
+              Psy w bazie HovBase
+            </h1>
+            <p className="text-gray-600">
+              Poznaj Hovawarty zgromadzonye w oficjalnej bazie Klubu.
+              Przeglądaj, wyszukuj i filtruj psy według wybranych kryteriów.
+            </p>
           </div>
         </div>
 
@@ -70,6 +79,7 @@ const DogsListView: React.FC = () => {
               dogs={state.dogs}
               isLoading={state.isLoading}
               onRowClick={handleRowClick}
+              isAuthenticated={isAuthenticated}
             />
             {state.pagination.pages > 1 && (
               <div className="border-t border-gray-200 p-4">

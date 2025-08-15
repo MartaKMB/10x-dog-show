@@ -1,20 +1,34 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
+import { createSupabaseServerClient } from "../../../db/supabase.server";
 import { OwnerService } from "../../../lib/services/ownerService";
 import {
-  ownerIdSchema,
   updateOwnerSchema,
+  ownerIdSchema,
 } from "../../../lib/validation/ownerSchemas";
-import { supabaseServerClient } from "../../../db/supabase.server";
 import type { ErrorResponseDto } from "../../../types";
 
 export const GET: APIRoute = async ({ params }) => {
   try {
+    const { id } = params;
+    if (!id) {
+      return new Response(
+        JSON.stringify({
+          error: { code: "BAD_REQUEST", message: "Owner ID is required" },
+          timestamp: new Date().toISOString(),
+          request_id: crypto.randomUUID(),
+        } as ErrorResponseDto),
+        { status: 400, headers: { "Content-Type": "application/json" } },
+      );
+    }
+
+    const supabase = createSupabaseServerClient();
+    const ownerService = new OwnerService(supabase);
+
     // Validate owner ID
-    const validatedId = ownerIdSchema.parse(params.id);
+    const validatedId = ownerIdSchema.parse(id);
 
     // Get owner using service
-    const ownerService = new OwnerService(supabaseServerClient);
     const owner = await ownerService.getById(validatedId);
 
     return new Response(JSON.stringify(owner), {
@@ -93,17 +107,28 @@ export const GET: APIRoute = async ({ params }) => {
 
 export const PUT: APIRoute = async ({ params, request }) => {
   try {
-    // Validate owner ID
-    const validatedId = ownerIdSchema.parse(params.id);
+    const { id } = params;
+    if (!id) {
+      return new Response(
+        JSON.stringify({
+          error: { code: "BAD_REQUEST", message: "Owner ID is required" },
+          timestamp: new Date().toISOString(),
+          request_id: crypto.randomUUID(),
+        } as ErrorResponseDto),
+        { status: 400, headers: { "Content-Type": "application/json" } },
+      );
+    }
 
-    // Parse request body
     const body = await request.json();
-
-    // Validate input data
     const validatedData = updateOwnerSchema.parse(body);
 
+    const supabase = createSupabaseServerClient();
+    const ownerService = new OwnerService(supabase);
+
+    // Validate owner ID
+    const validatedId = ownerIdSchema.parse(id);
+
     // Update owner using service
-    const ownerService = new OwnerService(supabaseServerClient);
     const owner = await ownerService.update(validatedId, validatedData);
 
     return new Response(JSON.stringify(owner), {
@@ -182,11 +207,25 @@ export const PUT: APIRoute = async ({ params, request }) => {
 
 export const DELETE: APIRoute = async ({ params }) => {
   try {
+    const { id } = params;
+    if (!id) {
+      return new Response(
+        JSON.stringify({
+          error: { code: "BAD_REQUEST", message: "Owner ID is required" },
+          timestamp: new Date().toISOString(),
+          request_id: crypto.randomUUID(),
+        } as ErrorResponseDto),
+        { status: 400, headers: { "Content-Type": "application/json" } },
+      );
+    }
+
+    const supabase = createSupabaseServerClient();
+    const ownerService = new OwnerService(supabase);
+
     // Validate owner ID
-    const validatedId = ownerIdSchema.parse(params.id);
+    const validatedId = ownerIdSchema.parse(id);
 
     // Delete owner using service
-    const ownerService = new OwnerService(supabaseServerClient);
     await ownerService.delete(validatedId);
 
     return new Response(

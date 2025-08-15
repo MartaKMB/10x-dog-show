@@ -6,7 +6,7 @@ import { useDashboard } from "../../hooks/useDashboard";
 import type { UserRole } from "../../types";
 
 interface DashboardProps {
-  userRole: UserRole;
+  userRole?: UserRole;
   showQuickActions?: boolean;
   isAuthenticated?: boolean;
 }
@@ -88,7 +88,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             data-testid="dashboard-version-info"
           >
             <div className="font-medium text-gray-900">Wersja</div>
-            <div className="text-gray-600">2.0.0</div>
+            <div className="text-gray-600">3.0.0</div>
           </div>
           <div
             className="text-center p-3 bg-gray-50 rounded-lg"

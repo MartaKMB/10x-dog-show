@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "../ui/button";
+import AuthLogo from "./AuthLogo";
 
 type ValidationErrors = Record<string, string[]>;
 
@@ -109,7 +110,11 @@ const RegisterForm: React.FC = () => {
 
   return (
     <div className="max-w-md mx-auto">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Rejestracja</h1>
+      <AuthLogo />
+
+      <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+        Rejestracja
+      </h2>
 
       {serverError && (
         <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800">

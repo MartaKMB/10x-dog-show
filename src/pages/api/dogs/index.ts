@@ -1,11 +1,11 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
+import { createSupabaseServerClient } from "../../../db/supabase.server";
 import { DogService } from "../../../lib/services/dogService";
 import {
   createDogSchema,
   dogQuerySchema,
 } from "../../../lib/validation/dogSchemas";
-import { supabaseServerClient } from "../../../db/supabase.server";
 import type { ErrorResponseDto } from "../../../types";
 
 export const GET: APIRoute = async ({ request }) => {
@@ -21,7 +21,8 @@ export const GET: APIRoute = async ({ request }) => {
     });
 
     // Get dogs using service
-    const dogService = new DogService(supabaseServerClient);
+    const supabase = createSupabaseServerClient();
+    const dogService = new DogService(supabase);
     const dogs = await dogService.getDogs(validatedParams);
 
     return new Response(JSON.stringify(dogs), {
@@ -107,7 +108,8 @@ export const POST: APIRoute = async ({ request }) => {
     const validatedData = createDogSchema.parse(body);
 
     // Create dog using service
-    const dogService = new DogService(supabaseServerClient);
+    const supabase = createSupabaseServerClient();
+    const dogService = new DogService(supabase);
     const dog = await dogService.create(validatedData);
 
     return new Response(JSON.stringify(dog), {

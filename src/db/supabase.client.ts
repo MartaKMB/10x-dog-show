@@ -3,7 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./database.types.ts";
 
 const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_KEY;
+const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY; // Poprawka: PUBLIC_SUPABASE_KEY -> PUBLIC_SUPABASE_ANON_KEY
 
 // Check if we're in local development environment
 const isLocalDevelopment =

@@ -306,6 +306,20 @@ export type UserRole = "club_board";
 export const PERMISSIONS = {
   CLUB_BOARD: ["*"], // Pełny dostęp
 } as const;
+
+// System uprawnień oparty na autoryzacji i statusie
+export const SHOW_PERMISSIONS = {
+  EDIT: (isAuthenticated: boolean, showStatus: ShowStatus) =>
+    isAuthenticated && showStatus === "draft",
+  DELETE: (
+    isAuthenticated: boolean,
+    showStatus: ShowStatus,
+    hasDogs: boolean,
+  ) => isAuthenticated && showStatus === "draft" && !hasDogs,
+  CHANGE_STATUS: (isAuthenticated: boolean) => isAuthenticated,
+  MANAGE_DOGS: (isAuthenticated: boolean, showStatus: ShowStatus) =>
+    isAuthenticated && showStatus === "draft",
+} as const;
 ```
 
 ### 5.2 Show Service
@@ -334,6 +348,25 @@ export interface CreateShowDto {
   description?: string;
   max_participants?: number;
 }
+
+// System uprawnień dla wystaw
+export interface ShowPermissions {
+  canEdit: boolean;
+  canDelete: boolean;
+  canChangeStatus: boolean;
+  canManageDogs: boolean;
+}
+
+export const getShowPermissions = (
+  isAuthenticated: boolean,
+  showStatus: ShowStatus,
+  hasRegisteredDogs: boolean,
+): ShowPermissions => ({
+  canEdit: isAuthenticated && showStatus === "draft",
+  canDelete: isAuthenticated && showStatus === "draft" && !hasRegisteredDogs,
+  canChangeStatus: isAuthenticated,
+  canManageDogs: isAuthenticated && showStatus === "draft",
+});
 ```
 
 ### 5.3 Dog Service
@@ -376,29 +409,39 @@ export interface CreateEvaluationDto {
   placement?: Placement;
 }
 
+// Walidacja uprawnień do ocen
+export const canManageEvaluation = (
+  isAuthenticated: boolean,
+  showStatus: ShowStatus,
+): boolean => {
+  return isAuthenticated && showStatus === "draft";
+};
+```
+
 // Oceny w języku polskim
 export type EvaluationGrade =
-  | "doskonała"
-  | "bardzo_dobra"
-  | "dobra"
-  | "zadowalająca"
-  | "zdyskwalifikowana"
-  | "nieobecna";
+| "doskonała"
+| "bardzo_dobra"
+| "dobra"
+| "zadowalająca"
+| "zdyskwalifikowana"
+| "nieobecna";
 
 // Tytuły klubowe hovawartów
 export type ClubTitle =
-  | "młodzieżowy_zwycięzca_klubu"
-  | "zwycięzca_klubu"
-  | "zwycięzca_klubu_weteranów"
-  | "najlepszy_reproduktor"
-  | "najlepsza_suka_hodowlana"
-  | "najlepsza_para"
-  | "najlepsza_hodowla"
-  | "zwycięzca_rasy"
-  | "zwycięzca_płci_przeciwnej"
-  | "najlepszy_junior"
-  | "najlepszy_weteran";
-```
+| "młodzieżowy_zwycięzca_klubu"
+| "zwycięzca_klubu"
+| "zwycięzca_klubu_weteranów"
+| "najlepszy_reproduktor"
+| "najlepsza_suka_hodowlana"
+| "najlepsza_para"
+| "najlepsza_hodowla"
+| "zwycięzca_rasy"
+| "zwycięzca_płci_przeciwnej"
+| "najlepszy_junior"
+| "najlepszy_weteran";
+
+````
 
 ## 6. Usunięte endpointy
 
@@ -410,6 +453,16 @@ export type ClubTitle =
   - `POST /branches`
   - `PUT /branches/{id}`
   - `DELETE /branches/{id}`
+
+### 6.5 Payment System
+
+- **Powód**: Usunięty z MVP zgodnie z wymaganiami
+- **Usunięte endpointy**:
+  - `GET /payments`
+  - `POST /payments`
+  - `PUT /payments/{id}`
+  - `DELETE /payments/{id}`
+  - `GET /shows/{showId}/payments`
 
 ### 6.2 Breeds Management
 
@@ -525,7 +578,7 @@ export const createEvaluationSchema = z
         "Baby/Puppy classes must use baby_puppy_grade, other classes must use grade",
     },
   );
-```
+````
 
 ### 7.2 Logika biznesowa
 
@@ -640,5 +693,8 @@ Plan implementacji API dla Klub Hovawarta Show został oparty na analizie archiw
 3. **Przeniesienie ocen** - z opisów do bezpośrednich ocen wystaw
 4. **Tytuły klubowe** - specyficzne dla hovawartów
 5. **Podstawowy system RODO** - zgodność z wymaganiami prawnymi
+6. **System uprawnień oparty na autoryzacji i statusie wystawy** - kontrola dostępu do edycji
+7. **Tryb podglądu dla użytkowników niezalogowanych** - dostęp tylko do odczytu
+8. **Usunięcie systemu płatności** - uproszczenie zgodnie z wymaganiami MVP
 
 Implementacja będzie przebiegać w 3 fazy funkcjonalne, wykorzystując sprawdzone wzorce z archiwizowanych endpointów przy jednoczesnym dostosowaniu do uproszczonych wymagań klubu hovawartów.

@@ -1,69 +1,154 @@
-# HovBase
+# HovBase 🐾
 
-A modern web application for managing and archiving dog show results, specifically designed for the Hovawart Club. Built with Astro, React, and Supabase to provide a comprehensive solution for show organizers, judges, and dog owners.
+---
 
-## 📋 Table of Contents
+## 🇵🇱 O projekcie
 
-- [Project Description](#project-description)
-- [Tech Stack](#tech-stack)
-- [Getting Started Locally](#getting-started-locally)
-- [Available Scripts](#available-scripts)
-- [Project Scope](#project-scope)
-- [Project Status](#project-status)
-- [License](#license)
+**HovBase** to nowoczesna aplikacja internetowa tworzona z myślą o miłośnikach i hodowcach rasy Hovawart w Polsce.  
+Jej celem jest gromadzenie, archiwizowanie i udostępnianie **zweryfikowanej wiedzy** o wystawach klubowych, psach i historii rasy.
 
-## 🎯 Project Description
+Projekt jest rozwijany jako inicjatywa społeczna i w przyszłości może stać się **oficjalnym narzędziem Klubu Hovawarta w Polsce**.  
+Aktualna wersja aplikacji pozwala przeglądać dane, a uprawnieni członkowie Zarządu mogą dodawać i edytować informacje.
 
-HovBase is a web application designed to centralize and manage dog show results for the Hovawart Club. The system provides a comprehensive platform for archiving historical show data, managing evaluations, and generating statistics for club management.
+W planach:
+- rozbudowa o profile hodowli, właścicieli, szczeniąt i szkolenia
+- integracja ze statystykami i raportami rasy
+- opcja przeglądania historii rodowodowej
 
-### Key Features (MVP)
+---
 
-- **Show Management**: Create, edit, and manage club shows with dates, locations, and judges
-- **Dog Registration**: Complete CRUD operations for dogs and their owners
-- **Evaluation System**: Standard FCI evaluations with Polish language support
-- **User Management**: Secure authentication system for club management
-- **Statistics & Reports**: Basic show statistics and performance analytics
-- **Responsive Design**: Full functionality on desktop and mobile devices
+## 🇬🇧 About the project
 
-### Target Users
+**HovBase** is a modern web application created for Hovawart enthusiasts and breeders in Poland.  
+Its goal is to collect, archive and share **verified knowledge** about club shows, dogs and the breed's history.
 
-- **Club Management**: Full access to all show data and administrative functions
-- **Show Organizers**: Tools for entering and managing show results
-- **Dog Owners & Breeders**: Access to historical results and performance data
+The project is developed as a community initiative and has the potential to become the **official tool for the Hovawart Club of Poland**.  
+The current version allows public browsing of data, while authorized Club Board members can add and edit information.
+
+Planned features:
+- Breeder, owner, puppy and training profiles
+- Extended breed statistics and reports
+- Pedigree history browsing
+
+---
+
+<div align="center">
+  <img src="logo.png" alt="HovBase Logo" width="200" height="auto">
+</div>
+
+---
+
+## 🎯 Key Features (MVP)
+
+- 🏆 **Show Management** – Archiving club show data (dates, results, judges)
+- 🐕 **Dog Profiles** – Verified dog entries with show history
+- 📝 **Evaluation System** – Based on official FCI standards
+- 📊 **Statistics** – Basic breed and show summaries
+- 🔐 **User Management** – Access control for Club Board members
+- 📱 **Responsive Design** – Works on desktop and mobile devices
+
+---
+
+## 📌 Future Enhancements
+
+- Extended profiles (breeders, owners, puppies, trainings)  
+- Advanced search and filtering  
+- Report generation and data export  
+- Pedigree tracking  
+- Integration with external systems  
+
+---
 
 ## 🛠 Tech Stack
 
-### Frontend
+**Frontend**
+- Astro 5  
+- React 19  
+- TypeScript 5  
+- Tailwind CSS 4  
+- shadcn/ui  
 
-- **Astro 5** - Static site generator with SSR capabilities
-- **React 19** - Interactive UI components
-- **TypeScript 5** - Type-safe development
-- **Tailwind CSS 4** - Utility-first styling
-- **Shadcn/ui** - Accessible React components
+**Backend & Database**
+- Supabase (PostgreSQL, Auth, RLS, Storage, Realtime)
 
-### Backend & Database
+**Testing**
+- Vitest, Playwright, React Testing Library, MSW
 
-- **Supabase** - Backend-as-a-Service platform
-  - PostgreSQL database
-  - Built-in authentication
-  - Row Level Security (RLS)
-  - Real-time subscriptions
-  - File storage
+**Other**
+- Resend (Email)
+- DigitalOcean (Hosting)
+- React-PDF (PDF generation)
 
-### Development Tools
+---
 
-- **ESLint + Prettier** - Code quality and formatting
-- **Husky + lint-staged** - Git hooks for code quality
-- **TypeScript ESLint** - TypeScript-specific linting rules
+## 🚀 Getting Started Locally
 
-### Testing
+### Prerequisites
+- Node.js (Latest LTS)
+- npm or yarn
+- Supabase account
 
-- **Vitest** - Fast unit and integration testing framework
-- **React Testing Library** - Component testing utilities
-- **Playwright** - End-to-end testing for browser automation
-- **MSW** - API mocking for integration tests
+### Installation
+```bash
+git clone <repository-url>
+cd hovbase
+npm install
+```
 
-#### Testing Environment
+### Environment variables
+Create `.env` file in the root:
+```env
+PUBLIC_SUPABASE_URL=your_supabase_url
+PUBLIC_SUPABASE_ANON_KEY=your_key
+SUPABASE_SERVICE_ROLE_KEY=your_key
+```
+
+### Run development server
+```bash
+npm run dev
+```
+
+The app will be available at `http://localhost:4321`
+
+---
+
+## 📊 Project Status
+
+**Phase:** MVP Development  
+✅ Project setup  
+✅ Database schema  
+🔄 Show & evaluation management in progress  
+⏳ Extended statistics, user testing
+
+---
+
+## 📄 License
+
+MIT License – see [LICENSE](LICENSE) file.
+
+---
+
+## 🤝 Contributing
+
+HovBase is designed for the Hovawart Club of Poland.  
+For contributions or questions, please contact m.muchabalcerek@gmail.com.
+
+---
+
+## 📋 Technical Details
+
+### Available Scripts
+
+| Script             | Description                          |
+| ------------------ | ------------------------------------ |
+| `npm run dev`      | Start the development server         |
+| `npm run build`    | Build the application for production |
+| `npm run lint`     | Run ESLint to check code quality     |
+| `npm run lint:fix` | Fix ESLint errors automatically      |
+| `npm run format`   | Format code with Prettier            |
+| `npm run test`     | Run unit and integration tests       |
+
+### Testing Environment
 
 The project supports both local and cloud testing environments:
 
@@ -74,108 +159,26 @@ The project supports both local and cloud testing environments:
 
 | Script                   | Description                             |
 | ------------------------ | --------------------------------------- |
-| `npm run test:run`       | Run unit and integration tests          |
-| `npm run test:watch`     | Run tests in watch mode                 |
+| `npm run test`       | Run unit and integration tests          |
 | `npm run test:coverage`  | Run tests with coverage report          |
 | `npm run test:e2e:cloud` | Run e2e tests against cloud environment |
-| `npm run test:e2e:ui`    | Run e2e tests with UI                   |
-| `npm run test:all`       | Run all tests (unit + e2e)              |
 
-### External Services
+### Project Scope Details
 
-- **Resend** - Email delivery service
-- **React-PDF** - PDF generation
-- **DigitalOcean** - Application hosting
+#### MVP Features (Phase 1)
 
-## 🚀 Getting Started Locally
-
-### Prerequisites
-
-- Node.js (Latest LTS version recommended)
-- npm or yarn package manager
-- Supabase account and project
-
-### Installation
-
-1. **Clone the repository**
-
-   ```bash
-   git clone <repository-url>
-   cd hovbase
-   ```
-
-2. **Install dependencies**
-
-   ```bash
-   npm install
-   ```
-
-3. **Set up environment variables**
-   Create a `.env` file in the root directory with your Supabase credentials:
-
-   ```env
-   # Local Development Environment
-   PUBLIC_SUPABASE_URL=your_supabase_url
-   PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-
-   # Cloud Testing Environment (Optional)
-   VITE_SUPABASE_URL_CLOUD=your_cloud_supabase_url
-   VITE_SUPABASE_ANON_KEY_CLOUD=your_cloud_anon_key
-   VITE_SUPABASE_SERVICE_ROLE_KEY_CLOUD=your_cloud_service_role_key
-
-   # Test Environment Selection
-   TEST_ENVIRONMENT=local  # or 'cloud'
-   ```
-
-4. **Set up Supabase**
-
-   - Create a new Supabase project
-   - Run the database migrations from `supabase/migrations/`
-   - Configure Row Level Security policies
-
-5. **Start the development server**
-
-   ```bash
-   npm run dev
-   ```
-
-6. **Open your browser**
-   Navigate to `http://localhost:4321` to view the application
-
-## 📜 Available Scripts
-
-| Script             | Description                          |
-| ------------------ | ------------------------------------ |
-| `npm run dev`      | Start the development server         |
-| `npm run build`    | Build the application for production |
-| `npm run preview`  | Preview the production build locally |
-| `npm run lint`     | Run ESLint to check code quality     |
-| `npm run lint:fix` | Fix ESLint errors automatically      |
-| `npm run format`   | Format code with Prettier            |
-| `npm run astro`    | Run Astro CLI commands               |
-| `npm run test`     | Run unit and integration tests       |
-| `npm run test:e2e` | Run end-to-end tests with Playwright |
-| `npm run test:ui`  | Run tests with Vitest UI             |
-
-## 🎯 Project Scope
-
-### MVP Features (Phase 1)
-
-#### Show Management
-
+**Show Management**
 - Create, edit, and delete club shows
 - Configure show dates, locations, and judges
-- Manage show status (planned, in progress, completed)
+- Manage show status (draft, completed)
+- Access control based on show status and user authentication
 
-#### Dog & Owner Management
-
+**Dog & Owner Management**
 - Complete dog profiles with identification data
 - Owner information management
 - Show participation history
 
-#### Evaluation System
-
+**Evaluation System**
 - Standard FCI evaluations in Polish:
   - Doskonała (Excellent)
   - Bardzo dobra (Very Good)
@@ -186,65 +189,20 @@ The project supports both local and cloud testing environments:
 - Age classes and club titles
 - Placement tracking (1st, 2nd, 3rd, 4th)
 
-#### User System
-
+**User System**
 - Single role: Club management with full permissions
 - Secure authentication and session management
 - User account administration
+- Guest preview mode for unauthenticated users
+- Status-based permissions for show editing
 
-#### Statistics & Reporting
-
+**Statistics & Reporting**
 - Show participation statistics
 - Evaluation distribution analysis
 - Club title statistics
 - Individual dog performance history
 
-### Future Enhancements (Phase 2 & 3)
-
-- Dog descriptions and detailed profiles
-- Advanced reporting and data export
-- Integration with external systems
-- Membership management
-- Pedigree tracking
-- Competition management
-
-## 📊 Project Status
-
-**Current Phase**: MVP Development (Phase 1)
-
-### Development Progress
-
-- ✅ Project setup and configuration
-- ✅ Database schema design
-- ✅ Basic authentication system
-- ✅ Core CRUD operations
-- ✅ Testing infrastructure migration to cloud
-- 🔄 Show management interface
-- 🔄 Evaluation system implementation
-- 🔄 Statistics and reporting
-- ⏳ User testing and refinement
-
-### Success Metrics
-
-- **Data Accuracy**: 0% errors in show data
-- **Data Entry Time**: <30 minutes per show
-- **User Satisfaction**: >90% satisfaction rate
-- **System Performance**: <2 seconds response time
-- **Uptime**: 99.9% availability
-- **Code Quality**: 30% line coverage, 20% branch coverage minimum
-- **Test Reliability**: 100% pass rate for critical tests (auth, CRUD)
-- **Cloud Testing**: 100% pass rate for e2e tests against production environment
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 🤝 Contributing
-
-This project is specifically designed for the Hovawart Club. For contributions or questions, please contact the project maintainers.
 
 ## 📞 Support
 
-For technical support or feature requests, please create an issue in the project repository or contact the development team.
+For technical support or feature requests, please create an issue in the project repository or contact m.muchabalcerek@gmail.com.

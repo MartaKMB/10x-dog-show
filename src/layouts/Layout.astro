@@ -22,7 +22,7 @@ const user = auth?.user ?? null;
     <script src="/mobile-menu.js" defer></script>
   </head>
   <body data-authenticated={user ? "true" : "false"}>
-    <div class="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-amber-50/30">
+    <div class="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-amber-50/30 flex flex-col">
       <!-- Header -->
       <header class="bg-gray-900 shadow-lg border-b border-amber-600/30" data-testid="main-header">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -184,10 +184,110 @@ const user = auth?.user ?? null;
       </header>
 
       <!-- Main content -->
-      <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8" data-testid="main-content">
+      <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 flex-1" data-testid="main-content">
         <slot />
       </main>
+
+      <!-- Footer -->
+      <footer class="bg-gray-900 text-gray-300 mt-auto" data-testid="footer">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Informacje o aplikacji -->
+            <div class="space-y-4">
+              <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden">
+                  <img src="/logo.png" alt="HovBase Logo" class="w-full h-full object-cover" />
+                </div>
+                <span class="text-lg font-semibold text-amber-400">HovBase</span>
+              </div>
+              <p class="text-sm text-gray-400 leading-relaxed">
+                Profesjonalna platforma do zarządzania wystawami psów rasowych. Organizuj, rejestruj i oceniaj psy w
+                jednym miejscu.
+              </p>
+            </div>
+
+            <!-- Szybkie linki -->
+            <div class="space-y-4">
+              <h3 class="text-lg font-semibold text-amber-400">Szybkie linki</h3>
+              <ul class="space-y-2">
+                <li>
+                  <a
+                    href="/"
+                    class="text-sm text-gray-400 hover:text-amber-400 transition-colors"
+                    data-testid="footer-dashboard-link"
+                  >
+                    Dashboard
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/shows"
+                    class="text-sm text-gray-400 hover:text-amber-400 transition-colors"
+                    data-testid="footer-shows-link"
+                  >
+                    Wystawy
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/dogs"
+                    class="text-sm text-gray-400 hover:text-amber-400 transition-colors"
+                    data-testid="footer-dogs-link"
+                  >
+                    Psy
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Kontakt i wsparcie -->
+            <div class="space-y-4">
+              <h3 class="text-lg font-semibold text-amber-400">Wsparcie</h3>
+              <ul class="space-y-2">
+                <li>
+                  <a
+                    href="/auth/login"
+                    class="text-sm text-gray-400 hover:text-amber-400 transition-colors"
+                    data-testid="footer-login-link"
+                  >
+                    Zaloguj się
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/auth/signup"
+                    class="text-sm text-gray-400 hover:text-amber-400 transition-colors"
+                    data-testid="footer-signup-link"
+                  >
+                    Zarejestruj się
+                  </a>
+                </li>
+                <li>
+                  <span class="text-sm text-gray-400">Email: support@hovbase.pl</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Dolna sekcja -->
+          <div class="mt-8 pt-8 border-t border-gray-700">
+            <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+              <div class="text-sm text-gray-400">
+                © {new Date().getFullYear()} HovBase. Wszystkie prawa zastrzeżone.
+              </div>
+              <div class="flex space-x-6 text-sm text-gray-400">
+                <a href="#" class="hover:text-amber-400 transition-colors" data-testid="footer-privacy-link">
+                  Polityka prywatności
+                </a>
+                <a href="#" class="hover:text-amber-400 transition-colors" data-testid="footer-terms-link">Regulamin</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
+    <!-- Logout handling script -->
+    <script is:inline src="/logout-handler.js" defer></script>
   </body>
 </html>
 

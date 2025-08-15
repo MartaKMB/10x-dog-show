@@ -1,11 +1,11 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
+import { createSupabaseServerClient } from "../../../db/supabase.server";
 import { OwnerService } from "../../../lib/services/ownerService";
 import {
   createOwnerSchema,
   ownerQuerySchema,
 } from "../../../lib/validation/ownerSchemas";
-import { supabaseServerClient } from "../../../db/supabase.server";
 import type { ErrorResponseDto } from "../../../types";
 
 export const GET: APIRoute = async ({ request }) => {
@@ -21,7 +21,8 @@ export const GET: APIRoute = async ({ request }) => {
     });
 
     // Get owners using service
-    const ownerService = new OwnerService(supabaseServerClient);
+    const supabase = createSupabaseServerClient();
+    const ownerService = new OwnerService(supabase);
     const owners = await ownerService.getMany(validatedParams);
 
     return new Response(JSON.stringify(owners), {
@@ -109,7 +110,8 @@ export const POST: APIRoute = async ({ request }) => {
     const validatedData = createOwnerSchema.parse(body);
 
     // Create owner using service
-    const ownerService = new OwnerService(supabaseServerClient);
+    const supabase = createSupabaseServerClient();
+    const ownerService = new OwnerService(supabase);
     const owner = await ownerService.create(validatedData);
 
     return new Response(JSON.stringify(owner), {
