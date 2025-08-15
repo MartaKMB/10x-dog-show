@@ -30,10 +30,12 @@ const Statistics: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="bg-white shadow rounded-lg p-6">
-        <h1 className="text-xl font-semibold text-gray-900 mb-2">Statystyki</h1>
+        <h1 className="text-xl font-semibold text-gray-900 mb-2">
+          Statystyki HovBase
+        </h1>
         <p className="text-gray-600 text-sm">
-          Ta strona będzie rozwijana w przyszłości o dodatkowe statystyki i
-          wykresy. Póki co prezentuje te same statystyki co na dashboardzie.
+          Podsumowanie danych o wystawach i psach. Wkrótce – więcej analiz,
+          wykresów i ciekawych zestawień.
         </p>
       </div>
 
