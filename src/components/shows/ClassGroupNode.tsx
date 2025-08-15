@@ -1,6 +1,6 @@
 import React from "react";
 import type { HierarchyNode, UserRole, ShowStatus } from "../../types";
-import DogCard from "./DogCard.tsx";
+import DogCard from "./DogCard";
 
 interface ClassGroupNodeProps {
   node: HierarchyNode;
@@ -20,7 +20,6 @@ const ClassGroupNode: React.FC<ClassGroupNodeProps> = ({
   onDogAction,
   canEdit,
   canDelete,
-  userRole,
   showStatus,
   onKeyDown,
   level,
@@ -115,7 +114,6 @@ const ClassGroupNode: React.FC<ClassGroupNodeProps> = ({
                       isProcessing: false,
                     }}
                     onAction={(action) => onDogAction(action, childNode.id)}
-                    userRole={userRole}
                     showStatus={showStatus}
                   />
                 </div>
