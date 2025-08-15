@@ -95,8 +95,8 @@ Zasady dla testów jednostkowych (wyciąg):
 - **Faza 1** ✅: pokrycie krytycznych komponentów auth i middleware testami integracyjnymi + smoke e2e (login, logout, publiczny wgląd).
 - **Faza 2** 🚧: scenariusze CRUD (shows, dogs, owners, registrations, evaluations) – testy integracyjne + rozszerzenie e2e; a11y podstawowe.
   - ✅ **Dogs**: `AddDogForm.test.tsx` (13 testów, wszystkie przechodzą)
-  - ✅ **Dogs**: `DogsTable.test.tsx` (testy renderowania i interakcji)
-  - 🔄 **Shows**: `ShowCreator.test.tsx`, `ShowDetailsView.test.tsx` (planowane)
+  - ✅ **Dogs**: `DogsTable.test.tsx` (20 testów, wszystkie przechodzą)
+  - ✅ **Shows**: `ShowCreator.test.tsx` (10 testów, wszystkie przechodzą), `ShowDetailsView.test.tsx` (5 testów, wszystkie przechodzą)
   - 🔄 **Owners**: komponenty właścicieli (planowane)
 - **Faza 3**: statystyki, edge-cases błędów, wydajność kluczowych widoków, domknięcie pokrycia.
 - **Kontynuacja**: regresja przy każdym PR (CI), smoke e2e nocne, pełny zestaw przed releasem.
@@ -111,13 +111,15 @@ Zasady dla testów jednostkowych (wyciąg):
 #### Postęp implementacji testów:
 - ✅ **Komponenty autentykacji**: `LoginForm.test.tsx`, `RegisterForm.test.tsx` (29 testów)
 - ✅ **Serwisy**: `authService.test.ts`, `dogService.test.ts` (17 testów)
-- ✅ **Komponenty domenowe**: `AddDogForm.test.tsx` (13 testów, pokrycie 95.38%), `DogsTable.test.tsx`
-- 🔄 **Planowane**: komponenty shows, owners, dashboard
+- ✅ **Komponenty domenowe**: `AddDogForm.test.tsx` (13 testów, pokrycie 95.38%), `DogsTable.test.tsx` (20 testów)
+- ✅ **Komponenty shows**: `ShowCreator.test.tsx` (10 testów), `ShowDetailsView.test.tsx` (5 testów)
+- 🔄 **Planowane**: komponenty owners, dashboard
 
-#### Aktualne pokrycie testami (po implementacji AddDogForm):
+#### Aktualne pokrycie testami (po implementacji AddDogForm i Shows):
 - **Ogólne pokrycie**: 3.29% (linie), 30.47% (gałęzie), 16.47% (funkcje)
 - **Komponenty dogs**: 64.91% (linie), 65.55% (gałęzie), 59.25% (funkcje)
   - `AddDogForm.tsx`: **95.38%** (linie), 68.6% (gałęzie), 69.56% (funkcje)
+- **Komponenty shows**: `ShowCreator.tsx` (pokrycie testami), `ShowDetailsView.tsx` (pokrycie testami)
 - **Serwisy**: 100% (wszystkie metody i przypadki brzegowe)
 - **Komponenty auth**: 60.19% (linie)
 
@@ -131,3 +133,26 @@ Zasady dla testów jednostkowych (wyciąg):
 
 - Przegląd co sprint/release; aktualizacja scenariuszy wraz ze zmianami PRD (`.ai/prd-hov.md`) i specyfikacji auth (`.ai/auth-spec.md`).
 - Dodawanie testów przy każdej nowej funkcjonalności, w szczególności w obszarach wysokiego ryzyka (auth, zapisy, agregacje statystyczne).
+
+### 11. Implementacja testów dla Shows
+
+#### ShowCreator.test.tsx - 10 testów, wszystkie przechodzą
+- **Renderowanie**: podstawowe elementy formularza, etykiety pól
+- **Walidacja**: wymagane pola, data w przyszłości
+- **Interakcje**: wypełnianie pól, czyszczenie błędów
+- **Wysyłanie formularza**: sukces, obsługa błędów
+- **Stany komponentu**: stan ładowania podczas wysyłania
+- **Nawigacja**: przekierowanie po anulowaniu
+
+#### ShowDetailsView.test.tsx - 5 testów, wszystkie przechodzą
+- **Renderowanie**: podstawowe elementy widoku, stan ładowania, błąd, pusty stan
+- **Inicjalizacja**: ładowanie danych wystawy przy montowaniu
+
+#### Dodane data-testid dla Shows:
+- **ShowCreator**: `show-creator-form`, `show-name-input`, `show-date-input`, `show-location-input`, `show-judge-input`, `show-description-input`, `submit-button`, `cancel-button`, komunikaty błędów i sukcesu
+- **ShowDetailsView**: `show-details-view`
+
+#### Następne kroki dla Shows:
+- Rozszerzenie testów o więcej scenariuszy (edge cases, błędy API)
+- Testy integracyjne z API endpoints
+- Testy a11y dla formularzy i widoków
